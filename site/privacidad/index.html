@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es-CO">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Aviso de privacidad · Angelo Studio</title>
+    <meta name="description" content="Cómo trata Angelo Studio los datos personales de los pedidos de la pre-venta del tote (Ley 1581 de 2012)." />
+    <meta name="theme-color" content="#F3EFE7" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@600&family=Geist+Mono:wght@400&display=swap" />
+    <link rel="stylesheet" href="/src/styles/index.css" />
+    <style>
+      .legal-head {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        padding-top: var(--safe-top);
+        background: var(--paper);
+        border-bottom: 1px solid var(--rule);
+      }
+      .legal-head .wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: var(--header-h);
+      }
+      .legal-head a {
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+      }
+      .legal-head .site-header__word { font-size: 1.25rem; }
+      .legal { padding-block: var(--s-8) var(--s-9); }
+      .legal h1 {
+        margin-top: var(--s-6);
+        font-size: var(--t-h2);
+        font-weight: 700;
+        line-height: 0.96;
+        max-width: 11ch;
+      }
+      .legal .lede { margin-top: var(--s-5); max-width: 38ch; color: var(--mute-ink); }
+      .legal section {
+        display: grid;
+        gap: var(--s-3);
+        margin-top: var(--s-7);
+        padding-top: var(--s-4);
+        border-top: 1px solid var(--rule);
+        max-width: 62ch;
+      }
+      .legal h2 { font-size: var(--t-h3); font-weight: 700; line-height: 1.05; }
+      .legal ul { display: grid; gap: var(--s-2); padding-left: 1.1em; list-style: square; }
+      .legal .updated { margin-top: var(--s-8); color: var(--mute-ink); }
+      @media (min-width: 1024px) {
+        .legal section { grid-template-columns: 16rem minmax(0, 1fr); column-gap: var(--s-7); max-width: none; }
+        .legal section > :not(h2) { grid-column: 2; }
+        .legal section > h2 { grid-row: 1 / span 9; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="legal-head">
+      <div class="wrap">
+        <a href="/"><span class="site-header__word">ANGELO STUDIO</span></a>
+        <a class="mono" href="/">Volver al tote</a>
+      </div>
+    </header>
+    <main class="wrap legal">
+      <p class="label">Ley 1581 de 2012</p>
+      <h1>Aviso de privacidad</h1>
+      <p class="lede">Lo que hacemos con tus datos cuando haces un pedido del tote por WhatsApp. Es corto, como debe ser.</p>
+
+      <section>
+        <h2>Quién es responsable</h2>
+        <p>Angelo Studio, estudio creativo y revista editorial con sede en El Retiro, Antioquia, Colombia, es el responsable del tratamiento de tus datos personales.</p>
+      </section>
+
+      <section>
+        <h2>Qué datos recogemos</h2>
+        <ul>
+          <li>Tu nombre.</li>
+          <li>Tu número de WhatsApp.</li>
+          <li>Los mensajes que nos envías sobre tu pedido.</li>
+          <li>El pantallazo de tu pago. De él guardamos solo los datos del comprobante (valor, fecha, referencia) y una huella digital de la imagen; la imagen no se conserva.</li>
+          <li>Tu dirección, solo si eliges envío.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Para qué los usamos</h2>
+        <p>Únicamente para procesar tu pedido: confirmar el pago, apartar tu tote y tu copia de UNBOUND, y coordinar la entrega o la recogida. No los vendemos, no los compartimos con terceros para publicidad y no te escribiremos por otros motivos.</p>
+        <p>Para leer los comprobantes de pago usamos un servicio de inteligencia artificial que procesa la imagen por nosotros. Una persona del equipo verifica cada pago antes de confirmar un pedido.</p>
+      </section>
+
+      <section>
+        <h2>Cuánto tiempo los guardamos</h2>
+        <p>Borramos tus datos 60 días después de la entrega de tu pedido. Si el pedido se cancela o no se paga, los borramos 60 días después de esa fecha.</p>
+      </section>
+
+      <section>
+        <h2>Tus derechos</h2>
+        <p>Puedes conocer, actualizar, rectificar y pedir que borremos tus datos en cualquier momento, y revocar la autorización que nos diste.</p>
+        <p>Para hacerlo, escríbenos por WhatsApp al mismo número donde hiciste tu pedido con el mensaje <strong>«Borrar mis datos»</strong>. Una persona del equipo te responde y te confirma cuando estén borrados.</p>
+      </section>
+
+      <section>
+        <h2>Autorización</h2>
+        <p>Al enviarnos tu pedido por WhatsApp autorizas el tratamiento de tus datos según este aviso.</p>
+      </section>
+
+      <p class="mono updated">Última actualización · 20.11.2026</p>
+    </main>
+    <footer class="site-footer">
+      <div class="wrap site-footer__inner">
+        <p class="mono site-footer__copy">© 2026 Angelo Studio</p>
+      </div>
+    </footer>
+  </body>
+</html>

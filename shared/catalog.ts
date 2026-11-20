@@ -1,0 +1,78 @@
+/**
+ * Single source of truth for everything that can change and is not secret.
+ * Imported by both the site (/site) and the WhatsApp bot (/bot), so prices,
+ * dates and limits can never disagree between them.
+ *
+ * NEVER put secrets here: this repo is public. Bank/Nequi details, API keys
+ * and the admin phone number live in Cloudflare Worker secrets.
+ */
+
+export type OptionId = "bundle" | "toteOnly";
+
+export interface AddOn {
+  id: string;
+  label: string;
+  price: number; // COP
+}
+
+export const CATALOG = {
+  presaleOpens: "2026-11-27T00:00:00-05:00",
+  presaleCloses: "2026-12-02T23:59:59-05:00",
+  magazineLaunch: "2026-12-04T00:00:00-05:00", // the "fecha de lanzamiento" the bot sends
+  options: {
+    bundle: { label: "Tote + UNBOUND reservado", price: 55000 }, // COP, placeholder
+    toteOnly: { label: "Solo tote", price: 45000 }, // COP, placeholder
+  } as Record<OptionId, { label: string; price: number }>,
+  addOns: [
+    // placeholders until Angelo confirms the real add-ons, e.g.
+    // { id: "extra-unbound", label: "Copia adicional de UNBOUND", price: 0 },
+  ] as AddOn[],
+  shipping: { enabled: true, label: "Envío", price: 0, area: "" }, // placeholder
+  pickup: { place: "", hours: "" }, // placeholder
+  maxQtyPerOrder: 3,
+  stockTotal: 75,
+  botNumber: "57XXXXXXXXXX", // the bot's WhatsApp number, placeholder
+  instagram: "angelostudio_official",
+  studioSite: "https://angelostudio.art",
+  /** Public URL of the bot Worker, used by the site for GET /stock. Empty = hide the counter. */
+  botBaseUrl: "",
+  ADOBE_FONTS_KIT_ID: "dzr8yxn",
+};
+
+export const TIMEZONE = "America/Bogota";
+
+/** "$45.000" — Colombian pesos, dot as thousands separator, no decimals. */
+export function formatCOP(value: number): string {
+  const n = Math.round(value);
+  const sign = n < 0 ? "-" : "";
+  const digits = Math.abs(n)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `${sign}$${digits}`;
+}
+
+export type PresalePhase = "before" | "open" | "closed";
+
+export function presalePhase(now: Date = new Date()): PresalePhase {
+  const t = now.getTime();
+  if (t < Date.parse(CATALOG.presaleOpens)) return "before";
+  if (t <= Date.parse(CATALOG.presaleCloses)) return "open";
+  return "closed";
+}
+
+/** Lowest option price, for "DESDE $45.000". */
+export function lowestPrice(): number {
+  return Math.min(...Object.values(CATALOG.options).map((o) => o.price));
+}
+
+/** "27.11" in Bogotá time. */
+export function shortDate(iso: string): string {
+  const parts = new Intl.DateTimeFormat("es-CO", {
+    timeZone: TIMEZONE,
+    day: "2-digit",
+    month: "2-digit",
+  }).formatToParts(new Date(iso));
+  const d = parts.find((p) => p.type === "day")!.value;
+  const m = parts.find((p) => p.type === "month")!.value;
+  return `${d}.${m}`;
+}

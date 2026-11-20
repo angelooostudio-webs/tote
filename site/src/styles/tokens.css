@@ -1,0 +1,68 @@
+/* ------------------------------------------------------------------
+   Fonts
+   Spalla comes from the Adobe Fonts kit (id in shared/catalog.ts) and is
+   registered as "spalla". Until it arrives we show "Spalla Fallback": a
+   local serif scaled to Spalla's measured metrics (upm 1000, asc 875,
+   desc 213, cap 700, x 500), so the line boxes do not jump on swap.
+   ------------------------------------------------------------------ */
+@font-face {
+  font-family: "Spalla Fallback";
+  src: local("Georgia"), local("Noto Serif"), local("Times New Roman"), local("DejaVu Serif");
+  size-adjust: 94%;
+  ascent-override: 93%;
+  descent-override: 22.7%;
+  line-gap-override: 0%;
+}
+
+:root {
+  /* palette */
+  --paper: #f3efe7;
+  --canvas: #d9ccb3;
+  --canvas-deep: #cbbd9f;
+  --ink: #111112;
+  --sky: #d6eeff;
+  --mute: #8a877f;
+  --mute-ink: #6b685f; /* AA on paper for small mono text */
+  --rule: rgba(17, 17, 18, 0.14);
+
+  /* type */
+  --f-display: "spalla", "Spalla Fallback", Georgia, serif;
+  --f-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --f-dot: "Doto", "Geist Mono", ui-monospace, monospace;
+
+  /* type scale — body never below 17px.
+     Spalla is caps-only (lowercase = small caps), so running text is set
+     larger and slightly tracked to stay readable on a phone. */
+  --t-body: 1.25rem; /* 20px */
+  --t-body-lh: 1.4;
+  --t-body-track: 0.02em;
+  --t-small: 1.125rem; /* 18px */
+  --t-mono: 0.75rem; /* 12px */
+  --t-mono-sm: 0.6875rem; /* 11px */
+  --t-h3: clamp(1.625rem, 1.2rem + 1.6vw, 2.25rem);
+  --t-h2: clamp(2.75rem, 1.6rem + 5.2vw, 6rem);
+  --t-display: clamp(3.25rem, 1.5rem + 8vw, 9rem);
+
+  /* space (4px base) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 72px;
+  --s-9: 112px;
+  --s-10: 160px;
+
+  --gutter: clamp(20px, 5vw, 56px);
+  --max: 1280px;
+  --header-h: 60px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* expo out */
+  --ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}

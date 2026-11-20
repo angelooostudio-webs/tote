@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es-CO">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Your favorite's favorite · Angelo Studio</title>
+    <meta name="description" content="Pre-venta del tote de Angelo Studio: lona natural, impreso en El Retiro. Con o sin tu copia reservada de UNBOUND. Solo {{stockTotal}} unidades, del {{opensShort}} al {{closesShort}}." />
+    <meta name="theme-color" content="#F3EFE7" />
+    <link rel="canonical" href="https://tote.angelostudio.art/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CO" />
+    <meta property="og:site_name" content="Angelo Studio" />
+    <meta property="og:title" content="Your favorite's favorite · Angelo Studio" />
+    <meta property="og:description" content="El tote de Angelo Studio. Pre-venta del {{opensShort}} al {{closesShort}}, solo {{stockTotal}} unidades." />
+    <meta property="og:url" content="https://tote.angelostudio.art/" />
+    <meta property="og:image" content="https://tote.angelostudio.art/assets/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Your favorite's favorite · Angelo Studio" />
+    <meta name="twitter:description" content="El tote de Angelo Studio. Pre-venta del {{opensShort}} al {{closesShort}}." />
+    <meta name="twitter:image" content="https://tote.angelostudio.art/assets/og.jpg" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@600;800&family=Geist+Mono:wght@400;500&display=swap" />
+
+    <link rel="preload" as="image" href="/assets/hero-poster.jpg" fetchpriority="high" />
+    <link rel="stylesheet" href="/src/styles/index.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contigo">Saltar al pedido</a>
+
+    <!-- Header: hidden while the hero plays; appears once the hero has left the screen. -->
+    <header class="site-header" data-header>
+      <div class="site-header__inner">
+        <a class="site-header__mark" href="#top" aria-label="Angelo Studio, volver arriba">
+          <span class="site-header__word" data-split>ANGELO STUDIO</span>
+        </a>
+        <span class="pill mono" data-presale-pill>Pre-venta {{opensShort}}</span>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- 01 · Hero: the turning tote -->
+      <section class="hero" id="hero" aria-labelledby="hero-title" data-hero>
+        <div class="hero__pin" data-hero-pin>
+          <p class="label hero__label">01 / El tote</p>
+          <h1 id="hero-title" class="visually-hidden">Tote Angelo Studio: Your favorite's favorite</h1>
+          <div class="hero__stage" data-hero-stage>
+            <img
+              class="hero__poster"
+              data-hero-poster
+              src="/assets/hero-poster.jpg"
+              width="1200"
+              height="1500"
+              alt="Tote de lona natural con la impresión «Your favorite's favorite · Angelo Studio»"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </div>
+          <p class="hero__slogan" data-hero-slogan aria-hidden="true">Your favorite's favorite.</p>
+          <p class="hero__hint mono" data-hero-hint aria-hidden="true">
+            <span class="hero__hint-line"></span>Desliza
+          </p>
+        </div>
+      </section>
+
+      <!-- 02 · Contigo -->
+      <section class="contigo" id="contigo" aria-labelledby="contigo-title">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="label">02 / Contigo</p>
+            <p class="label contigo__count" data-stack-count aria-hidden="true">1 / 4</p>
+          </div>
+
+          <button class="stack" type="button" data-stack aria-label="Ver la siguiente foto">
+            <!-- cards rendered from the image manifest in src/sections/contigo.ts -->
+          </button>
+
+          <h2 id="contigo-title" class="contigo__title">Your favorite's favorite, wherever you go.</h2>
+
+          <div class="order" data-order>
+            <button class="order-btn" type="button" data-order-btn>
+              <span class="order-btn__label" data-order-label>Ordenar</span>
+              <svg class="order-btn__arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 4.5 16.5 10 11 15.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="order-btn__price" data-order-price>Desde {{fromPrice}}</span>
+            </button>
+            <div class="order__meta">
+              <span class="dot order__stock" data-stock hidden></span>
+              <span class="dot order__countdown" data-countdown hidden></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 · ¿Qué llevan? -->
+      <section class="llevan" id="llevan" aria-labelledby="llevan-title">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="label">03 / ¿Qué llevan?</p>
+            <p class="dot llevan__counter" data-llevan-counter aria-hidden="true">01/06</p>
+          </div>
+          <h2 id="llevan-title" class="llevan__title">¿Qué llevan en su tote?</h2>
+          <p class="llevan__intro">El equipo detrás de Angelo vació sus bolsas sobre la mesa.</p>
+        </div>
+
+        <div class="llevan__track" data-llevan-track tabindex="0" aria-label="Integrantes del equipo y lo que llevan">
+          <!-- cards rendered from src/data/totes.json -->
+        </div>
+
+        <div class="wrap">
+          <div class="order" data-order>
+            <button class="order-btn" type="button" data-order-btn>
+              <span class="order-btn__label" data-order-label>Ordenar</span>
+              <svg class="order-btn__arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 4.5 16.5 10 11 15.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="order-btn__price" data-order-price>Desde {{fromPrice}}</span>
+            </button>
+            <div class="order__meta">
+              <span class="dot order__stock" data-stock hidden></span>
+              <span class="dot order__countdown" data-countdown hidden></span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap site-footer__inner">
+        <p class="site-footer__mark">ANGELO STUDIO</p>
+        <p class="site-footer__place">Angelo Studio · El Retiro, Antioquia</p>
+        <p class="dot site-footer__dates" aria-label="Pre-venta del {{opensShort}} al {{closesShort}}">{{opensShort}} → {{closesShort}}</p>
+        <ul class="site-footer__links mono">
+          <li><a href="https://instagram.com/{{instagram}}" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="{{studioSite}}" target="_blank" rel="noopener">angelostudio.art</a></li>
+          <li><a href="/privacidad/">Aviso de privacidad</a></li>
+        </ul>
+        <p class="mono site-footer__copy">© 2026 Angelo Studio</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+.env
+.dev.vars
+.wrangler/
+site/public/assets/_r/
+site/src/data/images.json
+playwright-report/
+test-results/
+.shots/
+.playwright-mcp/

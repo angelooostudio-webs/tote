@@ -1,0 +1,78 @@
+{
+  "_comment": "Edit freely. photo = file in public/assets/totes/ (1:1). items[].x / items[].y = hotspot position on the photo, 0–1 from top-left (desktop hover highlight). instagram = handle without @.",
+  "people": [
+    {
+      "slug": "miguel",
+      "name": "Miguel (Angelo) Gibbs Villegas",
+      "role": "Editor en jefe & Dirección artística",
+      "instagram": "",
+      "photo": "totes/miguel.jpg",
+      "items": [
+        { "label": "Cámara Nikon Z6 III", "x": 0.32, "y": 0.38 },
+        { "label": "Libreta de bocetos", "x": 0.66, "y": 0.30 },
+        { "label": "Prueba de impresión UNBOUND", "x": 0.55, "y": 0.68 },
+        { "label": "Audífonos", "x": 0.22, "y": 0.74 }
+      ]
+    },
+    {
+      "slug": "guadalupe",
+      "name": "Guadalupe Campuzano Toro",
+      "role": "Contenido literario",
+      "instagram": "",
+      "photo": "totes/guadalupe.jpg",
+      "items": [
+        { "label": "Objeto 01", "x": 0.3, "y": 0.35 },
+        { "label": "Objeto 02", "x": 0.65, "y": 0.4 },
+        { "label": "Objeto 03", "x": 0.5, "y": 0.7 }
+      ]
+    },
+    {
+      "slug": "samantha",
+      "name": "Samantha Zuluaga Cuartas",
+      "role": "Producción editorial",
+      "instagram": "",
+      "photo": "totes/samantha.jpg",
+      "items": [
+        { "label": "Objeto 01", "x": 0.3, "y": 0.35 },
+        { "label": "Objeto 02", "x": 0.65, "y": 0.4 },
+        { "label": "Objeto 03", "x": 0.5, "y": 0.7 }
+      ]
+    },
+    {
+      "slug": "libni",
+      "name": "Libni Ospina",
+      "role": "Fotografía",
+      "instagram": "",
+      "photo": "totes/libni.jpg",
+      "items": [
+        { "label": "Objeto 01", "x": 0.3, "y": 0.35 },
+        { "label": "Objeto 02", "x": 0.65, "y": 0.4 },
+        { "label": "Objeto 03", "x": 0.5, "y": 0.7 }
+      ]
+    },
+    {
+      "slug": "jhohan",
+      "name": "Jhohan González",
+      "role": "Dirección audiovisual",
+      "instagram": "",
+      "photo": "totes/jhohan.jpg",
+      "items": [
+        { "label": "Objeto 01", "x": 0.3, "y": 0.35 },
+        { "label": "Objeto 02", "x": 0.65, "y": 0.4 },
+        { "label": "Objeto 03", "x": 0.5, "y": 0.7 }
+      ]
+    },
+    {
+      "slug": "martin",
+      "name": "Martín Botero Alvarez",
+      "role": "Audio y composición",
+      "instagram": "",
+      "photo": "totes/martin.jpg",
+      "items": [
+        { "label": "Objeto 01", "x": 0.3, "y": 0.35 },
+        { "label": "Objeto 02", "x": 0.65, "y": 0.4 },
+        { "label": "Objeto 03", "x": 0.5, "y": 0.7 }
+      ]
+    }
+  ]
+}
