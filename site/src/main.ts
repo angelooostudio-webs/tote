@@ -1,4 +1,5 @@
 import { CATALOG, presalePhase, shortDate } from "../../shared/catalog";
+import { initScroll } from "./lib/scroll";
 import { initContigo } from "./sections/contigo";
 import { initLlevan } from "./sections/llevan";
 
@@ -14,8 +15,17 @@ if (pill) {
     phase === "before" ? `Pre-venta ${shortDate(CATALOG.presaleOpens)}` : phase === "open" ? "Pre-venta abierta" : "Pre-venta cerrada";
 }
 
+initScroll(reduced);
 initContigo();
 initLlevan();
+
+// three.js is loaded on demand so it never blocks the first paint (the poster covers it)
+if (!reduced) {
+  import("./hero").then(({ initHero }) => {
+    const h = initHero();
+    if (import.meta.env.DEV) (window as unknown as { __hero: unknown }).__hero = h;
+  });
+}
 
 // ---- header: hidden while the hero is on screen (phase 3 replaces this with the GSAP entrance) ----
 const header = document.querySelector<HTMLElement>("[data-header]");

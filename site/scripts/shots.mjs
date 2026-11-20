@@ -2,11 +2,12 @@
 //   node scripts/shots.mjs [url] [outDir] [--full]
 // Default: http://localhost:5173/ -> ../.shots/
 import { chromium } from "playwright";
+import { fileURLToPath } from "node:url";
 import { mkdirSync } from "node:fs";
 
 const args = process.argv.slice(2).filter((a) => !a.startsWith("--"));
 const url = args[0] ?? "http://localhost:5173/";
-const out = args[1] ?? new URL("../../.shots/", import.meta.url).pathname;
+const out = args[1] ?? fileURLToPath(new URL("../../.shots/", import.meta.url));
 const full = process.argv.includes("--full");
 const reduced = process.argv.includes("--reduced");
 mkdirSync(out, { recursive: true });

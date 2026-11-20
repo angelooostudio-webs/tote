@@ -85,7 +85,8 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   justify-items: center;
-  padding: calc(var(--safe-top) + var(--s-6)) var(--gutter) calc(var(--safe-bottom) + var(--s-5));
+  /* no side padding: the 3D stage is full-bleed so the floor shadow is never clipped */
+  padding: calc(var(--safe-top) + var(--s-6)) 0 calc(var(--safe-bottom) + var(--s-5));
   overflow: hidden;
 }
 .hero__label {
