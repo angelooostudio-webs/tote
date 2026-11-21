@@ -6,6 +6,7 @@
  * The bot never confirms an order by itself. The image is never stored: only its
  * fingerprint and the fields read from it.
  */
+import { push } from "./notify.ts";
 import { CATALOG, formatCOP, siteLabel } from "../../shared/catalog.ts";
 import { DELIVERY_LABEL } from "../../shared/order.ts";
 import type { Ctx } from "./env.ts";
@@ -37,6 +38,7 @@ function problemText(p: Problem, x: Extracted | null, o: OrderRow, holder: strin
 /** The review request Angelo gets: summary, what was read, the screenshot, and two buttons. */
 export async function sendReview(ctx: Ctx, o: OrderRow, x: Extracted | null, problems: Problem[] | null, image?: { bytes: Uint8Array; mime: string }) {
   const admin = ctx.env.ADMIN_NUMBER;
+  await push(ctx, `Pago por revisar ${o.code}`, `${o.name} · ${formatCOP(o.total)} · ${problems?.length ? "la verificación automática falla" : "la verificación automática pasa"}. Responde OK o NO en WhatsApp.`, { priority: 4, tags: ["moneybag"] });
   const yesNo = (ok: boolean) => (ok ? "sí" : "NO");
   const read = x
     ? [

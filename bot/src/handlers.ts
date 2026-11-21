@@ -2,7 +2,7 @@
  * Conversation logic. Every customer message lands in `handleInbound`.
  * Orders are handled entirely by code; Claude only classifies free-form text.
  */
-import { formatCOP, presalePhase } from "../../shared/catalog.ts";
+import { CATALOG, formatCOP, presalePhase } from "../../shared/catalog.ts";
 import { orderTotal, type Order } from "../../shared/order.ts";
 import type { Ctx } from "./env.ts";
 import {
@@ -19,6 +19,7 @@ import {
 import { parseOrderMessage } from "./parse.ts";
 import { T, paymentInstructions } from "./texts.ts";
 import type { InboundMessage } from "./whatsapp.ts";
+import { push } from "./notify.ts";
 import { handleAdmin, isAdminCommand } from "./admin.ts";
 import { handleImage } from "./payments.ts";
 
@@ -38,6 +39,7 @@ export const paymentDetails = (ctx: Ctx) => ({
 export async function forwardToAdmin(ctx: Ctx, waId: string, reason: string, name?: string) {
   const convo = await recentConversation(ctx.env.DB, waId, 8);
   const lines = convo.map((m) => `${m.direction === "in" ? "Cliente" : "Bot"}: ${(m.body ?? `[${m.kind}]`).slice(0, 300)}`);
+  await push(ctx, "Un cliente necesita respuesta", reason, { priority: 4, tags: ["speech_balloon"] });
   const body = [`Para revisar: ${reason}`, `De: +${waId}${name ? ` (${name})` : ""}`, "", ...lines].join("\n").slice(0, 4000);
   try {
     await ctx.wa.sendText(ctx.env.ADMIN_NUMBER, body);
@@ -111,7 +113,9 @@ export async function handleOrder(ctx: Ctx, waId: string, order: Order, statedTo
     const left = await remainingStock(db, now);
     return say(ctx, waId, left <= 0 ? T.soldOut : T.notEnoughStock(left));
   }
-  return say(ctx, waId, paymentInstructions(order, paymentDetails(ctx), first), order.code);
+  await say(ctx, waId, paymentInstructions(order, paymentDetails(ctx), first), order.code);
+  const left = await remainingStock(db, now);
+  await push(ctx, `Nuevo pedido ${order.code}`, `${order.qty} × ${CATALOG.options[order.option].label} · ${formatCOP(total)} · esperando pago · quedan ${left}`, { tags: ["shopping_bags"] });
 }
 
 async function handleFreeForm(ctx: Ctx, waId: string, text: string, profileName?: string) {

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { CATALOG, formatCOP } from "../../shared/catalog.ts";
 import { CODE_ALPHABET, buildOrderMessage, type Order } from "../../shared/order.ts";
 import worker, { processWebhook, setCtxFactory } from "../src/index.ts";
@@ -202,5 +202,24 @@ describe("HTTP routes", () => {
     expect(html).not.toContain("<b>Vale</b>");
     const pagos = await (await worker.fetch(new Request("https://bot/panel?key=k123&v=pagos"), env, exec().e)).text();
     expect(pagos).toContain("confirmado");
+  });
+
+  it("pushes a phone notification for each new order, without the customer's number", async () => {
+    const calls: any[] = [];
+    const spy = vi.spyOn(globalThis, "fetch").mockImplementation(async (_u, init) => {
+      calls.push(JSON.parse(String(init?.body)));
+      return new Response("{}");
+    });
+    try {
+      const { ctx } = testCtx();
+      const c2 = { ...ctx, env: { ...ctx.env, NTFY_TOPIC: "t-123" } };
+      await processWebhook(c2, inbound(CUSTOMER, { text: buildOrderMessage(order()) }));
+      expect(calls).toHaveLength(1);
+      expect(calls[0]).toMatchObject({ topic: "t-123", title: "Nuevo pedido ANG-7F3K" });
+      expect(calls[0].message).toContain("$55.000");
+      expect(JSON.stringify(calls[0])).not.toContain(CUSTOMER);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });

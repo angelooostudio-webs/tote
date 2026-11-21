@@ -18,6 +18,8 @@ export interface Env {
   ADMIN_TEST_MODE?: string;
   /** key for the Google Sheet CSV feeds (/sheet/*.csv) */
   SHEET_KEY?: string;
+  /** ntfy.sh topic for phone push notifications (optional) */
+  NTFY_TOPIC?: string;
   PAYMENT_NEQUI: string;
   PAYMENT_BANCOLOMBIA: string;
   PAYMENT_HOLDER_NAME: string;
