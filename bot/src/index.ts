@@ -34,6 +34,8 @@ const cors = (env: Env) => ({
 
 /** Processes a verified webhook body. Exported so the simulator can drive it. */
 export async function processWebhook(ctx: Ctx, payload: WebhookPayload) {
+  const inbound = inboundMessages(payload);
+  if (inbound.length) console.log(`webhook: ${inbound.length} inbound message(s)`);
   for (const { msg, profileName } of inboundMessages(payload)) {
     try {
       await handleInbound(ctx, msg, profileName);
@@ -55,6 +57,7 @@ export default {
     if (url.pathname === "/webhook" && req.method === "POST") {
       const raw = await req.arrayBuffer();
       if (!(await verifySignature(raw, req.headers.get("X-Hub-Signature-256"), env.META_APP_SECRET))) {
+        console.warn("webhook rejected: signature does not match META_APP_SECRET");
         return new Response("bad signature", { status: 401 });
       }
       let payload: WebhookPayload;
