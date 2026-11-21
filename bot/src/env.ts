@@ -16,6 +16,8 @@ export interface Env {
   ADMIN_NUMBER: string;
   /** "1" = the admin number may also order and pay like a customer, even before opening (for testing) */
   ADMIN_TEST_MODE?: string;
+  /** key for the Google Sheet CSV feeds (/sheet/*.csv) */
+  SHEET_KEY?: string;
   PAYMENT_NEQUI: string;
   PAYMENT_BANCOLOMBIA: string;
   PAYMENT_HOLDER_NAME: string;

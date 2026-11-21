@@ -22,7 +22,7 @@ const WINDOW_MS = 24 * 3600_000;
 const launchDate = () =>
   new Date(CATALOG.magazineLaunch).toLocaleDateString("es-CO", { timeZone: "America/Bogota", day: "numeric", month: "long", year: "numeric" });
 
-const STATUS_ES: Record<string, string> = {
+export const STATUS_ES: Record<string, string> = {
   AWAITING_PAYMENT: "esperando pago",
   PENDING_REVIEW: "por revisar",
   NEEDS_HUMAN: "necesita revisión manual",

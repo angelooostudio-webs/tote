@@ -170,4 +170,22 @@ describe("HTTP routes", () => {
     expect(res.headers.get("Cache-Control")).toContain("max-age=60");
     expect(await res.json()).toEqual({ remaining: CATALOG.stockTotal, total: CATALOG.stockTotal });
   });
+
+  it("serves the Google Sheet feeds only with the key, pickup list = confirmed orders with short phone", async () => {
+    const { ctx } = testCtx();
+    const env = { ...ctx.env, SHEET_KEY: "k123" };
+    setCtxFactory(() => ({ ...ctx, env }));
+    await processWebhook(ctx, inbound(CUSTOMER, { text: buildOrderMessage(order()) }));
+    await processWebhook(ctx, inbound(CUSTOMER, { text: buildOrderMessage(order({ code: "ANG-9X2M", name: "=HYPERLINK(1)" })) }));
+    await processWebhook(ctx, inbound(ADMIN, { text: "OK ANG-7F3K" }));
+    expect((await worker.fetch(new Request("https://bot/sheet/entrega.csv"), env, exec().e)).status).toBe(403);
+    expect((await worker.fetch(new Request("https://bot/sheet/pagos.csv?key=nope"), env, exec().e)).status).toBe(403);
+    const pickup = await (await worker.fetch(new Request("https://bot/sheet/entrega.csv?key=k123"), env, exec().e)).text();
+    expect(pickup.trim().split("\r\n")).toHaveLength(2); // header + the one confirmed order
+    expect(pickup).toContain('"ANG-7F3K","Valentina","…2233"');
+    expect(pickup).not.toContain(CUSTOMER);
+    const pagos = await (await worker.fetch(new Request("https://bot/sheet/pagos.csv?key=k123"), env, exec().e)).text();
+    expect(pagos).toContain('"ANG-7F3K","confirmado"');
+    expect(pagos).toContain(`"'=HYPERLINK(1)"`); // formulas defused
+  });
 });

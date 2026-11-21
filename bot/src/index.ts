@@ -9,6 +9,7 @@ import { ClaudeAssistant, KeywordAssistant } from "./assistant.ts";
 import { remainingStock } from "./db.ts";
 import type { Ctx, Env } from "./env.ts";
 import { handleInbound } from "./handlers.ts";
+import { paymentsCsv, pickupCsv } from "./sheet.ts";
 import { runExpiry } from "./expiry.ts";
 import { CloudApiMessenger } from "./messenger.ts";
 import { inboundMessages, verifySignature, type WebhookPayload } from "./whatsapp.ts";
@@ -71,6 +72,12 @@ export default {
       return new Response("ok", { status: 200 });
     }
 
+    // Google Sheet feeds (=IMPORTDATA). Customer data: only with the secret key.
+    if (url.pathname === "/sheet/entrega.csv" || url.pathname === "/sheet/pagos.csv") {
+      if (!env.SHEET_KEY || url.searchParams.get("key") !== env.SHEET_KEY) return new Response("forbidden", { status: 403 });
+      const body = url.pathname.endsWith("entrega.csv") ? await pickupCsv(env.DB) : await paymentsCsv(env.DB);
+      return new Response(body, { headers: { "content-type": "text/csv; charset=utf-8", "cache-control": "no-store" } });
+    }
     if (url.pathname === "/stock") {
       if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env) });
       const remaining = await remainingStock(env.DB, ctxFactory === makeCtx ? new Date() : ctxFactory(env).now());
