@@ -9,7 +9,7 @@ import { ClaudeAssistant, KeywordAssistant } from "./assistant.ts";
 import { remainingStock } from "./db.ts";
 import type { Ctx, Env } from "./env.ts";
 import { handleInbound } from "./handlers.ts";
-import { panelHtml, paymentsCsv, pickupCsv } from "./sheet.ts";
+import { panelHtml, paymentsCsv, pickupCsv, shippingCsv } from "./sheet.ts";
 import { runExpiry } from "./expiry.ts";
 import { CloudApiMessenger } from "./messenger.ts";
 import { inboundMessages, verifySignature, type WebhookPayload } from "./whatsapp.ts";
@@ -73,9 +73,10 @@ export default {
     }
 
     // Google Sheet feeds (=IMPORTDATA). Customer data: only with the secret key.
-    if (url.pathname === "/sheet/entrega.csv" || url.pathname === "/sheet/pagos.csv") {
+    if (url.pathname === "/sheet/entrega.csv" || url.pathname === "/sheet/envios.csv" || url.pathname === "/sheet/pagos.csv") {
       if (!env.SHEET_KEY || url.searchParams.get("key") !== env.SHEET_KEY) return new Response("forbidden", { status: 403 });
-      const body = url.pathname.endsWith("entrega.csv") ? await pickupCsv(env.DB) : await paymentsCsv(env.DB);
+      const p = url.pathname;
+      const body = p.endsWith("entrega.csv") ? await pickupCsv(env.DB) : p.endsWith("envios.csv") ? await shippingCsv(env.DB) : await paymentsCsv(env.DB);
       return new Response(body, { headers: { "content-type": "text/csv; charset=utf-8", "cache-control": "no-store" } });
     }
     // printable order lists for Angelo (same key as the CSV feeds)

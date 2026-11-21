@@ -351,6 +351,9 @@
 .field[aria-invalid="true"] {
   border-color: #b3342b;
 }
+.field--stack {
+  margin-top: var(--s-2);
+}
 .field__err {
   margin-top: var(--s-2);
   font-size: var(--t-small);

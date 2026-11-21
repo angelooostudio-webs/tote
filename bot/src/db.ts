@@ -26,6 +26,8 @@ export interface OrderRow {
   created_at: string;
   updated_at: string;
   confirmed_at: string | null;
+  address: string | null;
+  city: string | null;
 }
 
 export const RESERVATION_HOURS = 24;
@@ -37,6 +39,7 @@ export const rowToOrder = (r: OrderRow): Order => ({
   addOns: JSON.parse(r.add_ons || "[]"),
   delivery: r.delivery,
   name: r.name,
+  ...(r.delivery === "shipping" ? { address: r.address ?? "", city: r.city ?? "" } : {}),
 });
 
 // orders that currently hold stock
@@ -57,11 +60,11 @@ export async function createOrderIfStock(db: D1Database, o: Order, waId: string,
   const until = new Date(now.getTime() + RESERVATION_HOURS * 3600_000).toISOString();
   const res = await db
     .prepare(
-      `INSERT INTO orders (code, wa_id, name, option, qty, add_ons, delivery, total, status, reserved_until, created_at, updated_at)
-       SELECT ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 'AWAITING_PAYMENT', ?10, ?1, ?1
+      `INSERT INTO orders (code, wa_id, name, option, qty, add_ons, delivery, total, status, reserved_until, created_at, updated_at, address, city)
+       SELECT ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 'AWAITING_PAYMENT', ?10, ?1, ?1, ?12, ?13
        WHERE (SELECT COALESCE(SUM(qty), 0) FROM orders WHERE ${HOLDING}) + ?6 <= ?11`
     )
-    .bind(iso, o.code, waId, o.name, o.option, o.qty, JSON.stringify(o.addOns), o.delivery, total, until, CATALOG.stockTotal)
+    .bind(iso, o.code, waId, o.name, o.option, o.qty, JSON.stringify(o.addOns), o.delivery, total, until, CATALOG.stockTotal, o.address ?? null, o.city ?? null)
     .run();
   return (res.meta?.changes ?? 0) > 0;
 }

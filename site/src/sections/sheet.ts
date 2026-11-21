@@ -1,5 +1,5 @@
 import { CATALOG, formatCOP, shortDate, type OptionId } from "../../../shared/catalog";
-import { buildOrderMessage, cleanName, makeOrderCode, orderLines, whatsappLink, type Delivery, type Order } from "../../../shared/order";
+import { SHIPPING_NOTE, buildOrderMessage, cleanLine, cleanName, makeOrderCode, orderLines, whatsappLink, type Delivery, type Order } from "../../../shared/order";
 import { gsap, getLenis } from "../lib/scroll";
 
 /**
@@ -35,6 +35,10 @@ export function initSheet(reduced: boolean) {
   const codeEl = $("[data-sheet-code]");
   const hint = $("[data-delivery-hint]");
   const shipOpt = $("[data-shipping-opt]");
+  const shipGroup = $("[data-ship-group]");
+  const addrInput = $<HTMLInputElement>("#order-address");
+  const cityInput = $<HTMLInputElement>("#order-city");
+  const shipErr = $("[data-ship-err]");
 
   const order: Order = { code: "", option: "bundle", qty: 1, addOns: [], delivery: "pickup", name: "" };
 
@@ -64,13 +68,15 @@ export function initSheet(reduced: boolean) {
   shipOpt.hidden = !CATALOG.shipping.enabled;
   $("[data-shipping-label]").textContent = CATALOG.shipping.label;
 
-  // number the visible steps 01, 02, … (the add-ons step disappears when the list is empty)
-  [...form.querySelectorAll<HTMLElement>(".sheet__group")]
-    .filter((g) => !g.hidden)
-    .forEach((g, i) => {
-      const l = g.querySelector<HTMLElement>(".label")!;
-      l.textContent = l.textContent!.replace(/^\d+/, String(i + 1).padStart(2, "0"));
-    });
+  // number the visible steps 01, 02, … (add-ons disappear when the list is empty; the address step shows only for shipping)
+  const renumber = () =>
+    [...form.querySelectorAll<HTMLElement>(".sheet__group")]
+      .filter((g) => !g.hidden)
+      .forEach((g, i) => {
+        const l = g.querySelector<HTMLElement>(".label")!;
+        l.textContent = l.textContent!.replace(/^\d+/, String(i + 1).padStart(2, "0"));
+      });
+  renumber();
 
   // ---------- live state ----------
   const update = () => {
@@ -78,6 +84,18 @@ export function initSheet(reduced: boolean) {
     order.addOns = [...form.querySelectorAll<HTMLInputElement>('input[name="addon"]:checked')].map((i) => i.value);
     order.delivery = (form.querySelector<HTMLInputElement>('input[name="delivery"]:checked')?.value ?? "pickup") as Delivery;
     order.name = cleanName(nameInput.value);
+    const shipping = order.delivery === "shipping";
+    if (shipping) {
+      order.address = cleanLine(addrInput.value);
+      order.city = cleanLine(cityInput.value, 60);
+    } else {
+      delete order.address;
+      delete order.city;
+    }
+    if (shipGroup.hidden === shipping) {
+      shipGroup.hidden = !shipping;
+      renumber();
+    }
 
     qtyVal.textContent = String(order.qty);
     qtyBtns[0].disabled = order.qty <= 1;
@@ -101,7 +119,7 @@ export function initSheet(reduced: boolean) {
       hint.textContent = place ? `${place}${hours ? ` · ${hours}` : ""}` : "Te contamos el lugar y el horario de recogida por WhatsApp.";
     } else {
       const area = CATALOG.shipping.area ? `Envíos a ${CATALOG.shipping.area}. ` : "";
-      hint.textContent = `${area}Coordinamos la dirección por WhatsApp.`;
+      hint.textContent = `${area}${SHIPPING_NOTE}`;
     }
 
     cta.href = whatsappLink(buildOrderMessage(order));
@@ -112,6 +130,12 @@ export function initSheet(reduced: boolean) {
     if (nameInput.value.trim()) setNameError(false);
     update();
   });
+  const shipOk = () => cleanLine(addrInput.value).length >= 5 && cleanLine(cityInput.value).length >= 2;
+  for (const el of [addrInput, cityInput])
+    el.addEventListener("input", () => {
+      if (shipOk()) setShipError(false);
+      update();
+    });
   form.addEventListener("submit", (e) => e.preventDefault());
   qtyBtns.forEach((b) =>
     b.addEventListener("click", () => {
@@ -124,6 +148,11 @@ export function initSheet(reduced: boolean) {
     nameErr.hidden = !on;
     nameInput.setAttribute("aria-invalid", String(on));
   };
+  const setShipError = (on: boolean) => {
+    shipErr.hidden = !on;
+    addrInput.setAttribute("aria-invalid", String(on && cleanLine(addrInput.value).length < 5));
+    cityInput.setAttribute("aria-invalid", String(on && cleanLine(cityInput.value).length < 2));
+  };
 
   cta.addEventListener("click", (e) => {
     update();
@@ -132,6 +161,14 @@ export function initSheet(reduced: boolean) {
       setNameError(true);
       nameInput.focus();
       nameInput.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
+      return;
+    }
+    if (order.delivery === "shipping" && !shipOk()) {
+      e.preventDefault();
+      setShipError(true);
+      const first = cleanLine(addrInput.value).length < 5 ? addrInput : cityInput;
+      first.focus();
+      first.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
       return;
     }
     // the link opens WhatsApp; the next order gets a fresh code

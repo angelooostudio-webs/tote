@@ -9,6 +9,8 @@
  *   Adicionales: Ninguno
  *   Entrega: Recoger en El Retiro
  *   Nombre: Valentina
+ *   Dirección: Calle 10 # 43-12, apto 501   (shipping only)
+ *   Ciudad: Medellín                         (shipping only)
  *   Total: $55.000
  *
  * Tolerant of what people (and phones) do to text: case, accents, extra
@@ -16,7 +18,7 @@
  * every value must map to something in the catalog.
  */
 import { CATALOG, type OptionId } from "../../shared/catalog.ts";
-import { CODE_RE, DELIVERY_LABEL, cleanName, type Delivery, type Order } from "../../shared/order.ts";
+import { CODE_RE, DELIVERY_LABEL, cleanLine, cleanName, type Delivery, type Order } from "../../shared/order.ts";
 
 export type ParseResult =
   | { ok: true; order: Order; statedTotal: number | null }
@@ -40,9 +42,11 @@ const KEYS: Record<string, keyof Fields> = {
   adicionales: "addOns",
   entrega: "delivery",
   nombre: "name",
+  direccion: "address",
+  ciudad: "city",
   total: "total",
 };
-type Fields = { code: string; option: string; qty: string; addOns: string; delivery: string; name: string; total: string };
+type Fields = { code: string; option: string; qty: string; addOns: string; delivery: string; name: string; address: string; city: string; total: string };
 
 export function parseOrderMessage(text: string): ParseResult {
   const fields: Partial<Fields> = {};
@@ -86,6 +90,14 @@ export function parseOrderMessage(text: string): ParseResult {
   const name = cleanName(fields.name ?? "");
   if (!name) errors.push("name");
 
+  // shipping needs somewhere to ship to
+  const address = cleanLine(fields.address ?? "");
+  const city = cleanLine(fields.city ?? "", 60);
+  if (delivery === "shipping") {
+    if (address.length < 5) errors.push("address");
+    if (city.length < 2) errors.push("city");
+  }
+
   // the stated total is only informational: the bot always recomputes it
   const totalDigits = (fields.total ?? "").replace(/[^\d]/g, "");
   const statedTotal = totalDigits ? Number(totalDigits) : null;
@@ -94,6 +106,6 @@ export function parseOrderMessage(text: string): ParseResult {
   return {
     ok: true,
     statedTotal,
-    order: { code, option: option!, qty, addOns, delivery: delivery!, name },
+    order: { code, option: option!, qty, addOns, delivery: delivery!, name, ...(delivery === "shipping" ? { address, city } : {}) },
   };
 }

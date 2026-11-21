@@ -4,7 +4,7 @@
  * Prices, totals and payment details are always filled in by code.
  */
 import { CATALOG, formatCOP, siteLabel } from "../../shared/catalog.ts";
-import { DELIVERY_LABEL, orderLines, type Order } from "../../shared/order.ts";
+import { DELIVERY_LABEL, SHIPPING_NOTE, orderLines, type Order } from "../../shared/order.ts";
 
 export const PRIVACY_URL = `${CATALOG.siteUrl}privacidad/`;
 
@@ -16,6 +16,7 @@ export function orderSummary(o: Order): string {
   return [
     ...lines.map((l) => `- ${l.label}: ${formatCOP(l.amount)}`),
     `- Entrega: ${DELIVERY_LABEL[o.delivery]}`,
+    ...(o.delivery === "shipping" ? [`- Dirección: ${o.address ?? ""}, ${o.city ?? ""}`] : []),
     `Total: ${formatCOP(total)}`,
   ].join("\n");
 }
@@ -38,6 +39,7 @@ export function paymentInstructions(o: Order, pay: PaymentDetails, firstContact:
     "",
     orderSummary(o),
     "",
+    ...(o.delivery === "shipping" ? [SHIPPING_NOTE, ""] : []),
     "Para pagar, transfiere el valor exacto a:",
     ...accounts,
     "",
@@ -72,6 +74,8 @@ export const T = {
     addOns: "los adicionales",
     delivery: "la forma de entrega",
     name: "tu nombre",
+    address: "la dirección de envío",
+    city: "la ciudad de envío",
   } as Record<string, string>,
 
   get codeTakenByOther() {
@@ -96,7 +100,7 @@ export const T = {
     [
       "Precios de la pre-venta:",
       ...Object.values(CATALOG.options).map((o) => `- ${o.label}: ${formatCOP(o.price)}`),
-      ...(CATALOG.shipping.enabled ? [`- ${CATALOG.shipping.label}: ${formatCOP(CATALOG.shipping.price)}`] : []),
+      ...(CATALOG.shipping.enabled ? [`- ${CATALOG.shipping.label}: ${CATALOG.shipping.price > 0 ? formatCOP(CATALOG.shipping.price) : `por ${CATALOG.shipping.carrier}, lo pagas al recibir (contra entrega)`}`] : []),
       "",
       `Haz tu pedido en ${siteLabel()}.`,
     ].join("\n"),

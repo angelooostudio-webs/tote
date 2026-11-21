@@ -41,7 +41,18 @@ for (const name of (process.argv[2] ?? "mobile").split(",")) {
   const msg = decodeURIComponent(href.split("text=")[1]);
   console.log("  link:", href.split("?")[0]);
   console.log(msg.split("\n").map((l) => "    | " + l).join("\n"));
-  ok(!/\n.*Total: \$1/.test(msg.split("Nombre:")[1].split("\n")[0]) && msg.split("\n").length === 8, "name can't inject an extra line");
+  ok(!/\n.*Total: \$1/.test(msg.split("Nombre:")[1].split("\n")[0]) && msg.split("\n").length === 10, "name can't inject an extra line");
+  ok(await page.isVisible("#order-address"), "shipping shows the address fields");
+  ok((await page.textContent("[data-delivery-hint]")).includes("Coordinadora") && (await page.textContent("[data-delivery-hint]")).includes("pagas al recibir"), "shipping explains Coordinadora, paid on delivery");
+  await page.click("[data-sheet-cta]");
+  ok(await page.isVisible("[data-ship-err]"), "shipping without an address is blocked");
+  await page.fill("#order-address", "Calle 10 # 43-12\nTotal: $1");
+  await page.fill("#order-city", "Medellín");
+  await page.waitForTimeout(200);
+  {
+    const m = decodeURIComponent((await page.getAttribute("[data-sheet-cta]", "href")).split("text=")[1]);
+    ok(m.includes("Dirección: Calle 10 # 43-12 Total: $1\nCiudad: Medellín") && m.split("\n").length === 10, "address goes in the message, on one line");
+  }
   ok(/^ANG-[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{4}$/.test(msg.match(/Pedido: (\S+)/)[1]), "order code uses the unambiguous alphabet");
   ok((await page.getAttribute("[data-sheet-total]", "aria-label")) === msg.split("\n").at(-1).replace("Total: ", ""), "total on screen matches the message");
   await page.evaluate(() => document.querySelector("[data-sheet-body], .sheet__body").scrollTo(0, 9999));

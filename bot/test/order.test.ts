@@ -9,10 +9,11 @@ describe("totals (computed by code from the shared catalog)", () => {
     expect(orderTotal({ option: "bundle", qty: 1, addOns: [], delivery: "pickup" })).toBe(CATALOG.options.bundle.price);
     expect(orderTotal({ option: "toteOnly", qty: 3, addOns: [], delivery: "pickup" })).toBe(CATALOG.options.toteOnly.price * 3);
   });
-  it("adds shipping once per order", () => {
+  it("shipping is paid to the carrier on delivery: nothing added to the total", () => {
     const { lines, total } = orderLines({ option: "toteOnly", qty: 2, addOns: [], delivery: "shipping" });
-    expect(lines.at(-1)).toEqual({ label: CATALOG.shipping.label, amount: CATALOG.shipping.price });
-    expect(total).toBe(CATALOG.options.toteOnly.price * 2 + CATALOG.shipping.price);
+    expect(CATALOG.shipping.price).toBe(0);
+    expect(lines).toHaveLength(1);
+    expect(total).toBe(CATALOG.options.toteOnly.price * 2);
   });
   it("refuses anything outside the catalog", () => {
     expect(() => orderTotal({ option: "toteOnly", qty: 4, addOns: [], delivery: "pickup" })).toThrow();

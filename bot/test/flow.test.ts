@@ -222,4 +222,19 @@ describe("HTTP routes", () => {
       spy.mockRestore();
     }
   });
+
+  it("shipping orders: address stored, Coordinadora note in the payment message and the confirmation", async () => {
+    const { ctx, wa } = testCtx();
+    const o = order({ delivery: "shipping", address: "Calle 10 # 43-12, apto 501", city: "Medellín" });
+    await processWebhook(ctx, inbound(CUSTOMER, { text: buildOrderMessage(o) }));
+    expect(await getOrder(ctx.env.DB, "ANG-7F3K")).toMatchObject({ delivery: "shipping", address: "Calle 10 # 43-12, apto 501", city: "Medellín", total: 55000 });
+    const pay = wa.last(CUSTOMER)!.body;
+    expect(pay).toContain("Dirección: Calle 10 # 43-12, apto 501, Medellín");
+    expect(pay).toContain("Se envía por Coordinadora. El costo del envío lo pagas al recibir (contra entrega).");
+    await processWebhook(ctx, inbound(ADMIN, { text: "OK ANG-7F3K" }));
+    const done = wa.last(CUSTOMER)!.body;
+    expect(done).toContain("Lo enviamos por Coordinadora a Calle 10 # 43-12, apto 501, Medellín.");
+    expect(done).toContain("lo pagas al recibir");
+    expect(done).toMatch(/Gracias por su compra\.$/);
+  });
 });

@@ -14,10 +14,22 @@ describe("parseOrderMessage", () => {
     for (const option of ["bundle", "toteOnly"] as const)
       for (const qty of [1, 2, 3])
         for (const delivery of ["pickup", "shipping"] as const) {
-          const o = { ...base, option, qty, delivery };
+          const o: Order = { ...base, option, qty, delivery, ...(delivery === "shipping" ? { address: "Calle 10 # 43-12, apto 501, El Poblado", city: "Medellín" } : {}) };
           const r = parseOrderMessage(buildOrderMessage(o));
           expect(r.ok && r.order).toEqual(o);
         }
+  });
+
+  it("needs an address and city for shipping orders, and keeps them on one line", () => {
+    const ship: Order = { ...base, delivery: "shipping", address: "Cra 7 #12-34: casa\nazul", city: "Bogotá" };
+    const msg = buildOrderMessage(ship);
+    expect(msg).toContain("Dirección: Cra 7 #12-34: casa azul\nCiudad: Bogotá");
+    const r = parseOrderMessage(msg);
+    expect(r.ok && r.order).toEqual({ ...ship, address: "Cra 7 #12-34: casa azul" });
+    const missing = parseOrderMessage(buildOrderMessage({ ...base, delivery: "shipping" }));
+    expect(missing).toMatchObject({ ok: false, errors: ["address", "city"] });
+    // pickup orders never carry an address
+    expect(buildOrderMessage(base)).not.toContain("Dirección");
   });
 
   it("tolerates what phones do to text: CRLF, bold, case, accents, spacing, no intro", () => {

@@ -55,7 +55,7 @@ export async function sendReview(ctx: Ctx, o: OrderRow, x: Extracted | null, pro
   const body = [
     `Pago por revisar: ${o.code}`,
     `Cliente: ${o.name} (+${o.wa_id})`,
-    `Pedido: ${o.qty} × ${CATALOG.options[o.option].label} · ${DELIVERY_LABEL[o.delivery]}`,
+    `Pedido: ${o.qty} × ${CATALOG.options[o.option].label} · ${DELIVERY_LABEL[o.delivery]}${o.delivery === "shipping" ? ` a ${o.address}, ${o.city}` : ""}`,
     `Total: ${formatCOP(o.total)}`,
     "",
     ...read,

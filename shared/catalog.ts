@@ -27,7 +27,8 @@ export const CATALOG = {
     // placeholders until Angelo confirms the real add-ons, e.g.
     // { id: "extra-unbound", label: "Copia adicional de UNBOUND", price: 0 },
   ] as AddOn[],
-  shipping: { enabled: true, label: "Envío", price: 0, area: "" }, // placeholder
+  // price 0 = the customer pays the carrier on delivery (contra entrega); nothing is added to the total
+  shipping: { enabled: true, label: "Envío", carrier: "Coordinadora", price: 0, area: "" },
   pickup: { place: "", hours: "" }, // placeholder
   maxQtyPerOrder: 3,
   stockTotal: 75,

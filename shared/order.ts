@@ -18,12 +18,21 @@ export interface Order {
   addOns: string[]; // add-on ids
   delivery: Delivery;
   name: string;
+  /** shipping only: street address (with barrio, apto…) and city */
+  address?: string;
+  city?: string;
 }
 
 export const DELIVERY_LABEL: Record<Delivery, string> = {
   pickup: "Recoger en El Retiro",
   shipping: "Envío",
 };
+
+/** Said on the site and by the bot, word for word, for every shipping order. */
+export const SHIPPING_NOTE =
+  CATALOG.shipping.price > 0
+    ? `Se envía por ${CATALOG.shipping.carrier}.`
+    : `Se envía por ${CATALOG.shipping.carrier}. El costo del envío lo pagas al recibir (contra entrega).`;
 
 // ---------- order code: ANG-7F3K ----------
 // No 0/O or 1/I (and no L), so it can be read aloud and typed in a bank note.
@@ -59,7 +68,8 @@ export function orderLines(o: Pick<Order, "option" | "qty" | "addOns" | "deliver
   }
   if (o.delivery === "shipping") {
     if (!CATALOG.shipping.enabled) throw new Error("shipping disabled");
-    lines.push({ label: CATALOG.shipping.label, amount: CATALOG.shipping.price });
+    // contra entrega: the carrier charges the customer, so nothing is added here
+    if (CATALOG.shipping.price > 0) lines.push({ label: CATALOG.shipping.label, amount: CATALOG.shipping.price });
   }
   return { lines, total: lines.reduce((s, l) => s + l.amount, 0) };
 }
@@ -69,6 +79,9 @@ export const orderTotal = (o: Parameters<typeof orderLines>[0]) => orderLines(o)
 // ---------- the WhatsApp message ----------
 /** One line, no control characters, max 60 chars: a name can't smuggle in extra fields. */
 export const cleanName = (s: string) => s.replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 60);
+
+/** One line, no control characters, max 120 chars (addresses). */
+export const cleanLine = (s: string, max = 120) => s.replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
 
 export const MESSAGE_INTRO = "Hola, quiero hacer este pedido de la pre-venta:";
 
@@ -82,6 +95,7 @@ export function buildOrderMessage(o: Order): string {
     `Adicionales: ${addOnLabels.length ? addOnLabels.join(", ") : "Ninguno"}`,
     `Entrega: ${DELIVERY_LABEL[o.delivery]}`,
     `Nombre: ${cleanName(o.name)}`,
+    ...(o.delivery === "shipping" ? [`Dirección: ${cleanLine(o.address ?? "")}`, `Ciudad: ${cleanLine(o.city ?? "", 60)}`] : []),
     `Total: ${formatCOP(orderTotal(o))}`,
   ].join("\n");
 }

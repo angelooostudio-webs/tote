@@ -217,6 +217,13 @@
             <input class="field" id="order-name" name="name" type="text" autocomplete="name" autocapitalize="words" maxlength="60" required placeholder="Como quieres que te llamemos" aria-describedby="order-name-err" />
             <p class="field__err" id="order-name-err" data-name-err hidden>Escribe tu nombre para continuar.</p>
           </div>
+
+          <div class="sheet__group" role="group" aria-labelledby="order-ship-label" data-ship-group hidden>
+            <p class="label" id="order-ship-label" data-n="address">06 / Dirección de envío</p>
+            <input class="field" aria-label="Dirección" id="order-address" name="address" type="text" autocomplete="street-address" maxlength="120" placeholder="Calle, número, apto y barrio" aria-describedby="order-ship-err" />
+            <input class="field field--stack" aria-label="Ciudad" id="order-city" name="city" type="text" autocomplete="address-level2" autocapitalize="words" maxlength="60" placeholder="Ciudad y departamento" aria-describedby="order-ship-err" />
+            <p class="field__err" id="order-ship-err" data-ship-err hidden>Escribe la dirección y la ciudad para el envío.</p>
+          </div>
         </form>
 
         <div class="sheet__foot">

@@ -10,6 +10,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
+import { SHIPPING_NOTE } from "../../shared/order.ts";
 import { CATALOG, siteLabel } from "../../shared/catalog.ts";
 import type { Extracted } from "./proofs.ts";
 
@@ -70,7 +71,7 @@ export function systemPrompt(): string {
     ? `Recogida en El Retiro: ${CATALOG.pickup.place}${CATALOG.pickup.hours ? `, ${CATALOG.pickup.hours}` : ""}.`
     : "Recogida en El Retiro: el lugar y el horario se coordinan por este chat después de confirmar el pago.";
   const shipping = CATALOG.shipping.enabled
-    ? `Hay envío${CATALOG.shipping.area ? ` a ${CATALOG.shipping.area}` : ""}; la dirección se coordina por este chat.`
+    ? `Hay envío${CATALOG.shipping.area ? ` a ${CATALOG.shipping.area}` : ""} por ${CATALOG.shipping.carrier}. ${SHIPPING_NOTE.split(". ").slice(1).join(". ")} La dirección y la ciudad se escriben en el formulario de la página y llegan con el pedido.`
     : "No hay envíos, solo recogida.";
   return `Eres el asistente de WhatsApp de la pre-venta del tote de Angelo Studio, un estudio creativo y revista editorial ("Angelo") de El Retiro, Antioquia, Colombia.
 

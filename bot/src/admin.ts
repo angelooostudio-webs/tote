@@ -67,8 +67,8 @@ export function confirmationText(o: OrderRow): string {
       ? CATALOG.pickup.place
         ? ` Recogida: ${CATALOG.pickup.place}${CATALOG.pickup.hours ? `, ${CATALOG.pickup.hours}` : ""}.`
         : " Te escribimos por aquí para coordinar la recogida en El Retiro."
-      : " Te escribimos por aquí para coordinar el envío.";
-  return `Tu pedido ${o.code} está confirmado.${unbound}${where} Gracias por ser parte de esto.`;
+      : ` Lo enviamos por ${CATALOG.shipping.carrier} a ${o.address ?? ""}, ${o.city ?? ""}.${CATALOG.shipping.price > 0 ? "" : " El costo del envío lo pagas al recibir (contra entrega)."} Te escribimos por aquí con el número de guía.`;
+  return `Tu pedido ${o.code} está confirmado.${unbound}${where} Gracias por su compra.`;
 }
 
 export async function confirmOrder(ctx: Ctx, code: string) {
@@ -143,7 +143,7 @@ async function detail(ctx: Ctx, code: string) {
     [
       `${o.code} · ${STATUS_ES[o.status]}`,
       `${o.name} · +${o.wa_id}`,
-      `${o.qty} × ${CATALOG.options[o.option].label} · ${DELIVERY_LABEL[o.delivery]}`,
+      `${o.qty} × ${CATALOG.options[o.option].label} · ${DELIVERY_LABEL[o.delivery]}${o.delivery === "shipping" ? ` a ${o.address}, ${o.city}` : ""}`,
       `Total: ${formatCOP(o.total)}`,
       `Creado: ${when(o.created_at)}`,
       o.confirmed_at ? `Confirmado: ${when(o.confirmed_at)}` : "",

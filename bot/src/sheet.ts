@@ -22,7 +22,7 @@ const csv = (head: string[], rows: unknown[][]) => [head, ...rows].map((r) => r.
 const bogota = (iso: string | null) =>
   iso ? new Intl.DateTimeFormat("es-CO", { timeZone: "America/Bogota", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso)) : "";
 const product = (r: OrderRow) => CATALOG.options[r.option as keyof typeof CATALOG.options]?.label ?? r.option;
-const delivery = (r: OrderRow) => (r.delivery === "shipping" ? "Envío" : "Recogida");
+const delivery = (r: OrderRow) => (r.delivery === "shipping" ? `Envío${r.city ? ` · ${r.city}` : ""}` : "Recogida");
 
 async function rows(db: D1Database, onlyConfirmed: boolean): Promise<Row[]> {
   // latest payment screenshot per order
@@ -40,11 +40,25 @@ interface Table {
 }
 
 async function pickupTable(db: D1Database): Promise<Table> {
-  const list = await rows(db, true);
+  const list = (await rows(db, true)).filter((r) => r.delivery !== "shipping");
   return {
     head: ["#", "Código", "Nombre", "Tel. (últimos 4)", "Producto", "Cant.", "Entrega", "Entregado ✓", "Firma / nota"],
     rows: list.map((r, i) => [i + 1, r.code, r.name, `…${r.wa_id.slice(-4)}`, product(r), r.qty, delivery(r), "", ""]),
   };
+}
+
+/** confirmed shipping orders: what goes on the Coordinadora guides (full phone: the carrier needs it) */
+async function shippingTable(db: D1Database): Promise<Table> {
+  const list = (await rows(db, true)).filter((r) => r.delivery === "shipping");
+  return {
+    head: ["#", "Código", "Nombre", "Teléfono", "Dirección", "Ciudad", "Producto", "Cant.", "Enviado ✓", "Guía"],
+    rows: list.map((r, i) => [i + 1, r.code, r.name, `+${r.wa_id}`, r.address ?? "", r.city ?? "", product(r), r.qty, "", ""]),
+  };
+}
+
+export async function shippingCsv(db: D1Database): Promise<string> {
+  const t = await shippingTable(db);
+  return csv(t.head, t.rows);
 }
 
 export async function pickupCsv(db: D1Database): Promise<string> {
@@ -91,20 +105,21 @@ const h = (v: unknown) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&a
 
 /** Printable page: /panel?key=…&v=entrega|pagos */
 export async function panelHtml(db: D1Database, view: string, key: string, now: Date): Promise<string> {
-  const pickup = view !== "pagos";
-  const t = pickup ? await pickupTable(db) : await paymentsTable(db);
+  const v = view === "pagos" || view === "envios" ? view : "entrega";
+  const pickup = v !== "pagos"; // printable lists with a checkbox column
+  const t = v === "entrega" ? await pickupTable(db) : v === "envios" ? await shippingTable(db) : await paymentsTable(db);
   const k = encodeURIComponent(key);
-  const title = pickup ? "Lista de entrega" : "Pagos";
+  const title = v === "entrega" ? "Recogida" : v === "envios" ? "Envíos" : "Pagos";
   const stamp = new Intl.DateTimeFormat("es-CO", { timeZone: "America/Bogota", dateStyle: "long", timeStyle: "short" }).format(now);
   const cell = (v: unknown, i: number) => {
     const s = String(v ?? "");
     if (!pickup && t.head[i] === "WhatsApp" && s) return `<a href="https://${h(s)}">${h(s.replace("wa.me/", "+"))}</a>`;
-    if (pickup && (t.head[i] === "Entregado ✓")) return `<span class="box"></span>`;
+    if (pickup && (t.head[i] === "Entregado ✓" || t.head[i] === "Enviado ✓")) return `<span class="box"></span>`;
     return h(s);
   };
   const body = t.rows.length
     ? t.rows.map((r) => `<tr>${r.map((v, i) => `<td class="c${i}">${cell(v, i)}</td>`).join("")}</tr>`).join("")
-    : `<tr><td colspan="${t.head.length}" class="empty">${pickup ? "Todavía no hay pedidos confirmados." : "Todavía no hay pedidos."}</td></tr>`;
+    : `<tr><td colspan="${t.head.length}" class="empty">${v === "pagos" ? "Todavía no hay pedidos." : "Todavía no hay pedidos confirmados aquí."}</td></tr>`;
   return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex"><title>${title} · Tote Angelo Studio</title>
 <style>
@@ -121,8 +136,8 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#6b685f;wh
 @media print{body{background:#fff;padding:0;font-size:12px}nav,button{display:none}.wrap{overflow:visible;border-radius:0}table{min-width:0}th,td{padding:6px 8px}tr{break-inside:avoid}}
 </style></head><body>
 <header><div><h1>${title}</h1><div class="meta">Tote Angelo Studio · ${t.rows.length} ${t.rows.length === 1 ? (pickup ? "pedido confirmado" : "pedido") : pickup ? "pedidos confirmados" : "pedidos"} · actualizado ${h(stamp)}</div></div>
-<nav><a href="?key=${k}&v=entrega"${pickup ? ' class="on"' : ""}>Entrega</a><a href="?key=${k}&v=pagos"${pickup ? "" : ' class="on"'}>Pagos</a>
-<a href="/sheet/${pickup ? "entrega" : "pagos"}.csv?key=${k}">Descargar (Excel/Sheets)</a><button onclick="print()">Imprimir</button></nav></header>
+<nav>${(["entrega", "envios", "pagos"] as const).map((x) => `<a href="?key=${k}&v=${x}"${x === v ? ' class="on"' : ""}>${x === "entrega" ? "Recogida" : x === "envios" ? "Envíos" : "Pagos"}</a>`).join("")}
+<a href="/sheet/${v}.csv?key=${k}">Descargar (Excel/Sheets)</a><button onclick="print()">Imprimir</button></nav></header>
 <div class="wrap"><table><thead><tr>${t.head.map((x) => `<th>${h(x)}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>
 </body></html>`;
 }
