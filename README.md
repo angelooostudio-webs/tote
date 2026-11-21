@@ -9,8 +9,6 @@ bot/      the WhatsApp payment bot (Cloudflare Worker + D1)
 shared/   catalog.ts — prices, dates, stock, used by both
 ```
 
-> Work in progress: this README is completed as each phase lands.
-
 ## Run the site locally
 
 ```bash
@@ -48,13 +46,92 @@ node scripts/shots.mjs                 # mobile, tablet, desktop → .shots/
 node scripts/shots.mjs "" "" --full    # full-page
 ```
 
+## The WhatsApp bot (`bot/`)
+
+A Cloudflare Worker with a D1 (SQLite) database. Customers' orders arrive as the
+prefilled WhatsApp message from the site; the bot checks them against
+`shared/catalog.ts`, recomputes the total, reserves stock for 24 h and sends the
+payment details. Payment screenshots are read by Claude, checked by code, and
+sent to Angelo to confirm. **The bot never confirms an order on its own.**
+
+### Try it locally (no Meta, no Cloudflare, no API key)
+
+```bash
+cd bot
+npm install
+npm test            # 54 tests: parser, totals, checks, the full conversation
+npm run simulate    # plays a whole chat: order → screenshot → Angelo confirms → expiry
+```
+
+`npm run simulate -- --claude` uses the real Claude for free-form messages
+(needs `ANTHROPIC_API_KEY` in your shell).
+
+### Secrets (once, after SETUP.md)
+
+From `bot/`, each command asks for the value:
+
+```bash
+npx wrangler secret put WHATSAPP_TOKEN            # permanent system-user token
+npx wrangler secret put WHATSAPP_PHONE_NUMBER_ID  # from Meta → WhatsApp → API Setup
+npx wrangler secret put META_APP_SECRET           # Meta app → Settings → Basic
+npx wrangler secret put WEBHOOK_VERIFY_TOKEN      # any long random string; same one in Meta's webhook form
+npx wrangler secret put ANTHROPIC_API_KEY
+npx wrangler secret put CLAUDE_MODEL              # optional; default claude-opus-5-5
+npx wrangler secret put ADMIN_NUMBER              # Angelo's WhatsApp, digits only: 573001234567
+npx wrangler secret put PAYMENT_NEQUI             # e.g. 300 123 4567
+npx wrangler secret put PAYMENT_BANCOLOMBIA       # e.g. Ahorros 123-456789-01
+npx wrangler secret put PAYMENT_HOLDER_NAME       # name on the accounts, as banks show it
+```
+
+### Angelo's commands (from ADMIN_NUMBER only)
+
+| Write | Does |
+|---|---|
+| *Confirmar* / *Rechazar* buttons | come with every screenshot to review |
+| `OK ANG-7F3K` | confirm (after checking Nequi/Bancolombia) |
+| `NO ANG-7F3K el pago no llegó` | reject; the customer sees the reason, the tote goes back to stock |
+| `RESUMEN` | counts by status, confirmed totes and revenue, stock left |
+| `PENDIENTES` | orders waiting for review |
+| `PEDIDO ANG-7F3K` | one order's details |
+| `EXPORTAR` | CSV of all orders, sent as a file |
+
+WhatsApp only lets a business send free-form messages to someone who wrote in
+the last 24 h — that includes Angelo. **Send the bot any message (e.g.
+`RESUMEN`) each morning of the pre-sale** so review requests always reach you.
+
+### Message template `pedido_confirmado`
+
+Used to confirm orders when the customer hasn't written in 24 h. Submit it in
+WhatsApp Manager (Utility, Spanish (COL)):
+
+```
+Tu pedido {{1}} está confirmado. UNBOUND sale el {{2}}. Te escribimos por este chat para coordinar la entrega.
+```
+
+### Live stock on the site
+
+Once the bot is deployed, put its URL in `shared/catalog.ts` → `botBaseUrl`
+(e.g. `"https://tote-bot.<subdomain>.workers.dev"`) and push. The site then shows
+"QUEDAN XX DE 75" from `GET /stock`; until then the counter stays hidden.
+
+## Seeing every pre-sale state locally
+
+With `npm run dev` running in `site/`, open:
+
+- before (countdown): http://localhost:5173/
+- open (Ordenar works): http://localhost:5173/?now=2026-11-28T10:00:00-05:00
+- closed: http://localhost:5173/?now=2026-12-03T09:00:00-05:00
+
+The `?now=` override only exists in development, never on the live site.
+
 ## Deploys
 
 Push to `main`:
 
 - changes in `site/` or `shared/` → GitHub Actions builds and publishes to
   GitHub Pages (`.github/workflows/pages.yml`).
-- changes in `bot/` or `shared/` → the bot is deployed with wrangler (phase 7).
+- changes in `bot/` or `shared/` → tests run, D1 migrations apply, and the
+  bot deploys with wrangler (`.github/workflows/bot.yml`).
 
 First-time account setup (Cloudflare, Meta, Anthropic, DNS) is in
 [SETUP.md](SETUP.md).

@@ -9,6 +9,7 @@ import { ClaudeAssistant, KeywordAssistant } from "./assistant.ts";
 import { remainingStock } from "./db.ts";
 import type { Ctx, Env } from "./env.ts";
 import { handleInbound } from "./handlers.ts";
+import { runExpiry } from "./expiry.ts";
 import { CloudApiMessenger } from "./messenger.ts";
 import { inboundMessages, verifySignature, type WebhookPayload } from "./whatsapp.ts";
 
@@ -80,6 +81,8 @@ export default {
     return new Response("not found", { status: 404 });
   },
 
-  // phase 8: expiry of unpaid reservations + reminders
-  async scheduled(_event: ScheduledController, _env: Env, _exec: ExecutionContext) {},
+  // every 15 min: the 20 h reminder and the 24 h expiry of unpaid reservations
+  async scheduled(_event: ScheduledController, env: Env, exec: ExecutionContext) {
+    exec.waitUntil(runExpiry(ctxFactory(env)).then((r) => console.log("expiry", r)));
+  },
 } satisfies ExportedHandler<Env>;

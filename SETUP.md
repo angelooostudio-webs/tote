@@ -28,6 +28,19 @@ gh auth login        # choose GitHub.com, sign in as angelicalternative
    - `CLOUDFLARE_API_TOKEN` = the token
    - `CLOUDFLARE_ACCOUNT_ID` = the account ID
 
+### 1b. The bot's database (once)
+
+```bash
+cd bot
+npx wrangler login
+npx wrangler d1 create tote-bot
+```
+
+Copy the `database_id` it prints into `bot/wrangler.toml` (replace the
+`00000000-…` placeholder) and push. Then set the secrets listed in the
+README ("Secrets") and push again: GitHub Actions deploys the bot and prints its
+URL (`https://tote-bot.<your-subdomain>.workers.dev`).
+
 ## 2. Anthropic API key
 
 1. <https://console.anthropic.com> → sign in → *Settings → Billing*: add a

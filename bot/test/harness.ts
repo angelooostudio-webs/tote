@@ -86,6 +86,9 @@ export class FakeMessenger implements Messenger {
   async sendImage(to: string, mediaId: string, caption?: string) {
     this.push({ to, kind: "image", body: caption ?? "", extra: mediaId });
   }
+  async sendImageBytes(to: string, data: Uint8Array, mime: string, caption?: string) {
+    this.push({ to, kind: "image", body: caption ?? "", extra: { bytes: data.length, mime } });
+  }
   async sendDocument(to: string, data: Uint8Array, filename: string, mime: string, caption?: string) {
     this.push({ to, kind: "document", body: caption ?? "", extra: { filename, mime, text: new TextDecoder().decode(data) } });
   }

@@ -147,10 +147,13 @@
   bottom: calc(var(--safe-bottom) + 7svh);
   text-align: center;
   font-size: clamp(2.25rem, 1.2rem + 4.6vw, 5.5rem);
-  font-weight: 700;
+  font-weight: 400;
   line-height: 0.95;
   opacity: 0;
   pointer-events: none;
+}
+.hero__slogan strong {
+  font-weight: 700;
 }
 .hero__hint {
   grid-row: 3;

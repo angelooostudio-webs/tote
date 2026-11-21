@@ -119,3 +119,51 @@ export async function recentConversation(db: D1Database, waId: string, limit = 1
     .all<{ direction: string; kind: string; body: string | null; created_at: string }>();
   return (r.results ?? []).reverse();
 }
+
+// ---------- payment proofs ----------
+
+export async function saveProof(
+  db: D1Database,
+  p: { orderCode: string; mediaId: string; hash: string; extracted: unknown; verdict: "pass" | "fail"; reasons: string[] },
+  now: Date
+) {
+  await db
+    .prepare(`INSERT INTO payment_proofs (order_code, wa_media_id, image_hash, extracted_json, verdict, reasons, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`)
+    .bind(p.orderCode, p.mediaId, p.hash, JSON.stringify(p.extracted ?? null), p.verdict, JSON.stringify(p.reasons), now.toISOString())
+    .run();
+}
+
+/** fingerprints of screenshots already sent for *other* orders */
+export async function otherOrderHashes(db: D1Database, orderCode: string): Promise<string[]> {
+  const r = await db.prepare(`SELECT image_hash FROM payment_proofs WHERE order_code != ?`).bind(orderCode).all<{ image_hash: string }>();
+  return (r.results ?? []).map((x) => x.image_hash);
+}
+
+export async function latestProof(db: D1Database, orderCode: string) {
+  return db
+    .prepare(`SELECT * FROM payment_proofs WHERE order_code = ? ORDER BY id DESC LIMIT 1`)
+    .bind(orderCode)
+    .first<{ extracted_json: string; verdict: string; reasons: string; created_at: string }>();
+}
+
+export async function countsByStatus(db: D1Database) {
+  const r = await db.prepare(`SELECT status, COUNT(*) AS n, COALESCE(SUM(qty),0) AS q, COALESCE(SUM(total),0) AS t FROM orders GROUP BY status`).all<{ status: Status; n: number; q: number; t: number }>();
+  return r.results ?? [];
+}
+
+export async function ordersInStatus(db: D1Database, statuses: Status[]) {
+  const r = await db
+    .prepare(`SELECT * FROM orders WHERE status IN (${statuses.map(() => "?").join(",")}) ORDER BY created_at`)
+    .bind(...statuses)
+    .all<OrderRow>();
+  return r.results ?? [];
+}
+
+export async function allOrders(db: D1Database) {
+  return (await db.prepare(`SELECT * FROM orders ORDER BY created_at`).all<OrderRow>()).results ?? [];
+}
+
+export async function bumpFailedAttempts(db: D1Database, code: string, now: Date): Promise<number> {
+  await db.prepare(`UPDATE orders SET failed_attempts = failed_attempts + 1, updated_at = ? WHERE code = ?`).bind(now.toISOString(), code).run();
+  return (await getOrder(db, code))?.failed_attempts ?? 0;
+}

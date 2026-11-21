@@ -13,6 +13,8 @@ export interface Messenger {
   sendText(to: string, body: string): Promise<void>;
   sendButtons(to: string, body: string, buttons: Button[]): Promise<void>;
   sendImage(to: string, mediaId: string, caption?: string): Promise<void>;
+  /** uploads the bytes and sends them as an image (inbound media ids can't be re-sent) */
+  sendImageBytes(to: string, data: Uint8Array, mime: string, caption?: string): Promise<void>;
   sendDocument(to: string, data: Uint8Array, filename: string, mime: string, caption?: string): Promise<void>;
   sendTemplate(to: string, name: string, lang: string, params: string[]): Promise<void>;
   downloadMedia(mediaId: string): Promise<{ bytes: Uint8Array; mime: string }>;
@@ -72,15 +74,24 @@ export class CloudApiMessenger implements Messenger {
     await this.send(to, { type: "image", image: { id: mediaId, ...(caption ? { caption: caption.slice(0, 1024) } : {}) } });
   }
 
-  async sendDocument(to: string, data: Uint8Array, filename: string, mime: string, caption?: string) {
+  private async upload(data: Uint8Array, mime: string, filename: string) {
     const form = new FormData();
     form.append("messaging_product", "whatsapp");
     form.append("type", mime);
     form.append("file", new Blob([data], { type: mime }), filename);
     const up = await fetch(`${GRAPH}/${this.phoneNumberId}/media`, { method: "POST", headers: { Authorization: `Bearer ${this.token}` }, body: form });
     if (!up.ok) throw new WhatsAppError(`media upload ${up.status}`, up.status);
-    const { id } = (await up.json()) as { id: string };
+    return ((await up.json()) as { id: string }).id;
+  }
+
+  async sendDocument(to: string, data: Uint8Array, filename: string, mime: string, caption?: string) {
+    const id = await this.upload(data, mime, filename);
     await this.send(to, { type: "document", document: { id, filename, ...(caption ? { caption } : {}) } });
+  }
+
+  async sendImageBytes(to: string, data: Uint8Array, mime: string, caption?: string) {
+    const id = await this.upload(data, mime, mime === "image/png" ? "comprobante.png" : "comprobante.jpg");
+    await this.sendImage(to, id, caption);
   }
 
   async sendTemplate(to: string, name: string, lang: string, params: string[]) {
