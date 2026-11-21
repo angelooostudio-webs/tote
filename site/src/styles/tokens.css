@@ -57,6 +57,13 @@
   --s-10: 160px;
 
   --gutter: clamp(20px, 5vw, 56px);
+
+  /* vertical rhythm: the same gap above every section rule, the same gap from a
+     section's label to its content, the same step between a headline and what follows */
+  --space-section: clamp(112px, 8vw + 64px, 176px);
+  --space-head: clamp(40px, 2vw + 32px, 64px);
+  --space-step: 20px;
+  --space-action: 32px;
   --max: 1280px;
   --header-h: 60px;
 

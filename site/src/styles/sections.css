@@ -194,7 +194,7 @@
    Order button + readouts (used twice)
    ========================================================= */
 .order {
-  margin-top: var(--s-7);
+  margin-top: var(--space-action);
 }
 .order-btn {
   position: relative;
@@ -263,6 +263,10 @@
   padding-inline: 28px var(--s-5);
   font-size: 0.9375rem;
 }
+/* after the cards, the button gets the same room a section label gives its content */
+.llevan .order {
+  margin-top: var(--space-head);
+}
 .order__magnet {
   display: block;
 }
@@ -326,7 +330,8 @@
    02 · Contigo — fanned stack of prints
    ========================================================= */
 .contigo {
-  padding-block: var(--s-8) var(--s-9);
+  /* the hero's slogan is centred against this top padding (hero/index.ts) */
+  padding-block: var(--s-8) 0;
   /* the prints enter from off-screen right: never let them widen the page */
   overflow-x: clip;
 }
@@ -342,7 +347,7 @@
   display: block;
   width: var(--w);
   height: calc(var(--cw) * 1.25 + 3 * var(--dy));
-  margin: var(--s-7) auto 0;
+  margin: var(--space-head) auto 0;
   cursor: pointer;
   border-radius: 4px;
 }
@@ -404,7 +409,7 @@
 }
 /* the hint under the headline: "tap" on touch screens, "click" with a mouse */
 .contigo__hint {
-  margin-top: var(--s-4);
+  margin-top: var(--space-step);
   color: var(--mute-ink);
 }
 .contigo__hint-click {
@@ -419,7 +424,7 @@
   }
 }
 .contigo__title {
-  margin-top: var(--s-8);
+  margin-top: var(--space-head);
   font-size: var(--t-h2);
   font-weight: 700;
   line-height: 0.96;
@@ -441,7 +446,7 @@
   .stack {
     --w: min(40vw, 520px);
     grid-row: 2;
-    margin: var(--s-8) 0 0;
+    margin: var(--space-head) 0 0;
   }
   /* headline, hint and button read as one block, centred against the stack */
   .contigo__copy {
@@ -458,10 +463,10 @@
    03 · ¿Qué llevan?
    ========================================================= */
 .llevan {
-  padding-block: var(--s-8) var(--s-9);
+  padding-block: var(--space-section) 0;
 }
 .llevan__title {
-  margin-top: var(--s-7);
+  margin-top: var(--space-head);
   font-size: var(--t-h2);
   font-weight: 700;
   line-height: 0.96;
@@ -470,7 +475,7 @@
   text-wrap: balance;
 }
 .llevan__intro {
-  margin-top: var(--s-4);
+  margin-top: var(--space-step);
   max-width: 34ch;
   color: var(--mute-ink);
 }
@@ -479,9 +484,10 @@
 }
 
 .llevan__track {
+  /* cards follow the intro at the label→content gap */
   display: flex;
   gap: var(--s-4);
-  margin-top: var(--s-7);
+  margin-top: var(--space-head);
   padding-inline: var(--gutter);
   scroll-padding-inline: var(--gutter);
   overflow-x: auto;
@@ -607,7 +613,8 @@
    ========================================================= */
 .site-footer {
   border-top: 1px solid var(--rule);
-  padding-block: var(--s-8) calc(var(--safe-bottom) + var(--s-7));
+  margin-top: var(--space-section);
+  padding-block: var(--space-head) calc(var(--safe-bottom) + var(--s-7));
 }
 .site-footer__inner {
   display: grid;
@@ -646,7 +653,7 @@
 }
 .site-footer__copy {
   color: var(--mute-ink);
-  margin-top: var(--s-5);
+  margin-top: var(--space-step);
 }
 @media (min-width: 1024px) {
   .site-footer__inner {
