@@ -19,7 +19,7 @@ import {
 import { parseOrderMessage } from "./parse.ts";
 import { T, paymentInstructions } from "./texts.ts";
 import type { InboundMessage } from "./whatsapp.ts";
-import { handleAdmin } from "./admin.ts";
+import { handleAdmin, isAdminCommand } from "./admin.ts";
 import { handleImage } from "./payments.ts";
 
 /** Sends a text and logs it (the log also tells us whether we've written to this number before). */
@@ -48,6 +48,8 @@ export async function forwardToAdmin(ctx: Ctx, waId: string, reason: string, nam
   }
 }
 
+const adminTesting = (ctx: Ctx) => ctx.env.ADMIN_TEST_MODE === "1";
+
 export async function handleInbound(ctx: Ctx, msg: InboundMessage, profileName?: string) {
   const db = ctx.env.DB;
   const waId = msg.from;
@@ -56,7 +58,8 @@ export async function handleInbound(ctx: Ctx, msg: InboundMessage, profileName?:
   const isNew = await logInbound(db, msg.id, waId, msg.type, body, ctx.now());
   if (!isNew) return;
 
-  if (waId === ctx.env.ADMIN_NUMBER) return handleAdmin(ctx, msg);
+  // test mode: the admin can also act as a customer (orders, screenshots) before the pre-sale opens
+  if (waId === ctx.env.ADMIN_NUMBER && (!adminTesting(ctx) || isAdminCommand(msg))) return handleAdmin(ctx, msg);
 
   switch (msg.type) {
     case "text":
@@ -87,7 +90,7 @@ export async function handleOrder(ctx: Ctx, waId: string, order: Order, statedTo
   const first = await isFirstContact(db, waId);
 
   const phase = presalePhase(now);
-  if (phase === "before") return say(ctx, waId, T.presaleNotOpen() + (first ? `\n\n${T.privacyLine}` : ""));
+  if (phase === "before" && !(adminTesting(ctx) && waId === ctx.env.ADMIN_NUMBER)) return say(ctx, waId, T.presaleNotOpen() + (first ? `\n\n${T.privacyLine}` : ""));
   if (phase === "closed") return say(ctx, waId, T.presaleClosed() + (first ? `\n\n${T.privacyLine}` : ""));
 
   // the same order sent twice (or re-sent later): answer with where it stands, never create it twice

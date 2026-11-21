@@ -14,6 +14,8 @@ export interface Env {
 
   /** Angelo's WhatsApp number, digits only (e.g. 573001234567). Only this number can run admin actions. */
   ADMIN_NUMBER: string;
+  /** "1" = the admin number may also order and pay like a customer, even before opening (for testing) */
+  ADMIN_TEST_MODE?: string;
   PAYMENT_NEQUI: string;
   PAYMENT_BANCOLOMBIA: string;
   PAYMENT_HOLDER_NAME: string;

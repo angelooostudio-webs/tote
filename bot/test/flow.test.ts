@@ -64,6 +64,26 @@ describe("order received", () => {
     }
   });
 
+  it("test mode: the admin can order before opening, and admin commands still work", async () => {
+    const env = { ...testCtx().ctx.env };
+    // off: the admin's order message is treated as an (unknown) admin command
+    {
+      const { ctx, wa } = testCtx({ at: "2026-11-21T12:00:00-05:00" });
+      await processWebhook(ctx, inbound(ADMIN, { text: buildOrderMessage(order()) }));
+      expect(await getOrder(ctx.env.DB, "ANG-7F3K")).toBeNull();
+      expect(wa.last(ADMIN)).toBeTruthy();
+    }
+    // on: the same message creates the order even before opening; RESUMEN still goes to the admin handler
+    const { ctx, wa } = testCtx({ at: "2026-11-21T12:00:00-05:00", env: { ...env, ADMIN_TEST_MODE: "1" } });
+    await processWebhook(ctx, inbound(ADMIN, { text: buildOrderMessage(order()) }));
+    expect(await getOrder(ctx.env.DB, "ANG-7F3K")).toMatchObject({ status: "AWAITING_PAYMENT", wa_id: ADMIN });
+    await processWebhook(ctx, inbound(ADMIN, { text: "RESUMEN" }));
+    expect(wa.last(ADMIN)!.body).not.toContain("Envía el pantallazo");
+    // customers are still refused before opening
+    await processWebhook(ctx, inbound(CUSTOMER, { text: buildOrderMessage(order({ code: "ANG-9X2M" })) }));
+    expect(wa.last(CUSTOMER)!.body).toContain("abre el");
+  });
+
   it("never sells more than the stock, and frees reservations once they expire", async () => {
     const { ctx, wa, advance } = testCtx();
     // fill the stock with 3-tote orders from other customers

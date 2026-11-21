@@ -175,6 +175,15 @@ async function exportCsv(ctx: Ctx) {
   await logOutbound(ctx.env.DB, ctx.env.ADMIN_NUMBER, "document", `pedidos-tote-${date}.csv`, null, ctx.now());
 }
 
+/** True when an admin message is a command (OK/NO/RESUMEN/…) rather than a customer-style message. */
+export function isAdminCommand(msg: InboundMessage): boolean {
+  if (msg.interactive?.button_reply?.id ?? msg.button?.payload) return true;
+  const text = (msg.text?.body ?? "").trim();
+  const hasCode = /ANG-[A-Z0-9]{4}/.test(text.toUpperCase());
+  const cmd = norm(text).split(" ")[0];
+  return ((cmd === "ok" || cmd === "no" || cmd === "pedido") && hasCode) || cmd === "resumen" || cmd === "pendientes" || cmd === "exportar";
+}
+
 export async function handleAdmin(ctx: Ctx, msg: InboundMessage) {
   // buttons from a review request
   const buttonId = msg.interactive?.button_reply?.id ?? msg.button?.payload;
