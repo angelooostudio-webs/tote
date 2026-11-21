@@ -31,13 +31,13 @@ export const CATALOG = {
   pickup: { place: "", hours: "" }, // placeholder
   maxQtyPerOrder: 3,
   stockTotal: 75,
-  botNumber: "57XXXXXXXXXX", // the bot's WhatsApp number, placeholder
+  botNumber: "573116955922", // the bot's WhatsApp number
   instagram: "angelostudio_official",
   studioSite: "https://angelostudio.art",
   /** where the site lives, with a trailing slash. Switch to "https://tote.angelostudio.art/" (and add site/public/CNAME) once the domain is set up. */
   siteUrl: "https://angelooostudio-webs.github.io/tote/",
   /** Public URL of the bot Worker, used by the site for GET /stock. Empty = hide the counter. */
-  botBaseUrl: "",
+  botBaseUrl: "https://tote-bot.angelo-tote-bot.workers.dev",
   ADOBE_FONTS_KIT_ID: "dzr8yxn",
 };
 

@@ -13,7 +13,7 @@ WHATSAPP_PHONE_NUMBER_ID = "1495160933674987"
 binding = "DB"
 database_name = "tote-bot"
 # filled in by `wrangler d1 create tote-bot` (see SETUP.md); the deploy workflow reads it from here
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "c9a8c77f-814d-44de-8396-c00f179440af"
 migrations_dir = "migrations"
 
 [triggers]
