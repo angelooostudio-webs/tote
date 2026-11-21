@@ -46,18 +46,21 @@ async function key(file) {
   const stack = new Int32Array(N);
   const comp = new Int32Array(N);
   const pockets = [];
+  const enclosed = []; // enclosed regions keyed as background (for the print-safety report)
   for (let start = 0; start < N; start++) {
     if (seen[start] || L[start] > BG_MAX) continue;
     let sp = 0;
     let n = 0;
-    let zeros = 0;
+    let zeros = 0; // truly pure black (0–1): the studio background, never the ink
+    let nearZeros = 0; // near-black (≤5): slits blurred by video compression — and also thin ink cores
     let edge = false;
     stack[sp++] = start;
     seen[start] = 1;
     while (sp) {
       const i = stack[--sp];
       comp[n++] = i;
-      if (L[i] <= 5) zeros++; // "pure black" allowing for video compression noise
+      if (L[i] <= 1) zeros++;
+      if (L[i] <= 5) nearZeros++;
       const x = i % W;
       const y = (i / W) | 0;
       if (x === 0 || y === 0 || x === W - 1 || y === H - 1) edge = true;
@@ -78,11 +81,14 @@ async function key(file) {
     }
     // thin pockets between overlapping straps are small and partly antialiased: a quarter
     // of pure-black pixels is plenty (the ink never gets close: ~1%)
-    if (edge || zeros / n > 0.25) for (let k = 0; k < n; k++) bg[comp[k]] = 1;
-    else if (n < 3000 && zeros / n > 0.08) pockets.push(comp.slice(0, n));
+    if (edge || (n >= 12 && zeros / n > 0.25)) {
+      for (let k = 0; k < n; k++) bg[comp[k]] = 1;
+      if (!edge) enclosed.push(comp.slice(0, n));
+    } else if (n < 3000 && nearZeros / n > 0.25) pockets.push(comp.slice(0, n));
   }
-  // slivers where strap layers fold over each other: small, touching the background,
-  // with some pure black in them (ink sits at ~1%, well under the 8% asked above)
+  // slivers where strap layers fold over each other: small, mostly near-black, and touching
+  // the background already found. Print letters sit inside the bag, ringed by canvas, so
+  // they never touch the background — that is what keeps them safe.
   const touchesBg = (i) => {
     const x = i % W;
     const y = (i / W) | 0;
@@ -94,7 +100,19 @@ async function key(file) {
       }
     return false;
   };
-  for (const pk of pockets) if (pk.some(touchesBg)) for (const i of pk) bg[i] = 1;
+  for (const pk of pockets)
+    if (pk.some(touchesBg)) {
+      for (const i of pk) bg[i] = 1;
+      enclosed.push(pk);
+    }
+  // safety report: enclosed areas keyed inside the print zone (rows 48–85%, cols 15–85%) must be none
+  let printZoneKeyed = 0;
+  for (const pk of enclosed)
+    for (const i of pk) {
+      const x = i % W;
+      const y = (i / W) | 0;
+      if (y > H * 0.48 && y < H * 0.85 && x > W * 0.15 && x < W * 0.85) printZoneKeyed++;
+    }
 
   // 2. alpha: 0 in the background, soft on a 3px band at the edge, 1 inside
   const alpha = new Float32Array(N).fill(1);
@@ -168,7 +186,7 @@ async function key(file) {
         if (x < cMin) cMin = x;
         if (x > cMax) cMax = x;
       }
-  return { rgba, W, H, box: { minX, maxX, minY, maxY }, contact: { left: cMin, right: cMax, bottom: maxY } };
+  return { rgba, W, H, box: { minX, maxX, minY, maxY }, contact: { left: cMin, right: cMax, bottom: maxY }, printZoneKeyed };
 }
 
 const tmp = `${root}.frames-tmp/`;
@@ -179,6 +197,7 @@ for (const [n, f] of pick.entries()) {
   const k = await key(f);
   await sharp(k.rgba, { raw: { width: k.W, height: k.H, channels: 4 } }).png({ compressionLevel: 1 }).toFile(`${tmp}${n}.png`);
   keyed.push({ W: k.W, H: k.H, box: k.box, contact: k.contact });
+  if (k.printZoneKeyed) console.log(`\n  ⚠ frame ${n}: ${k.printZoneKeyed} px keyed inside the print zone`);
   process.stdout.write(`\rkeyed ${n + 1}/${pick.length}`);
 }
 process.stdout.write("\n");
