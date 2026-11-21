@@ -4,7 +4,7 @@ Pre-sale site for the Angelo Studio tote (`tote.angelostudio.art`) and the
 WhatsApp bot that takes the orders.
 
 ```
-site/     the website (Vite + TypeScript, three.js, GSAP) → GitHub Pages
+site/     the website (Vite + TypeScript, GSAP, image-sequence hero) → GitHub Pages
 bot/      the WhatsApp payment bot (Cloudflare Worker + D1)
 shared/   catalog.ts — prices, dates, stock, used by both
 ```
