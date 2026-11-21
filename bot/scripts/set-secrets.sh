@@ -19,12 +19,9 @@ ask() { # $1 name, $2 hint
   unset val
 }
 
-echo "── CLOUDFLARE_API_TOKEN → GitHub  (the Cloudflare API token you created)"
-gh secret set CLOUDFLARE_API_TOKEN -R angelooostudio-webs/tote && echo "   ✓ saved"
 
 ask WHATSAPP_TOKEN       "the NEW never-expiring System user token from Meta"
 ask META_APP_SECRET      "Meta app → Settings → Basic → App secret"
-ask WEBHOOK_VERIFY_TOKEN "make up a long random phrase; you'll type it again in Meta's webhook form"
 ask ANTHROPIC_API_KEY    "console.anthropic.com → API Keys"
 ask ADMIN_NUMBER         "YOUR personal WhatsApp, digits only, e.g. 573001234567"
 ask PAYMENT_NEQUI        "your Nequi number, e.g. 300 123 4567"
