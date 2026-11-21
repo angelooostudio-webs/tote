@@ -16,7 +16,7 @@ const PAPER = "#f3efe7";
 
 type Img = ImageBitmap | HTMLImageElement;
 
-export function createSequenceRenderer(stage: HTMLElement, state: HeroState): HeroRenderer {
+export function createSequenceRenderer(stage: HTMLElement, state: HeroState, onLayout?: () => void): HeroRenderer {
   const canvas = document.createElement("canvas");
   canvas.setAttribute("aria-hidden", "true");
   canvas.className = "hero__canvas";
@@ -86,7 +86,9 @@ export function createSequenceRenderer(stage: HTMLElement, state: HeroState): He
     const h = w / meta.aspect;
     rect = { x: (W - w) / 2, y: H * BOX.cy - h / 2, w, h };
     dirty = true;
+    onFit?.();
   };
+  const onFit = onLayout;
   const ro = new ResizeObserver(fit);
   ro.observe(stage);
   fit();
@@ -134,6 +136,7 @@ export function createSequenceRenderer(stage: HTMLElement, state: HeroState): He
 
   return {
     ready,
+    bagBottom: () => (rect.y + meta.frames[N - 1].y * rect.h) / dpr(),
     setActive(on) {
       if (on === active) return;
       active = on;

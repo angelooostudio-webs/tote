@@ -155,12 +155,6 @@
 .hero__slogan strong {
   font-weight: 700;
 }
-/* Spalla's word space is generous at display sizes: pull the words together */
-.hero__slogan,
-.contigo__title,
-.llevan__title {
-  word-spacing: -0.12em;
-}
 .hero__hint {
   grid-row: 3;
   display: inline-flex;

@@ -14,6 +14,8 @@ export interface HeroRenderer {
   /** resolves when the first real frame has been drawn */
   ready: Promise<void>;
   setActive(active: boolean): void;
+  /** where the bottom of the tote sits on the last frame, in CSS px from the top of the stage */
+  bagBottom(): number;
   dispose(): void;
 }
 
