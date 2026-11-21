@@ -88,57 +88,72 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   justify-items: center;
-  /* no side padding: the 3D stage is full-bleed so the floor shadow is never clipped */
   padding: calc(var(--safe-top) + var(--s-6)) 0 calc(var(--safe-bottom) + var(--s-5));
   overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+}
+.hero__label,
+.hero__hint,
+.hero__slogan {
+  position: relative;
+  z-index: 2;
 }
 .hero__label {
   justify-self: center;
 }
+/* the stage is the whole pinned screen: canvas + poster sit behind the labels */
 .hero__stage {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  display: grid;
-  place-items: center;
-}
-.hero__stage canvas {
   position: absolute;
   inset: 0;
-  width: 100% !important;
-  height: 100% !important;
+  z-index: 0;
 }
-.hero__poster,
+.hero__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hero__poster {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transition: opacity 0.5s var(--ease-out);
+}
+/* mirrors renderer-sequence.ts BOX: contained in 96% × 70% of the stage, middle at 45% */
 .hero__poster img {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  left: 2%;
+  top: 10%;
+  width: 96%;
+  height: 70%;
+  max-width: none;
   object-fit: contain;
-  transition: opacity 0.6s var(--ease-out);
+}
+@media (min-aspect-ratio: 3 / 4) {
+  .hero__slogan {
+    bottom: calc(var(--safe-bottom) + 4svh);
+    font-size: clamp(2.25rem, 1rem + 3.6vw, 4.5rem);
+  }
 }
 .hero__poster.is-hidden {
   opacity: 0;
+  pointer-events: none;
 }
 .hero__slogan {
   position: absolute;
   left: var(--gutter);
   right: var(--gutter);
-  bottom: calc(var(--safe-bottom) + 18svh);
+  bottom: calc(var(--safe-bottom) + 7svh);
   text-align: center;
-  font-size: var(--t-h2);
+  font-size: clamp(2.25rem, 1.2rem + 4.6vw, 5.5rem);
   font-weight: 700;
   line-height: 0.95;
   opacity: 0;
   pointer-events: none;
 }
-@media (min-width: 768px) {
-  .hero__slogan {
-    bottom: calc(var(--safe-bottom) + 7svh);
-  }
-}
 .hero__hint {
+  grid-row: 3;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -309,6 +324,8 @@
    ========================================================= */
 .contigo {
   padding-block: var(--s-8) var(--s-9);
+  /* the prints enter from off-screen right: never let them widen the page */
+  overflow-x: clip;
 }
 .contigo__count {
   font-variant-numeric: tabular-nums;
@@ -589,25 +606,6 @@
     justify-self: end;
     text-align: right;
   }
-}
-
-/* =========================================================
-   Poster mode (dev only, /?poster=back|print): the stage fills the
-   viewport so scripts/posters.mjs can bake the poster images.
-   ========================================================= */
-.poster-mode .hero__label,
-.poster-mode .hero__hint,
-.poster-mode .hero__slogan,
-.poster-mode .hero__poster,
-.poster-mode .site-header {
-  display: none !important;
-}
-.poster-mode .hero__pin {
-  padding: 0;
-}
-.poster-mode .hero__stage {
-  position: fixed;
-  inset: 0;
 }
 
 /* =========================================================

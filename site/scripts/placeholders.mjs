@@ -46,26 +46,6 @@ function block(w, h, lines, { bg = C.canvas, fg = C.ink, sub = C.mute } = {}) {
 </svg>`);
 }
 
-function tote(w, h) {
-  // plain back-side silhouette, interim hero poster until the 3D scene renders one
-  const bw = w * 0.56;
-  const bh = bw * 1.08;
-  const x = (w - bw) / 2;
-  const y = h * 0.34;
-  const inset = bw * 0.035;
-  const hw = bw * 0.2;
-  const handle = (ox) =>
-    `<path d="M${ox} ${y + 4} C ${ox} ${y - bh * 0.62}, ${ox + hw} ${y - bh * 0.62}, ${ox + hw} ${y + 4}" fill="none" stroke="${C.deep}" stroke-width="${bw * 0.05}" stroke-linecap="round"/>`;
-  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-  <defs><radialGradient id="s" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#111112" stop-opacity="0.22"/><stop offset="1" stop-color="#111112" stop-opacity="0"/></radialGradient></defs>
-  <rect width="100%" height="100%" fill="${C.paper}"/>
-  <ellipse cx="${w / 2}" cy="${y + bh + 6}" rx="${bw * 0.6}" ry="${bw * 0.06}" fill="url(#s)"/>
-  ${handle(x + bw * 0.18)}${handle(x + bw * 0.62)}
-  <path d="M${x + inset} ${y} H${x + bw - inset} L${x + bw} ${y + bh} H${x} Z" fill="${C.canvas}"/>
-  <path d="M${x + inset} ${y} H${x + bw - inset}" stroke="${C.deep}" stroke-width="3"/>
-  <rect x="${x + bw - 10}" y="${y + bh * 0.42}" width="10" height="${bh * 0.08}" fill="#9a978f"/>
-</svg>`);
-}
 
 const totes = JSON.parse(readFileSync(join(root, "src/data/totes.json"), "utf8")).people;
 
@@ -83,22 +63,9 @@ const jobs = [
       ]),
   })),
   {
-    // reads as a magazine from across the room, so the 3D easter egg works before the real cover exists
-    file: "unbound-cover.jpg",
-    svg: () =>
-      Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1600">
-  <rect width="100%" height="100%" fill="${C.paper}"/>
-  <rect x="90" y="300" width="1020" height="1000" fill="${C.canvas}"/>
-  <text x="600" y="250" text-anchor="middle" font-family="Didot, 'Bodoni 72', Georgia, serif" font-size="230" font-weight="700" letter-spacing="6" fill="${C.ink}">UNBOUND</text>
-  <text x="90" y="1400" font-family="${MONO}" font-size="34" letter-spacing="3" fill="${C.ink}">ANGELO · N.º 3 · 04.12.2026</text>
-  <text x="90" y="1452" font-family="${MONO}" font-size="26" letter-spacing="2" fill="${C.mute}">PORTADA PROVISIONAL · 1200 × 1600 · assets/unbound-cover.jpg</text>
-</svg>`),
-  },
-  {
     file: "og.jpg",
     svg: () => block(1200, 630, ["OG · YOUR FAVORITE'S FAVORITE · 1200 × 630"], { bg: C.paper }),
   },
-  { file: "hero-poster.jpg", svg: () => tote(1200, 1500) },
 ];
 
 let made = 0;

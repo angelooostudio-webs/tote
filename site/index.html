@@ -29,7 +29,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@600;800&family=Geist+Mono:wght@400;500&display=swap" />
 
-    <link rel="preload" as="image" href="/assets/hero-poster.jpg" fetchpriority="high" media="(prefers-reduced-motion: no-preference)" />
+    <link rel="preload" as="image" type="image/webp" href="/assets/hero-poster.webp" fetchpriority="high" media="(prefers-reduced-motion: no-preference)" />
     <link rel="stylesheet" href="/src/styles/index.css" />
   </head>
   <body>
@@ -54,11 +54,11 @@
           <div class="hero__stage" data-hero-stage>
             <picture class="hero__poster" data-hero-poster>
               <!-- reduced motion: no turn, so show the printed side straight away -->
-              <source media="(prefers-reduced-motion: reduce)" srcset="/assets/hero-poster-print.jpg" />
+              <source media="(prefers-reduced-motion: reduce)" srcset="/assets/hero-poster-print.webp" />
               <img
-                src="/assets/hero-poster.jpg"
-                width="1200"
-                height="1500"
+                src="/assets/hero-poster.webp"
+                width="1000"
+                height="1516"
                 alt="Tote de lona natural de Angelo Studio con la impresión «Your favorite's favorite · Angelo Studio»"
                 fetchpriority="high"
               />

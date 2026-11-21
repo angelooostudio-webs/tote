@@ -25,7 +25,7 @@ initLlevan();
 initOrderButtons(setPill);
 initSheet(reduced);
 
-// three.js is loaded on demand so it never blocks the first paint (the poster covers it)
+// the hero (image sequence) loads after first paint; the poster covers it until frame 1 is drawn
 if (!reduced) {
   import("./hero").then(({ initHero }) => {
     const h = initHero();

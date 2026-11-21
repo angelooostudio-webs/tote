@@ -1,5 +1,5 @@
 // Responsive image pipeline. For every photo in public/assets/{people,totes}
-// (and the magazine cover) writes AVIF + WebP + JPEG variants at several widths
+// writes AVIF + WebP + JPEG variants at several widths
 // to public/assets/_r/, plus a manifest the site reads to build srcsets.
 // Skips variants that are newer than their source, so it is fast on re-runs.
 import sharp from "sharp";
@@ -23,7 +23,6 @@ for (const dir of ["people", "totes"]) {
   if (!existsSync(d)) continue;
   for (const f of readdirSync(d)) if (/\.(jpe?g|png)$/i.test(f)) sources.push(join(d, f));
 }
-if (existsSync(join(assets, "unbound-cover.jpg"))) sources.push(join(assets, "unbound-cover.jpg"));
 
 const manifest = {};
 let written = 0;

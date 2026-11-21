@@ -19,10 +19,19 @@ Export JPEG, sRGB, quality ~90. Larger is fine; the build resizes down.
 | `totes/libni.jpg` | 1600 × 1600 | 1:1 | 03 / ¿Qué llevan? | Same setup. |
 | `totes/jhohan.jpg` | 1600 × 1600 | 1:1 | 03 / ¿Qué llevan? | Same setup. |
 | `totes/martin.jpg` | 1600 × 1600 | 1:1 | 03 / ¿Qué llevan? | Same setup. |
-| `unbound-cover.jpg` | 1200 × 1600 | 3:4 | Hero: cover of the small 3D magazine that spills out | Flat scan/export of the UNBOUND cover, no mockup. |
 | `og.jpg` | 1200 × 630 | 1.91:1 | Link preview on WhatsApp, Instagram, X | Tote on paper background + "Your favorite's favorite". Keep text inside the middle 1000 px. |
-| `wordmark.svg` | vector | — | 3D tote print and favicon | ANGELO / STUDIO wordmark exactly as printed on the tote, black, outlined paths (no live text). Not created yet: the site uses Spalla until this file exists. |
-| `hero-poster.jpg` | 1200 × 1500 | 4:5 | First paint of the hero, before 3D loads | **Rendered automatically from the 3D scene** — do not shoot. |
+| `wordmark.svg` | vector | — | Favicon | ANGELO / STUDIO wordmark, black, outlined paths (no live text). Not created yet. |
+| `hero-poster.jpg`, `hero-poster-print.jpg` | 1080 × 1440 | 3:4 | First paint of the hero / reduced-motion version | **Made automatically** from the first and last frame of the turn video. |
+
+## The turn video (hero)
+
+The hero is the product render (1440 × 1920, 24 fps, plain side → print, **on pure black**), turned into an image sequence that scrolling scrubs through: every 4th frame, background keyed out, shown on the page's paper with a soft contact shadow. To replace it with a new render, keep the background pure black (#000) and end with the print facing the camera:
+
+```bash
+cd site
+swift scripts/extract-frames.swift "/path/to/new-video.mp4" /tmp/tote-frames
+node scripts/encode-frames.mjs /tmp/tote-frames 4      # every 4th frame, keyed → public/assets/turn/, posters
+```
 
 ## Flat-lay hotspots
 
