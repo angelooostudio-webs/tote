@@ -180,6 +180,7 @@
 }
 .order-btn {
   position: relative;
+  text-decoration: none;
   display: flex;
   align-items: center;
   gap: var(--s-3);
@@ -198,6 +199,7 @@
   transform: scale(0.98);
 }
 .order-btn__label {
+  white-space: nowrap;
   font-family: var(--f-display);
   font-weight: 700;
   font-size: 1.375rem;
@@ -214,6 +216,7 @@
 }
 .order-btn__price {
   margin-left: auto;
+  white-space: nowrap;
   font-family: var(--f-mono);
   font-size: var(--t-mono);
   letter-spacing: 0.08em;
@@ -242,11 +245,54 @@
   padding-inline: 28px var(--s-5);
   font-size: 0.9375rem;
 }
-.order__meta:empty,
-.order__meta:has(> [hidden]:only-child) {
+.order__magnet {
+  display: block;
+}
+.order__stock {
+  text-transform: uppercase;
+}
+.order__note {
+  color: var(--mute-ink);
+  font-size: var(--t-mono);
+}
+.order__note[hidden] {
   display: none;
 }
+.order__countdown {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s-3);
+}
+.order__countdown[hidden],
+.order__stock[hidden] {
+  display: none;
+}
+.order__countdown .mono {
+  color: var(--mute-ink);
+  font-size: var(--t-mono-sm);
+}
+.order__countdown .sep {
+  display: inline-block;
+  width: 3px;
+  height: 0.62em;
+  margin: 0 0.22em;
+  vertical-align: 0.02em;
+  background:
+    linear-gradient(currentColor, currentColor) top / 3px 3px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom / 3px 3px no-repeat;
+  background-position: 0 22%, 0 78%;
+}
+.order__countdown .dot {
+  font-size: 1.375rem;
+  letter-spacing: 0.04em;
+}
+[data-order][data-state="before"] .order-btn__price {
+  opacity: 0.6;
+}
 @media (min-width: 768px) {
+  .order__magnet {
+    display: inline-block;
+  }
   .order-btn {
     width: auto;
     min-width: 380px;
@@ -286,15 +332,23 @@
   top: 0;
   width: var(--cw);
   aspect-ratio: 4 / 5;
+  transform-origin: 50% 60%;
+  will-change: transform;
+}
+/* the shadow and canvas sit on the inner layer so they travel with the entrance */
+.stack__inner {
+  width: 100%;
+  height: 100%;
   background: var(--canvas);
   border-radius: 3px;
   overflow: hidden;
   box-shadow:
     0 1px 1px rgba(17, 17, 18, 0.06),
     0 22px 44px -24px rgba(17, 17, 18, 0.45);
-  transform: translate(calc(var(--i) * var(--dx)), calc(var(--i) * var(--dy))) rotate(var(--r));
-  transform-origin: 50% 60%;
   will-change: transform;
+}
+.stack__card picture {
+  height: 100%;
 }
 .stack__card img {
   width: 100%;

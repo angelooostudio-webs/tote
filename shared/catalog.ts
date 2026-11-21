@@ -72,7 +72,8 @@ export function shortDate(iso: string): string {
     day: "2-digit",
     month: "2-digit",
   }).formatToParts(new Date(iso));
-  const d = parts.find((p) => p.type === "day")!.value;
-  const m = parts.find((p) => p.type === "month")!.value;
+  // Intl may drop the leading zero for es-CO, so pad explicitly: "04.12"
+  const d = parts.find((p) => p.type === "day")!.value.padStart(2, "0");
+  const m = parts.find((p) => p.type === "month")!.value.padStart(2, "0");
   return `${d}.${m}`;
 }

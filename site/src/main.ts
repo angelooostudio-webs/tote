@@ -1,4 +1,5 @@
-import { CATALOG, presalePhase, shortDate } from "../../shared/catalog";
+import { CATALOG, shortDate, type PresalePhase } from "../../shared/catalog";
+import { initOrderButtons } from "./sections/order-button";
 import { initScroll, ScrollTrigger } from "./lib/scroll";
 import { initHeader } from "./sections/header";
 import { initContigo } from "./sections/contigo";
@@ -7,19 +8,20 @@ import { initLlevan } from "./sections/llevan";
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 document.documentElement.classList.toggle("reduced-motion", reduced);
 
-// ---- presale pill in the header ----
+// ---- presale pill in the header (kept in sync by the order buttons' clock) ----
 const pill = document.querySelector<HTMLElement>("[data-presale-pill]");
-if (pill) {
-  const phase = presalePhase();
+const setPill = (phase: PresalePhase) => {
+  if (!pill) return;
   pill.dataset.state = phase;
   pill.textContent =
     phase === "before" ? `Pre-venta ${shortDate(CATALOG.presaleOpens)}` : phase === "open" ? "Pre-venta abierta" : "Pre-venta cerrada";
-}
+};
 
 initScroll(reduced);
 initHeader(reduced);
-initContigo();
+initContigo(reduced);
 initLlevan();
+initOrderButtons(setPill);
 
 // three.js is loaded on demand so it never blocks the first paint (the poster covers it)
 if (!reduced) {
