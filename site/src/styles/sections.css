@@ -400,12 +400,18 @@
     grid-row: 2 / span 2;
     margin: var(--s-8) 0 0;
   }
+  /* headline and button read as one unit, sitting together against the stack */
   .contigo__title {
     grid-column: 2;
+    grid-row: 2;
+    align-self: end;
     margin-top: 0;
   }
   .contigo .order {
     grid-column: 2;
+    grid-row: 3;
+    align-self: start;
+    margin-top: var(--s-6);
   }
 }
 
@@ -509,7 +515,7 @@
   align-self: flex-start;
   margin-top: var(--s-1);
 }
-.person__ig[aria-disabled="true"] {
+.person__ig[data-pending] {
   color: var(--mute-ink);
   text-decoration: none;
 }

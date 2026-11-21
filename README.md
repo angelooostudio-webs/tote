@@ -38,13 +38,18 @@ the placeholder with the same name in `site/public/assets/` and push.
 Team members, roles, Instagram handles and item lists are in
 `site/src/data/totes.json`.
 
-## Screenshots
+## Checks (with `npm run dev` running in `site/`)
 
 ```bash
 cd site
-node scripts/shots.mjs                 # mobile, tablet, desktop → .shots/
-node scripts/shots.mjs "" "" --full    # full-page
+node scripts/shots.mjs                 # screenshots: mobile, tablet, desktop → .shots/
+node scripts/sheet-test.mjs mobile,tablet,desktop   # 40 order-sheet checks
+node scripts/a11y.mjs                  # axe accessibility audit, every pre-sale state + the sheet
+node scripts/brand-images.mjs          # re-render og.jpg and the icons in Spalla (after copy changes)
 ```
+
+Last Lighthouse run (mobile, production build): Performance 99 · Accessibility 100
+· Best Practices 100 · SEO 100.
 
 ## The WhatsApp bot (`bot/`)
 

@@ -44,7 +44,6 @@ function swapTag(b: Block, tag: "a" | "button") {
 }
 
 function render(phase: PresalePhase) {
-  const opens = new Date(CATALOG.presaleOpens);
   for (const b of blocks) {
     const state = soldOut && phase === "open" ? "soldout" : phase;
     b.root.dataset.state = state;
@@ -61,7 +60,7 @@ function render(phase: PresalePhase) {
         b.note.textContent = `UNBOUND sale el ${shortDate(CATALOG.magazineLaunch)}`;
         b.note.hidden = false;
       }
-      a.setAttribute("aria-label", `Pre-venta cerrada. UNBOUND sale el ${shortDate(CATALOG.magazineLaunch)}. Ver en Instagram`);
+
       continue;
     }
     swapTag(b, "button");
@@ -72,10 +71,7 @@ function render(phase: PresalePhase) {
     if (state === "before") {
       b.btn.setAttribute("aria-disabled", "true");
       b.label.textContent = `Disponible ${shortDate(CATALOG.presaleOpens)}`;
-      b.btn.setAttribute(
-        "aria-label",
-        `Disponible el ${opens.toLocaleDateString("es-CO", { timeZone: "America/Bogota", day: "numeric", month: "long" })} a la medianoche`
-      );
+
     } else if (state === "soldout") {
       b.btn.setAttribute("aria-disabled", "true");
       b.label.textContent = "Agotado";

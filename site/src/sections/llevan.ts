@@ -37,7 +37,7 @@ export function initLlevan() {
     role.className = "person__role";
     role.textContent = p.role;
 
-    const ig = document.createElement("a");
+    const ig = document.createElement(p.instagram ? "a" : "span") as HTMLAnchorElement;
     ig.className = "person__ig mono";
     if (p.instagram) {
       ig.href = `https://instagram.com/${p.instagram}`;
@@ -46,7 +46,7 @@ export function initLlevan() {
       ig.textContent = `@${p.instagram}`;
     } else {
       ig.textContent = "@instagram pendiente";
-      ig.setAttribute("aria-disabled", "true");
+      ig.dataset.pending = "";
     }
 
     const list = document.createElement("ol");

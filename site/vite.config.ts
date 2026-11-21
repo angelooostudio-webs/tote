@@ -39,7 +39,9 @@ function adobeFonts(): Plugin {
       if (!id) return [];
       return [
         { tag: "link", attrs: { rel: "preconnect", href: "https://use.typekit.net", crossorigin: "" }, injectTo: "head-prepend" },
-        { tag: "link", attrs: { rel: "stylesheet", href: `https://use.typekit.net/${id}.css` }, injectTo: "head" },
+        // non-blocking: "Spalla Fallback" (metric-matched) shows until the kit arrives
+        { tag: "link", attrs: { rel: "stylesheet", href: `https://use.typekit.net/${id}.css`, media: "print", onload: "this.media='all'" }, injectTo: "head" },
+        { tag: "noscript", children: `<link rel="stylesheet" href="https://use.typekit.net/${id}.css">`, injectTo: "head" },
       ];
     },
   };

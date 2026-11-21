@@ -35,7 +35,7 @@ export function createSequenceRenderer(stage: HTMLElement, state: HeroState, onL
   async function load(i: number) {
     if (frames[i]) return;
     try {
-      const blob = await (await fetch(url(i))).blob();
+      const blob = await (await fetch(url(i), { priority: i === 0 ? "high" : "low" } as RequestInit)).blob();
       frames[i] = "createImageBitmap" in window ? await createImageBitmap(blob) : await decodeImg(URL.createObjectURL(blob));
       dirty = true;
     } catch {
@@ -53,7 +53,14 @@ export function createSequenceRenderer(stage: HTMLElement, state: HeroState, onL
   for (const stride of [8, 4, 2, 1]) for (let i = 0; i < N; i += stride) if (!order.includes(i)) order.push(i);
   let readyResolve!: () => void;
   const ready = new Promise<void>((r) => (readyResolve = r));
-  (async () => {
+  // The poster (an identical first frame) covers the page until the visitor scrolls, so the
+  // sequence waits: it starts after the page has loaded and gone idle, or on the first scroll,
+  // whichever comes first. This keeps the frames out of the way of the first paint on slow phones.
+  let started = false;
+  const start = async () => {
+    if (started) return;
+    started = true;
+    removeEventListener("scroll", onScroll);
     await load(0);
     draw(true);
     readyResolve();
@@ -62,7 +69,12 @@ export function createSequenceRenderer(stage: HTMLElement, state: HeroState, onL
       while (queue.length) await load(queue.shift()!);
     };
     await Promise.all([worker(), worker(), worker()]);
-  })();
+  };
+  const onScroll = () => void start();
+  addEventListener("scroll", onScroll, { passive: true });
+  const idle = (cb: () => void) => ("requestIdleCallback" in window ? requestIdleCallback(cb, { timeout: 2000 }) : setTimeout(cb, 400));
+  if (document.readyState === "complete") idle(() => void start());
+  else addEventListener("load", () => idle(() => void start()), { once: true });
 
   const nearest = (i: number): number => {
     for (let d = 0; d < N; d++) {

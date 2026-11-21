@@ -78,12 +78,4 @@ for (const j of jobs) {
   console.log("placeholder", j.file);
 }
 
-// favicon (until wordmark.svg exists, a serif A on ink)
-const fav = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${C.ink}"/><text x="32" y="47" text-anchor="middle" font-family="Didot, 'Bodoni 72', Georgia, serif" font-weight="700" font-size="44" fill="${C.paper}">A</text></svg>`;
-if (!existsSync(join(pub, "favicon.svg")) || force) {
-  const { writeFileSync } = await import("node:fs");
-  writeFileSync(join(pub, "favicon.svg"), fav);
-  await sharp(Buffer.from(fav)).resize(180, 180).png().toFile(join(pub, "apple-touch-icon.png"));
-  made++;
-}
 console.log(made ? `${made} placeholder(s) written` : "all assets present");

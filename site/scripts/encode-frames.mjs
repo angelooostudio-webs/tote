@@ -252,6 +252,7 @@ for (const [n, name] of [[0, "hero-poster.webp"], [pick.length - 1, "hero-poster
     .composite([{ input: shadowSvg(fw, fh, frames[n]) }, { input: tote }])
     .webp({ quality: 74, alphaQuality: 100, effort: 5 })
     .toFile(`${root}public/assets/${name}`);
+  await sharp(`${root}public/assets/${name}`).resize(600).webp({ quality: 72, alphaQuality: 100 }).toFile(`${root}public/assets/${name.replace(".webp", "-600.webp")}`);
 }
 rmSync(tmp, { recursive: true, force: true });
 console.log(`${pick.length} frames, crop ${crop.width}×${crop.height} @${crop.left},${crop.top}  sm ${(bytes.sm / 1024).toFixed(0)} kB  lg ${(bytes.lg / 1024).toFixed(0)} kB`);
