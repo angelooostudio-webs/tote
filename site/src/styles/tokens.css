@@ -27,16 +27,17 @@
 
   /* type */
   --f-display: "spalla", "Spalla Fallback", Georgia, serif;
+  --f-body: "Fragment Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --f-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --f-dot: "Doto", "Geist Mono", ui-monospace, monospace;
 
   /* type scale — body never below 17px.
-     Spalla is caps-only (lowercase = small caps), so running text is set
-     larger and slightly tracked to stay readable on a phone. */
-  --t-body: 1.25rem; /* 20px */
-  --t-body-lh: 1.4;
-  --t-body-track: 0.02em;
-  --t-small: 1.125rem; /* 18px */
+     Running text is Fragment Mono (wide, so a touch smaller and airier than a proportional face);
+     Spalla carries the headlines, names, buttons and wordmark. */
+  --t-body: 1.0625rem; /* 17px */
+  --t-body-lh: 1.6;
+  --t-body-track: 0;
+  --t-small: 1.0625rem; /* 17px */
   --t-mono: 0.75rem; /* 12px */
   --t-mono-sm: 0.6875rem; /* 11px */
   --t-h3: clamp(1.625rem, 1.2rem + 1.6vw, 2.25rem);

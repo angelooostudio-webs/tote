@@ -338,7 +338,7 @@
   background: transparent;
   color: var(--ink);
   font: inherit;
-  font-size: 1.25rem; /* ≥ 16px: iOS won't zoom on focus */
+  font-size: 1.0625rem; /* ≥ 16px: iOS won't zoom on focus */
   letter-spacing: var(--t-body-track);
 }
 .field::placeholder {

@@ -26,7 +26,7 @@ html.lenis body {
 body {
   margin: 0;
   background: var(--paper);
-  font-family: var(--f-display);
+  font-family: var(--f-body);
   font-size: var(--t-body);
   line-height: var(--t-body-lh);
   letter-spacing: var(--t-body-track);
@@ -114,6 +114,19 @@ button {
 }
 .skip-link:focus-visible {
   transform: none;
+}
+
+/* Spalla: headlines, names, the slogan, buttons and the wordmark. Everything else reads in Fragment Mono. */
+h1,
+h2,
+h3,
+.hero__slogan,
+.site-footer__mark,
+.opt__name,
+.order-btn__label,
+.site-header__word {
+  font-family: var(--f-display);
+  letter-spacing: 0.01em;
 }
 
 /* ----- shared atoms ----- */
