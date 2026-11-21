@@ -25,7 +25,7 @@ ask META_APP_SECRET      "Meta app → Settings → Basic → App secret"
 ask ANTHROPIC_API_KEY    "console.anthropic.com → API Keys"
 ask ADMIN_NUMBER         "YOUR personal WhatsApp, digits only, e.g. 573001234567"
 ask PAYMENT_NEQUI        "your Nequi number, e.g. 300 123 4567"
-ask PAYMENT_BANCOLOMBIA  "e.g. Ahorros 123-456789-01"
+ask PAYMENT_BANCOLOMBIA  "only if you have one; otherwise just press Enter"
 ask PAYMENT_HOLDER_NAME  "account holder name exactly as the bank shows it"
 
 echo

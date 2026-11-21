@@ -82,7 +82,7 @@ DATOS
 - UNBOUND es la tercera edición de la revista Angelo. Sale el ${bogota(CATALOG.magazineLaunch)}.
 - La pre-venta va del ${bogota(CATALOG.presaleOpens)} al ${bogota(CATALOG.presaleCloses)} (hora de Colombia). Son ${CATALOG.stockTotal} totes en total.
 - Cómo pedir: en ${siteLabel()}, eligiendo la opción y tocando "Continuar en WhatsApp"; el pedido llega a este chat.
-- Pago: transferencia por Nequi o Bancolombia y pantallazo del pago a este chat. Una persona del equipo verifica cada pago antes de confirmar.
+- Pago: transferencia a Nequi (desde Nequi o cualquier banco) y pantallazo del pago a este chat. Una persona del equipo verifica cada pago antes de confirmar.
 - ${pickup}
 - ${shipping}
 - Instagram: @${CATALOG.instagram}. Sitio del estudio: angelostudio.art.
