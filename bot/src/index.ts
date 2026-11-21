@@ -9,7 +9,7 @@ import { ClaudeAssistant, KeywordAssistant } from "./assistant.ts";
 import { remainingStock } from "./db.ts";
 import type { Ctx, Env } from "./env.ts";
 import { handleInbound } from "./handlers.ts";
-import { paymentsCsv, pickupCsv } from "./sheet.ts";
+import { panelHtml, paymentsCsv, pickupCsv } from "./sheet.ts";
 import { runExpiry } from "./expiry.ts";
 import { CloudApiMessenger } from "./messenger.ts";
 import { inboundMessages, verifySignature, type WebhookPayload } from "./whatsapp.ts";
@@ -77,6 +77,13 @@ export default {
       if (!env.SHEET_KEY || url.searchParams.get("key") !== env.SHEET_KEY) return new Response("forbidden", { status: 403 });
       const body = url.pathname.endsWith("entrega.csv") ? await pickupCsv(env.DB) : await paymentsCsv(env.DB);
       return new Response(body, { headers: { "content-type": "text/csv; charset=utf-8", "cache-control": "no-store" } });
+    }
+    // printable order lists for Angelo (same key as the CSV feeds)
+    if (url.pathname === "/panel") {
+      const key = url.searchParams.get("key") ?? "";
+      if (!env.SHEET_KEY || key !== env.SHEET_KEY) return new Response("forbidden", { status: 403 });
+      const html = await panelHtml(env.DB, url.searchParams.get("v") ?? "entrega", key, new Date());
+      return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "x-robots-tag": "noindex" } });
     }
     if (url.pathname === "/stock") {
       if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env) });

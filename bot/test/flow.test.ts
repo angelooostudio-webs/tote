@@ -188,4 +188,19 @@ describe("HTTP routes", () => {
     expect(pagos).toContain('"ANG-7F3K","confirmado"');
     expect(pagos).toContain(`"'=HYPERLINK(1)"`); // formulas defused
   });
+
+  it("serves the printable panel only with the key, and escapes customer text", async () => {
+    const { ctx } = testCtx();
+    const env = { ...ctx.env, SHEET_KEY: "k123" };
+    setCtxFactory(() => ({ ...ctx, env }));
+    await processWebhook(ctx, inbound(CUSTOMER, { text: buildOrderMessage(order({ name: "<b>Vale</b>" })) }));
+    await processWebhook(ctx, inbound(ADMIN, { text: "OK ANG-7F3K" }));
+    expect((await worker.fetch(new Request("https://bot/panel"), env, exec().e)).status).toBe(403);
+    const html = await (await worker.fetch(new Request("https://bot/panel?key=k123"), env, exec().e)).text();
+    expect(html).toContain("ANG-7F3K");
+    expect(html).toContain("&lt;b&gt;Vale&lt;/b&gt;");
+    expect(html).not.toContain("<b>Vale</b>");
+    const pagos = await (await worker.fetch(new Request("https://bot/panel?key=k123&v=pagos"), env, exec().e)).text();
+    expect(pagos).toContain("confirmado");
+  });
 });
