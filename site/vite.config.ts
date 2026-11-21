@@ -8,7 +8,11 @@ function catalogTokens(): Plugin {
     fromPrice: formatCOP(lowestPrice()),
     opensShort: shortDate(CATALOG.presaleOpens),
     closesShort: shortDate(CATALOG.presaleCloses),
+    // Doto's period reads like a comma, so dates shown in Doto get a drawn square dot
+    opensDot: shortDate(CATALOG.presaleOpens).replace(".", '<span class="pt" aria-hidden="true"></span>'),
+    closesDot: shortDate(CATALOG.presaleCloses).replace(".", '<span class="pt" aria-hidden="true"></span>'),
     stockTotal: String(CATALOG.stockTotal),
+    botNumber: CATALOG.botNumber,
     instagram: CATALOG.instagram,
     studioSite: CATALOG.studioSite,
   };

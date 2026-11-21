@@ -576,7 +576,14 @@
   font-size: var(--t-small);
 }
 .site-footer__dates {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
   font-size: 1.25rem;
+}
+.site-footer__arrow svg {
+  width: 18px;
+  height: 18px;
 }
 .site-footer__links {
   display: flex;

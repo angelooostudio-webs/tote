@@ -150,6 +150,16 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
+/* Doto's period reads like a comma: separators in Doto are drawn as one square dot */
+.dot .pt {
+  display: inline-block;
+  width: 0.14em;
+  height: 0.14em;
+  margin: 0 0.06em;
+  background: currentColor;
+  vertical-align: baseline;
+}
+
 .rule {
   height: 0;
   border: 0;
