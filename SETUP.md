@@ -12,7 +12,7 @@ Nothing here goes in the repo. The repo is public.
 
 ```bash
 brew install gh
-gh auth login        # choose GitHub.com, sign in as angelicalternative
+gh auth login        # choose GitHub.com, sign in as angelooostudio-webs
 ```
 
 ## 1. Cloudflare account and API token
@@ -23,7 +23,7 @@ gh auth login        # choose GitHub.com, sign in as angelicalternative
 3. *My Profile → API Tokens → Create Token → "Edit Cloudflare Workers"
    template*. Add permission **Account · D1 · Edit**. Create it and copy the
    token (shown once).
-4. In GitHub: repo `angelicalternative/tote` → *Settings → Secrets and
+4. In GitHub: repo `angelooostudio-webs/tote` → *Settings → Secrets and
    variables → Actions → New repository secret*:
    - `CLOUDFLARE_API_TOKEN` = the token
    - `CLOUDFLARE_ACCOUNT_ID` = the account ID
@@ -110,7 +110,7 @@ At the provider where `angelostudio.art` is registered, add:
 
 | Type | Host / Name | Value / Target | TTL |
 |---|---|---|---|
-| `CNAME` | `tote` | `angelicalternative.github.io` | Auto / 3600 |
+| `CNAME` | `tote` | `angelooostudio-webs.github.io` | Auto / 3600 |
 
 Then GitHub → repo → *Settings → Pages*: confirm the custom domain shows
 `tote.angelostudio.art`, wait for the certificate (minutes to an hour), and
