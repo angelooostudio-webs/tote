@@ -1,5 +1,6 @@
 import { CATALOG, shortDate, type PresalePhase } from "../../shared/catalog";
 import { initOrderButtons } from "./sections/order-button";
+import { initSheet } from "./sections/sheet";
 import { initScroll, ScrollTrigger } from "./lib/scroll";
 import { initHeader } from "./sections/header";
 import { initContigo } from "./sections/contigo";
@@ -22,6 +23,7 @@ initHeader(reduced);
 initContigo(reduced);
 initLlevan();
 initOrderButtons(setPill);
+initSheet(reduced);
 
 // three.js is loaded on demand so it never blocks the first paint (the poster covers it)
 if (!reduced) {
