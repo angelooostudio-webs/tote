@@ -77,7 +77,6 @@ From `bot/`, each command asks for the value:
 
 ```bash
 npx wrangler secret put WHATSAPP_TOKEN            # permanent system-user token
-npx wrangler secret put WHATSAPP_PHONE_NUMBER_ID  # from Meta → WhatsApp → API Setup
 npx wrangler secret put META_APP_SECRET           # Meta app → Settings → Basic
 npx wrangler secret put WEBHOOK_VERIFY_TOKEN      # any long random string; same one in Meta's webhook form
 npx wrangler secret put ANTHROPIC_API_KEY

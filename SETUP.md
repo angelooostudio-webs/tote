@@ -66,7 +66,7 @@ delete that WhatsApp account first.
 4. In the app: *WhatsApp → API Setup → Add phone number*. Display name:
    **Angelo Studio**. Verify the number by SMS. Display names are reviewed by
    Meta (usually 1–2 days).
-5. Copy the **Phone number ID** (not the phone number) from API Setup.
+5. The **Phone number ID** (not the phone number) from API Setup is already in `bot/wrangler.toml`.
 6. **Permanent token:** *Business settings → Users → System users → Add*
    (role Admin) → *Assign assets*: the app (full control) and the WhatsApp
    account (full control) → *Generate new token*, expiry **Never**,
