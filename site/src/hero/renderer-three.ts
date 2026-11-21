@@ -1,9 +1,17 @@
 import * as THREE from "three";
 import type { HeroRenderer, HeroState } from "./state";
 import { buildTote, DIM } from "./tote";
+import { buildGroceries } from "./groceries";
 import { drawPrint, makeWeave, shadowCanvas, tileTexture } from "./textures";
 
 const WEAVE_PER_UNIT = 3.2; // weave tiles per scene unit, same on every panel
+const TIP_MAX = THREE.MathUtils.degToRad(86);
+const STRAP_FLOP = THREE.MathUtils.degToRad(-62);
+
+export interface ThreeRendererOptions {
+  /** render a still (no float), opaque paper background — used to bake the poster images */
+  still?: boolean;
+}
 
 async function loadWordmark(): Promise<HTMLImageElement | null> {
   try {
@@ -18,14 +26,25 @@ async function loadWordmark(): Promise<HTMLImageElement | null> {
   }
 }
 
-export function createThreeRenderer(stage: HTMLElement, state: HeroState): HeroRenderer {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
+const smooth = (x: number) => x * x * (3 - 2 * x);
+const smoother = (x: number) => x * x * x * (x * (x * 6 - 15) + 10);
+const easeOutQuad = (x: number) => 1 - (1 - x) * (1 - x);
+
+export function createThreeRenderer(stage: HTMLElement, state: HeroState, opts: ThreeRendererOptions = {}): HeroRenderer {
+  const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: !opts.still,
+    powerPreference: "high-performance",
+    preserveDrawingBuffer: !!opts.still,
+  });
   let maxPR = Math.min(window.devicePixelRatio || 1, 2);
   renderer.setPixelRatio(maxPR);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1.12;
-  renderer.setClearColor(0x000000, 0);
+  if (opts.still) renderer.setClearColor(0xf3efe7, 1);
+  else renderer.setClearColor(0x000000, 0);
   const canvas = renderer.domElement;
   canvas.setAttribute("aria-hidden", "true");
   canvas.style.opacity = "0";
@@ -84,7 +103,7 @@ export function createThreeRenderer(stage: HTMLElement, state: HeroState): HeroR
     tag: new THREE.MeshStandardMaterial({ color: 0x9c9a94, roughness: 0.75 }),
   };
 
-  const { group: tote, faceAspect } = buildTote(mats);
+  const { group: tote, faceAspect, straps, mouth } = buildTote(mats);
 
   const redrawPrint = async () => {
     const wm = await loadWordmark();
@@ -92,11 +111,15 @@ export function createThreeRenderer(stage: HTMLElement, state: HeroState): HeroR
     printT.needsUpdate = true;
   };
 
-  // ---------- rig: tip (phase 3) > turn > float > tote ----------
-  const tipPivot = new THREE.Group(); // pivots about the bottom edge in phase 3
+  // ---------- rig: tip pivot (bottom edge) > turn > float > tote ----------
+  // After the 180° turn the bottom edge on the viewer's right sits at x = +w/2.
+  // The bag tips over that edge, onto its tagged gusset, mouth toward +x.
+  const P = DIM.w / 2;
+  const tipPivot = new THREE.Group();
+  tipPivot.position.set(P, 0, 0);
   const turn = new THREE.Group();
+  turn.position.set(-P, 0, 0);
   const float = new THREE.Group();
-  tote.position.y = 0;
   float.add(tote);
   turn.add(float);
   tipPivot.add(turn);
@@ -104,31 +127,72 @@ export function createThreeRenderer(stage: HTMLElement, state: HeroState): HeroR
 
   // ---------- contact shadow ----------
   const shadowT = new THREE.CanvasTexture(shadowCanvas());
-  const shadow = new THREE.Mesh(
-    new THREE.PlaneGeometry(1, 1),
-    new THREE.MeshBasicMaterial({ map: shadowT, transparent: true, depthWrite: false, toneMapped: false })
-  );
+  const shadowMat = new THREE.MeshBasicMaterial({ map: shadowT, transparent: true, depthWrite: false, toneMapped: false });
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat);
   shadow.rotation.x = -Math.PI / 2;
   shadow.position.y = 0.001;
-  shadow.scale.set(DIM.w * 1.6, DIM.d * 2.4, 1);
   scene.add(shadow);
+
+  // ---------- groceries ----------
+  const coverT = new THREE.TextureLoader().load("/assets/unbound-cover.jpg");
+  coverT.colorSpace = THREE.SRGBColorSpace;
+  coverT.anisotropy = aniso;
+  const items = buildGroceries(coverT);
+
+  // where the bag's mouth ends up once it has tipped over
+  tipPivot.rotation.z = -TIP_MAX;
+  turn.rotation.y = Math.PI;
+  scene.updateMatrixWorld(true);
+  const mouthW = mouth.getWorldPosition(new THREE.Vector3());
+  tipPivot.rotation.z = 0;
+  turn.rotation.y = 0;
+  const anchor = new THREE.Vector3(mouthW.x + 0.04, 0, mouthW.z);
+
+  const itemState = items.map((it, i) => {
+    it.obj.visible = false;
+    scene.add(it.obj);
+    const sh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat.clone());
+    sh.rotation.x = -Math.PI / 2;
+    sh.position.y = 0.0015 + i * 0.0001;
+    sh.visible = false;
+    scene.add(sh);
+    const start = mouthW.clone().add(new THREE.Vector3(-0.08, ((i % 3) - 1) * 0.12, ((i % 4) - 1.5) * 0.08));
+    const end = new THREE.Vector3(anchor.x + it.rest.dx, it.rest.y, anchor.z + it.rest.dz);
+    const qEnd = new THREE.Quaternion().setFromEuler(it.restRot);
+    const qStart = new THREE.Quaternion().setFromEuler(new THREE.Euler(it.restRot.x + it.spin * 0.6, it.restRot.y - it.spin * 0.4, it.restRot.z + it.spin));
+    return { it, sh, start, end, qStart, qEnd, delay: i * 0.055 };
+  });
+  const tmpQ = new THREE.Quaternion();
+
+  // composition bounds once everything has landed (for the camera)
+  const spillMinX = Math.min(P - 0.08, ...itemState.map((s) => s.end.x - s.it.r));
+  const spillMaxX = Math.max(...itemState.map((s) => s.end.x + s.it.r));
+  const spillMinZ = Math.min(-DIM.d / 2, ...itemState.map((s) => s.end.z - s.it.r));
+  const spillMaxZ = Math.max(...itemState.map((s) => s.end.z + s.it.r));
 
   // ---------- framing ----------
   const totalH = DIM.h + DIM.strapRise;
-  const target = new THREE.Vector3(0, totalH * 0.47, 0);
-  let baseDist = 5;
+  const target1 = new THREE.Vector3(0, totalH * 0.47, 0);
+  const target2 = new THREE.Vector3((spillMinX + spillMaxX) / 2, 0.2, (spillMinZ + spillMaxZ) / 2);
+  let dist1 = 5;
+  let dist2 = 6;
+  let portrait = true;
+  const vFov = THREE.MathUtils.degToRad(28);
   const fit = () => {
     const w = stage.clientWidth || 1;
     const h = stage.clientHeight || 1;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    // fit height (tote + straps) to ~78% of the stage, and the turning width to ~80%
-    const vFov = THREE.MathUtils.degToRad(camera.fov);
-    const distH = (totalH / 0.74) / 2 / Math.tan(vFov / 2);
+    portrait = camera.aspect < 0.9;
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
-    const span = Math.hypot(DIM.w, DIM.d) * 1.02;
-    const distW = (span / 0.74) / 2 / Math.tan(hFov / 2);
-    baseDist = Math.max(distH, distW);
+    const t = Math.tan(vFov / 2);
+    const th = Math.tan(hFov / 2);
+    // upright: tote + straps ~74% of the stage height, the turning width ~74% of the width
+    dist1 = Math.max(totalH / 0.74 / 2 / t, (Math.hypot(DIM.w, DIM.d) * 1.02) / 0.74 / 2 / th);
+    // spilled: the whole still life, a little looser
+    const spanX = (spillMaxX - spillMinX) * (portrait ? 0.92 : 1);
+    const spanV = 1.05 + (spillMaxZ - spillMinZ) * 0.5;
+    dist2 = Math.max(spanV / (portrait ? 0.62 : 0.7) / 2 / t, spanX / (portrait ? 0.9 : 0.78) / 2 / th);
     camera.updateProjectionMatrix();
   };
   const ro = new ResizeObserver(fit);
@@ -138,38 +202,92 @@ export function createThreeRenderer(stage: HTMLElement, state: HeroState): HeroR
   // ---------- loop ----------
   let active = true;
   let raf = 0;
-  let t0 = performance.now();
+  const t0 = performance.now();
   let frames = 0;
   let sampleStart = 0;
   let resolveReady!: () => void;
   const ready = new Promise<void>((r) => (resolveReady = r));
   let firstFrame = true;
-
-  const ease = (x: number) => x * x * (3 - 2 * x);
+  const target = new THREE.Vector3();
 
   const frame = (now: number) => {
     raf = active ? requestAnimationFrame(frame) : 0;
     const t = (now - t0) / 1000;
 
-    // turn: 0 → π about Y, a slight forward lean mid-turn so it feels like an object, not a card
+    // ---- turn: 0 → π about Y, a slight lean mid-turn so it reads as an object, not a card
     const k = state.turn;
     turn.rotation.y = k * Math.PI;
     turn.rotation.x = Math.sin(k * Math.PI) * 0.07;
     turn.rotation.z = Math.sin(k * Math.PI) * -0.025;
 
-    // float: a few millimetres of breathing, damped as the bag settles toward the floor later
-    const f = 1 - state.tip;
+    // ---- tip over the bottom edge, straps flop toward the floor
+    const tip = clamp01(state.tip);
+    tipPivot.rotation.z = -TIP_MAX * tip;
+    for (const s of straps) {
+      // straps go slack and fall toward the floor as the bag lands
+      const k2 = smooth(clamp01((tip - 0.3) / 0.7));
+      s.rotation.z = STRAP_FLOP * k2;
+      s.scale.y = 1 - 0.42 * k2;
+    }
+
+    // ---- float: a few millimetres of breathing, gone once it starts to fall
+    const f = opts.still ? 0 : 1 - smooth(clamp01(tip * 3));
     float.position.y = (0.018 + Math.sin(t * 1.15) * 0.014) * f;
     float.rotation.z = Math.sin(t * 0.72) * 0.008 * f;
-    shadow.material.opacity = 0.85 - float.position.y * 6;
-    const ss = 1 - float.position.y * 1.5;
-    shadow.scale.set(DIM.w * 1.6 * ss, DIM.d * 2.4 * ss, 1);
 
-    // camera: three-quarter view from slightly above, dolly in during the turn
-    const dolly = ease(state.dolly);
-    const dist = baseDist * (1 - 0.09 * dolly);
-    const yaw = THREE.MathUtils.degToRad(-16 + 42 * dolly); // ends in a three-quarter view, tag side showing
-    const pitch = THREE.MathUtils.degToRad(13 - 3 * dolly);
+    // ---- bag shadow follows the bag from standing to lying
+    const ss = 1 - float.position.y * 1.5;
+    shadow.position.x = THREE.MathUtils.lerp(0, P + DIM.h * 0.48, smooth(tip));
+    shadow.scale.set(
+      THREE.MathUtils.lerp(DIM.w * 1.6, DIM.h * 1.75, smooth(tip)) * ss,
+      THREE.MathUtils.lerp(DIM.d * 2.4, DIM.d * 2.2, smooth(tip)) * ss,
+      1
+    );
+    shadowMat.opacity = 0.85 - float.position.y * 6;
+
+    // ---- groceries: thrown out of the mouth, land, one small bounce, settle
+    const sp = state.spill;
+    for (const s of itemState) {
+      const p = clamp01((sp - s.delay) / 0.6);
+      const on = p > 0;
+      s.it.obj.visible = on;
+      s.sh.visible = on;
+      if (!on) continue;
+      const o = s.it.obj;
+      const FLY = 0.68;
+      if (p < FLY) {
+        const u = p / FLY;
+        const e = easeOutQuad(u);
+        o.position.set(
+          THREE.MathUtils.lerp(s.start.x, s.end.x, e),
+          THREE.MathUtils.lerp(s.start.y, s.end.y, u) + s.it.arc * 4 * u * (1 - u),
+          THREE.MathUtils.lerp(s.start.z, s.end.z, e)
+        );
+        tmpQ.slerpQuaternions(s.qStart, s.qEnd, smooth(u));
+        o.quaternion.copy(tmpQ);
+      } else {
+        const u = (p - FLY) / (1 - FLY);
+        const bounce = 0.035 * (s.it.r < 0.1 ? 1.3 : 0.6) * 4 * u * (1 - u) * (1 - u * 0.5);
+        o.position.set(s.end.x, s.end.y + bounce, s.end.z);
+        o.quaternion.copy(s.qEnd);
+        o.rotateZ(Math.sin(u * Math.PI * 2) * 0.05 * (1 - u));
+      }
+      const hgt = Math.max(0, o.position.y - s.end.y);
+      const r = s.it.r * (2.6 + hgt * 3);
+      s.sh.position.x = o.position.x;
+      s.sh.position.z = o.position.z;
+      s.sh.scale.set(r, r * (s.it.name === "baguette" ? 0.5 : 1), 1);
+      s.sh.rotation.z = s.it.name === "baguette" ? -s.it.restRot.y : 0;
+      (s.sh.material as THREE.MeshBasicMaterial).opacity = 0.6 * clamp01(1 - hgt * 2.2) * clamp01(p * 4);
+    }
+
+    // ---- camera: three-quarter view orbit during the turn, then pulls back over the spill
+    const d1 = smooth(state.dolly);
+    const c = smoother(clamp01(state.tip * 0.85 + state.spill * 0.15));
+    const dist = THREE.MathUtils.lerp(dist1 * (1 - 0.09 * d1), dist2, c);
+    const yaw = THREE.MathUtils.degToRad(THREE.MathUtils.lerp(-16 + 42 * d1, portrait ? 30 : 12, c));
+    const pitch = THREE.MathUtils.degToRad(THREE.MathUtils.lerp(13 - 3 * d1, portrait ? 40 : 28, c));
+    target.lerpVectors(target1, target2, c);
     camera.position.set(
       target.x + Math.sin(yaw) * Math.cos(pitch) * dist,
       target.y + Math.sin(pitch) * dist,
@@ -185,7 +303,7 @@ export function createThreeRenderer(stage: HTMLElement, state: HeroState): HeroR
       resolveReady();
     }
 
-    // low-end detection: average frame time over the first ~60 frames
+    // low-end detection: average frame time over ~60 frames after warm-up
     if (frames === 10) sampleStart = now;
     if (frames === 70 && maxPR > 1.5) {
       const avg = (now - sampleStart) / 60;
@@ -204,6 +322,13 @@ export function createThreeRenderer(stage: HTMLElement, state: HeroState): HeroR
       await document.fonts.load(`400 100px "spalla"`);
     } catch {}
     await redrawPrint();
+    if (opts.still) {
+      await new Promise<void>((r) => {
+        if (coverT.image) r();
+        else coverT.onUpdate = () => r();
+        setTimeout(r, 3000);
+      });
+    }
     raf = requestAnimationFrame(frame);
     document.fonts.ready.then(redrawPrint);
   })();
@@ -213,10 +338,7 @@ export function createThreeRenderer(stage: HTMLElement, state: HeroState): HeroR
     setActive(on) {
       if (on === active) return;
       active = on;
-      if (on && !raf) {
-        t0 = performance.now() - 0;
-        raf = requestAnimationFrame(frame);
-      }
+      if (on && !raf) raf = requestAnimationFrame(frame);
     },
     dispose() {
       active = false;

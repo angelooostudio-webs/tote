@@ -83,8 +83,16 @@ const jobs = [
       ]),
   })),
   {
+    // reads as a magazine from across the room, so the 3D easter egg works before the real cover exists
     file: "unbound-cover.jpg",
-    svg: () => block(1200, 1600, ["UNBOUND · PORTADA · 3:4", "1200 × 1600 · assets/unbound-cover.jpg"], { bg: C.ink, fg: C.paper, sub: "#8A877F" }),
+    svg: () =>
+      Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1600">
+  <rect width="100%" height="100%" fill="${C.paper}"/>
+  <rect x="90" y="300" width="1020" height="1000" fill="${C.canvas}"/>
+  <text x="600" y="250" text-anchor="middle" font-family="Didot, 'Bodoni 72', Georgia, serif" font-size="230" font-weight="700" letter-spacing="6" fill="${C.ink}">UNBOUND</text>
+  <text x="90" y="1400" font-family="${MONO}" font-size="34" letter-spacing="3" fill="${C.ink}">ANGELO · N.º 3 · 04.12.2026</text>
+  <text x="90" y="1452" font-family="${MONO}" font-size="26" letter-spacing="2" fill="${C.mute}">PORTADA PROVISIONAL · 1200 × 1600 · assets/unbound-cover.jpg</text>
+</svg>`),
   },
   {
     file: "og.jpg",

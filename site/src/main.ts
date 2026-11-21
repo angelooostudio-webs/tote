@@ -1,5 +1,6 @@
 import { CATALOG, presalePhase, shortDate } from "../../shared/catalog";
-import { initScroll } from "./lib/scroll";
+import { initScroll, ScrollTrigger } from "./lib/scroll";
+import { initHeader } from "./sections/header";
 import { initContigo } from "./sections/contigo";
 import { initLlevan } from "./sections/llevan";
 
@@ -16,6 +17,7 @@ if (pill) {
 }
 
 initScroll(reduced);
+initHeader(reduced);
 initContigo();
 initLlevan();
 
@@ -23,13 +25,22 @@ initLlevan();
 if (!reduced) {
   import("./hero").then(({ initHero }) => {
     const h = initHero();
+    // the hero pin changes the page length: recompute every trigger created before it
+    ScrollTrigger.refresh();
     if (import.meta.env.DEV) (window as unknown as { __hero: unknown }).__hero = h;
   });
 }
 
-// ---- header: hidden while the hero is on screen (phase 3 replaces this with the GSAP entrance) ----
-const header = document.querySelector<HTMLElement>("[data-header]");
-const hero = document.querySelector<HTMLElement>("[data-hero]");
-if (header && hero && !reduced) {
-  new IntersectionObserver(([e]) => header.classList.toggle("is-visible", !e.isIntersecting)).observe(hero);
+// ---- reduced motion: no pin, no spill; sections simply fade in ----
+if (reduced) {
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) if (e.isIntersecting) (e.target.classList.add("is-in"), io.unobserve(e.target));
+    },
+    { threshold: 0.12 }
+  );
+  document.querySelectorAll<HTMLElement>("main > section:not(.hero), .site-footer").forEach((el) => {
+    el.classList.add("reveal");
+    io.observe(el);
+  });
 }

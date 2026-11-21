@@ -44,6 +44,10 @@ export interface ToteParts {
   /** material of the printed face, so the print texture can be swapped/redrawn */
   printMat: THREE.MeshStandardMaterial;
   faceAspect: number;
+  /** strap pivots at the rim, rotated about local Z so the straps flop when the bag falls */
+  straps: THREE.Group[];
+  /** a point at the center of the opening, for the spill */
+  mouth: THREE.Object3D;
 }
 
 export function buildTote(mats: {
@@ -182,7 +186,17 @@ export function buildTote(mats: {
     const m = new THREE.Mesh(g, mats.strap);
     return m;
   };
-  group.add(strap(1), strap(-1));
+  const straps = [strap(1), strap(-1)].map((m) => {
+    const pivot = new THREE.Group();
+    pivot.position.set(0, h, 0);
+    m.position.y = -h;
+    pivot.add(m);
+    group.add(pivot);
+    return pivot;
+  });
+  const mouth = new THREE.Object3D();
+  mouth.position.set(0, h * 0.92, 0);
+  group.add(mouth);
 
   // woven tag on the seam to the right of the print (viewer's right when the print faces you = -x)
   const tag = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.075, 0.004), mats.tag);
@@ -190,5 +204,5 @@ export function buildTote(mats: {
   tag.rotation.y = Math.PI / 2 - 0.55; // flap angled out of the seam, toward the gusset
   group.add(tag);
 
-  return { group, printMat: mats.print, faceAspect: h / DIM.w };
+  return { group, printMat: mats.print, faceAspect: h / DIM.w, straps, mouth };
 }

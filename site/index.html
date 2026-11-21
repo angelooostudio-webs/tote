@@ -29,7 +29,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@600;800&family=Geist+Mono:wght@400;500&display=swap" />
 
-    <link rel="preload" as="image" href="/assets/hero-poster.jpg" fetchpriority="high" />
+    <link rel="preload" as="image" href="/assets/hero-poster.jpg" fetchpriority="high" media="(prefers-reduced-motion: no-preference)" />
     <link rel="stylesheet" href="/src/styles/index.css" />
   </head>
   <body>
@@ -52,16 +52,17 @@
           <p class="label hero__label">01 / El tote</p>
           <h1 id="hero-title" class="visually-hidden">Tote Angelo Studio: Your favorite's favorite</h1>
           <div class="hero__stage" data-hero-stage>
-            <img
-              class="hero__poster"
-              data-hero-poster
-              src="/assets/hero-poster.jpg"
-              width="1200"
-              height="1500"
-              alt="Tote de lona natural con la impresión «Your favorite's favorite · Angelo Studio»"
-              fetchpriority="high"
-              decoding="async"
-            />
+            <picture class="hero__poster" data-hero-poster>
+              <!-- reduced motion: no turn, so show the printed side straight away -->
+              <source media="(prefers-reduced-motion: reduce)" srcset="/assets/hero-poster-print.jpg" />
+              <img
+                src="/assets/hero-poster.jpg"
+                width="1200"
+                height="1500"
+                alt="Tote de lona natural de Angelo Studio con la impresión «Your favorite's favorite · Angelo Studio»"
+                fetchpriority="high"
+              />
+            </picture>
           </div>
           <p class="hero__slogan" data-hero-slogan aria-hidden="true">Your favorite's favorite.</p>
           <p class="hero__hint mono" data-hero-hint aria-hidden="true">

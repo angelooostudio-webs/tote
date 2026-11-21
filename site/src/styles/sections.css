@@ -34,6 +34,9 @@
   min-height: 44px;
 }
 .site-header__word {
+  display: inline-block;
+  overflow: hidden;
+  padding-block: 2px;
   font-family: var(--f-display);
   font-weight: 700;
   font-size: 1.375rem;
@@ -106,11 +109,12 @@
   width: 100% !important;
   height: 100% !important;
 }
-.hero__poster {
-  width: auto;
+.hero__poster,
+.hero__poster img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
   height: 100%;
-  max-height: 72svh;
-  max-width: 100%;
   object-fit: contain;
   transition: opacity 0.6s var(--ease-out);
 }
@@ -128,6 +132,11 @@
   line-height: 0.95;
   opacity: 0;
   pointer-events: none;
+}
+@media (min-width: 768px) {
+  .hero__slogan {
+    bottom: calc(var(--safe-bottom) + 7svh);
+  }
 }
 .hero__hint {
   display: inline-flex;
@@ -529,9 +538,39 @@
 }
 
 /* =========================================================
+   Poster mode (dev only, /?poster=back|print): the stage fills the
+   viewport so scripts/posters.mjs can bake the poster images.
+   ========================================================= */
+.poster-mode .hero__label,
+.poster-mode .hero__hint,
+.poster-mode .hero__slogan,
+.poster-mode .hero__poster,
+.poster-mode .site-header {
+  display: none !important;
+}
+.poster-mode .hero__pin {
+  padding: 0;
+}
+.poster-mode .hero__stage {
+  position: fixed;
+  inset: 0;
+}
+
+/* =========================================================
    Reduced motion
    ========================================================= */
+.reveal {
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-out) !important;
+}
+.reveal.is-in {
+  opacity: 1;
+}
 @media (prefers-reduced-motion: reduce) {
+  /* the header is always there, so the hero starts below it */
+  .hero__pin {
+    padding-top: calc(var(--safe-top) + var(--header-h) + var(--s-5));
+  }
   .site-header {
     transform: none;
     opacity: 1;
