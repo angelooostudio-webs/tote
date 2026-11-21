@@ -1,0 +1,24 @@
+name = "tote-bot"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# where the site lives (CORS for GET /stock)
+SITE_ORIGIN = "https://tote.angelostudio.art"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tote-bot"
+# filled in by `wrangler d1 create tote-bot` (see SETUP.md); the deploy workflow reads it from here
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[triggers]
+# expiry of unpaid reservations + the 20 h reminder
+crons = ["*/15 * * * *"]
+
+# Secrets (never in this file): wrangler secret put <NAME>
+#   WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID, META_APP_SECRET, WEBHOOK_VERIFY_TOKEN,
+#   ANTHROPIC_API_KEY, CLAUDE_MODEL, ADMIN_NUMBER,
+#   PAYMENT_NEQUI, PAYMENT_BANCOLOMBIA, PAYMENT_HOLDER_NAME
