@@ -4,7 +4,7 @@
  * Stock frees itself the moment reserved_until passes (see db.ts); this just
  * makes the status explicit and keeps the customer informed.
  */
-import { formatCOP } from "../../shared/catalog.ts";
+import { formatCOP, siteLabel } from "../../shared/catalog.ts";
 import type { Ctx } from "./env.ts";
 import { logOutbound, setStatus, type OrderRow } from "./db.ts";
 
@@ -41,7 +41,7 @@ export async function runExpiry(ctx: Ctx) {
   const expired = await db.prepare(`SELECT * FROM orders WHERE status = 'AWAITING_PAYMENT' AND reserved_until <= ?`).bind(iso).all<OrderRow>();
   for (const o of expired.results ?? []) {
     await setStatus(db, o.code, "EXPIRED", now);
-    await tell(ctx, o, `La reserva de tu pedido ${o.code} venció porque no recibimos el pago a tiempo. Si todavía lo quieres, haz un pedido nuevo en tote.angelostudio.art.`);
+    await tell(ctx, o, `La reserva de tu pedido ${o.code} venció porque no recibimos el pago a tiempo. Si todavía lo quieres, haz un pedido nuevo en ${siteLabel()}.`);
   }
   return { reminded: due.results?.length ?? 0, expired: expired.results?.length ?? 0 };
 }

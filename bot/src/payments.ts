@@ -6,7 +6,7 @@
  * The bot never confirms an order by itself. The image is never stored: only its
  * fingerprint and the fields read from it.
  */
-import { CATALOG, formatCOP } from "../../shared/catalog.ts";
+import { CATALOG, formatCOP, siteLabel } from "../../shared/catalog.ts";
 import { DELIVERY_LABEL } from "../../shared/order.ts";
 import type { Ctx } from "./env.ts";
 import type { InboundMessage } from "./whatsapp.ts";
@@ -77,7 +77,7 @@ export async function handleImage(ctx: Ctx, waId: string, msg: InboundMessage) {
   const now = ctx.now();
   const mediaId = msg.image?.id;
   const order = await latestOrderFor(db, waId, ["AWAITING_PAYMENT", "PENDING_REVIEW", "NEEDS_HUMAN"]);
-  if (!order || !mediaId) return say(ctx, waId, "Recibimos tu imagen. Si es un comprobante de pago, primero haz tu pedido en tote.angelostudio.art.");
+  if (!order || !mediaId) return say(ctx, waId, `Recibimos tu imagen. Si es un comprobante de pago, primero haz tu pedido en ${siteLabel()}.`);
   if (order.status === "PENDING_REVIEW")
     return say(ctx, waId, `Ya recibimos tu comprobante. Tu pedido ${order.code} está pendiente de verificación; te confirmamos en cuanto lo revisemos.`, order.code);
 

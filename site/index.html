@@ -6,25 +6,25 @@
     <title>Your favorite's favorite · Angelo Studio</title>
     <meta name="description" content="Pre-venta del tote de Angelo Studio: lona natural, impreso en El Retiro. Con o sin tu copia reservada de UNBOUND. Solo {{stockTotal}} unidades, del {{opensShort}} al {{closesShort}}." />
     <meta name="theme-color" content="#F3EFE7" />
-    <link rel="canonical" href="https://tote.angelostudio.art/" />
+    <link rel="canonical" href="{{siteUrl}}" />
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_CO" />
     <meta property="og:site_name" content="Angelo Studio" />
     <meta property="og:title" content="Your favorite's favorite · Angelo Studio" />
     <meta property="og:description" content="El tote de Angelo Studio. Pre-venta del {{opensShort}} al {{closesShort}}, solo {{stockTotal}} unidades." />
-    <meta property="og:url" content="https://tote.angelostudio.art/" />
-    <meta property="og:image" content="https://tote.angelostudio.art/assets/og.jpg" />
+    <meta property="og:url" content="{{siteUrl}}" />
+    <meta property="og:image" content="{{siteUrl}}assets/og.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Your favorite's favorite · Angelo Studio" />
     <meta name="twitter:description" content="El tote de Angelo Studio. Pre-venta del {{opensShort}} al {{closesShort}}." />
-    <meta name="twitter:image" content="https://tote.angelostudio.art/assets/og.jpg" />
+    <meta name="twitter:image" content="{{siteUrl}}assets/og.jpg" />
 
-    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
-    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" href="{{base}}favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="{{base}}icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="{{base}}apple-touch-icon.png" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -33,7 +33,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@600;800&family=Fragment+Mono&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@600;800&family=Fragment+Mono&family=Geist+Mono:wght@400;500&display=swap" /></noscript>
 
-    <link rel="preload" as="image" type="image/webp" href="/assets/hero-poster.webp" imagesrcset="/assets/hero-poster-600.webp 600w, /assets/hero-poster.webp 1000w" imagesizes="(min-aspect-ratio: 3/4) 46svh, 70vw" fetchpriority="high" media="(prefers-reduced-motion: no-preference)" />
+    <link rel="preload" as="image" type="image/webp" href="{{base}}assets/hero-poster.webp" imagesrcset="{{base}}assets/hero-poster-600.webp 600w, {{base}}assets/hero-poster.webp 1000w" imagesizes="(min-aspect-ratio: 3/4) 46svh, 70vw" fetchpriority="high" media="(prefers-reduced-motion: no-preference)" />
     <link rel="stylesheet" href="/src/styles/index.css" />
   </head>
   <body>
@@ -58,10 +58,10 @@
           <div class="hero__stage" data-hero-stage>
             <picture class="hero__poster" data-hero-poster>
               <!-- reduced motion: no turn, so show the printed side straight away -->
-              <source media="(prefers-reduced-motion: reduce)" srcset="/assets/hero-poster-print-600.webp 600w, /assets/hero-poster-print.webp 1000w" sizes="(min-aspect-ratio: 3/4) 46svh, 70vw" />
+              <source media="(prefers-reduced-motion: reduce)" srcset="{{base}}assets/hero-poster-print-600.webp 600w, {{base}}assets/hero-poster-print.webp 1000w" sizes="(min-aspect-ratio: 3/4) 46svh, 70vw" />
               <img
-                src="/assets/hero-poster.webp"
-                srcset="/assets/hero-poster-600.webp 600w, /assets/hero-poster.webp 1000w"
+                src="{{base}}assets/hero-poster.webp"
+                srcset="{{base}}assets/hero-poster-600.webp 600w, {{base}}assets/hero-poster.webp 1000w"
                 sizes="(min-aspect-ratio: 3/4) 46svh, 70vw"
                 width="1000"
                 height="1516"
@@ -151,7 +151,7 @@
         <ul class="site-footer__links mono">
           <li><a href="https://instagram.com/{{instagram}}" target="_blank" rel="noopener">Instagram</a></li>
           <li><a href="{{studioSite}}" target="_blank" rel="noopener">angelostudio.art</a></li>
-          <li><a href="/privacidad/">Aviso de privacidad</a></li>
+          <li><a href="{{base}}privacidad/">Aviso de privacidad</a></li>
         </ul>
         <p class="mono site-footer__copy">© 2026 Angelo Studio</p>
       </div>
@@ -223,7 +223,7 @@
             <span class="order-btn__label">Continuar en WhatsApp</span>
             <svg class="order-btn__arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 4.5 16.5 10 11 15.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
           </a>
-          <p class="sheet__fine">Te enviamos los datos de pago por WhatsApp. Confirmamos tu pedido cuando verifiquemos el pago. <a href="/privacidad/">Aviso de privacidad</a></p>
+          <p class="sheet__fine">Te enviamos los datos de pago por WhatsApp. Confirmamos tu pedido cuando verifiquemos el pago. <a href="{{base}}privacidad/">Aviso de privacidad</a></p>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
-import { CATALOG } from "../../shared/catalog.ts";
+import { CATALOG, siteLabel } from "../../shared/catalog.ts";
 import type { Extracted } from "./proofs.ts";
 
 export const INTENTS = [
@@ -81,7 +81,7 @@ DATOS
 - Dos opciones: el tote con una copia reservada de UNBOUND, o solo el tote.
 - UNBOUND es la tercera edición de la revista Angelo. Sale el ${bogota(CATALOG.magazineLaunch)}.
 - La pre-venta va del ${bogota(CATALOG.presaleOpens)} al ${bogota(CATALOG.presaleCloses)} (hora de Colombia). Son ${CATALOG.stockTotal} totes en total.
-- Cómo pedir: en tote.angelostudio.art, eligiendo la opción y tocando "Continuar en WhatsApp"; el pedido llega a este chat.
+- Cómo pedir: en ${siteLabel()}, eligiendo la opción y tocando "Continuar en WhatsApp"; el pedido llega a este chat.
 - Pago: transferencia por Nequi o Bancolombia y pantallazo del pago a este chat. Una persona del equipo verifica cada pago antes de confirmar.
 - ${pickup}
 - ${shipping}
@@ -199,7 +199,7 @@ export class KeywordAssistant implements Assistant {
     if (/cuanto (cuesta|vale)|precio|valor/.test(t)) return { intent: "price", reply: "" };
     if (/(mi )?pedido|estado|confirma|pague|pago/.test(t)) return { intent: "status", reply: "" };
     if (/cuando sale|unbound|lanzamiento/.test(t))
-      return { intent: "faq", reply: `UNBOUND sale el ${bogota(CATALOG.magazineLaunch)}. Puedes reservar tu copia con el tote en tote.angelostudio.art.` };
+      return { intent: "faq", reply: `UNBOUND sale el ${bogota(CATALOG.magazineLaunch)}. Puedes reservar tu copia con el tote en ${siteLabel()}.` };
     if (/^(hola|buenas|buenos dias|buenas tardes|quiero (comprar|uno|el tote))/.test(t.trim())) return { intent: "how_to_order", reply: "" };
     return { intent: "human", reply: "" };
   }

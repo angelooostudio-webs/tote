@@ -4,6 +4,7 @@ import { CATALOG, formatCOP, lowestPrice, shortDate } from "../shared/catalog.ts
 
 /** Replaces {{tokens}} in HTML with values from shared/catalog.ts (no hardcoded prices/dates). */
 function catalogTokens(): Plugin {
+  let base = "/";
   const tokens: Record<string, string> = {
     fromPrice: formatCOP(lowestPrice()),
     opensShort: shortDate(CATALOG.presaleOpens),
@@ -15,9 +16,14 @@ function catalogTokens(): Plugin {
     botNumber: CATALOG.botNumber,
     instagram: CATALOG.instagram,
     studioSite: CATALOG.studioSite,
+    siteUrl: CATALOG.siteUrl,
   };
   return {
     name: "catalog-tokens",
+    configResolved(c) {
+      base = c.base;
+      tokens.base = base;
+    },
     transformIndexHtml: {
       order: "pre",
       handler(html) {
@@ -47,8 +53,9 @@ function adobeFonts(): Plugin {
   };
 }
 
-export default defineConfig({
-  base: "/",
+export default defineConfig(({ command }) => ({
+  // served from a sub-path on GitHub Pages (e.g. /tote/); the dev server stays at /
+  base: command === "build" ? new URL(CATALOG.siteUrl).pathname : "/",
   plugins: [catalogTokens(), adobeFonts()],
   server: { fs: { allow: [".."] }, host: true },
   build: {
@@ -60,4 +67,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

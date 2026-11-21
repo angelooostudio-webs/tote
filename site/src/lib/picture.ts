@@ -1,4 +1,5 @@
 import manifest from "../data/images.json";
+import { asset } from "./base";
 
 type Entry = { w: number; h: number; widths: number[]; base: string };
 const M = manifest as Record<string, Entry>;
@@ -15,11 +16,12 @@ export function picture(path: string, alt: string, sizes: string, opts: { eager?
   img.decoding = "async";
   img.loading = opts.eager ? "eager" : "lazy";
   if (!e) {
-    img.src = `/assets/${path}`;
+    img.src = asset(`assets/${path}`);
     pic.append(img);
     return pic;
   }
-  const set = (ext: string) => e.widths.map((w) => `${e.base}-${w}.${ext} ${w}w`).join(", ");
+  const base = asset(e.base);
+  const set = (ext: string) => e.widths.map((w) => `${base}-${w}.${ext} ${w}w`).join(", ");
   for (const [ext, type] of [
     ["avif", "image/avif"],
     ["webp", "image/webp"],
@@ -32,7 +34,7 @@ export function picture(path: string, alt: string, sizes: string, opts: { eager?
   }
   img.srcset = set("jpg");
   img.sizes = sizes;
-  img.src = `${e.base}-${e.widths[Math.min(1, e.widths.length - 1)]}.jpg`;
+  img.src = `${base}-${e.widths[Math.min(1, e.widths.length - 1)]}.jpg`;
   img.width = e.w;
   img.height = e.h;
   pic.append(img);

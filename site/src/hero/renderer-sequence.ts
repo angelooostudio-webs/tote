@@ -1,5 +1,6 @@
 import meta from "../data/turn.json";
 import type { HeroRenderer, HeroState } from "./state";
+import { asset } from "../lib/base";
 
 /**
  * Apple-style image sequence: the product video's frames (background keyed out,
@@ -30,7 +31,7 @@ export function createSequenceRenderer(stage: HTMLElement, state: HeroState, onL
   const size = stage.clientWidth * dpr() > 560 ? "lg" : "sm";
   const N = meta.count;
   const frames: (Img | null)[] = new Array(N).fill(null);
-  const url = (i: number) => `/assets/turn/${size}/${String(i).padStart(2, "0")}.webp`;
+  const url = (i: number) => asset(`assets/turn/${size}/${String(i).padStart(2, "0")}.webp`);
 
   async function load(i: number) {
     if (frames[i]) return;

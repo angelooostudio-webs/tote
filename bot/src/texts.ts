@@ -3,10 +3,10 @@
  * professional, no emojis. It should sound like the magazine, not a sales bot.
  * Prices, totals and payment details are always filled in by code.
  */
-import { CATALOG, formatCOP } from "../../shared/catalog.ts";
+import { CATALOG, formatCOP, siteLabel } from "../../shared/catalog.ts";
 import { DELIVERY_LABEL, orderLines, type Order } from "../../shared/order.ts";
 
-export const PRIVACY_URL = "https://tote.angelostudio.art/privacidad/";
+export const PRIVACY_URL = `${CATALOG.siteUrl}privacidad/`;
 
 const launchDate = () =>
   new Date(CATALOG.magazineLaunch).toLocaleDateString("es-CO", { timeZone: "America/Bogota", day: "numeric", month: "long", year: "numeric" });
@@ -63,7 +63,7 @@ export const T = {
       "No pude leer bien tu pedido. Revisa estos datos:",
       ...problems.map((p) => `- ${p}`),
       "",
-      "Lo más fácil es volver a hacerlo desde la página: tote.angelostudio.art",
+      `Lo más fácil es volver a hacerlo desde la página: ${siteLabel()}`,
     ].join("\n"),
   fieldNames: {
     code: "el código del pedido (ANG-…)",
@@ -74,7 +74,9 @@ export const T = {
     name: "tu nombre",
   } as Record<string, string>,
 
-  codeTakenByOther: "Ese código de pedido ya está en uso. Haz tu pedido de nuevo desde la página para obtener uno nuevo: tote.angelostudio.art",
+  get codeTakenByOther() {
+    return `Ese código de pedido ya está en uso. Haz tu pedido de nuevo desde la página para obtener uno nuevo: ${siteLabel()}`;
+  },
   alreadyHaveOrder: (code: string, status: string) =>
     status === "CONFIRMED"
       ? `Tu pedido ${code} ya está confirmado.`
@@ -86,7 +88,7 @@ export const T = {
   greeting: (firstContact: boolean) =>
     [
       "Hola. Aquí puedes pedir el tote de Angelo Studio de la pre-venta.",
-      "Haz tu pedido en tote.angelostudio.art y toca «Continuar en WhatsApp»: el mensaje llega listo a este chat.",
+      `Haz tu pedido en ${siteLabel()} y toca «Continuar en WhatsApp»: el mensaje llega listo a este chat.`,
       ...(firstContact ? ["", `Cómo tratamos tus datos: ${PRIVACY_URL}`] : []),
     ].join("\n"),
 
@@ -96,17 +98,19 @@ export const T = {
       ...Object.values(CATALOG.options).map((o) => `- ${o.label}: ${formatCOP(o.price)}`),
       ...(CATALOG.shipping.enabled ? [`- ${CATALOG.shipping.label}: ${formatCOP(CATALOG.shipping.price)}`] : []),
       "",
-      "Haz tu pedido en tote.angelostudio.art.",
+      `Haz tu pedido en ${siteLabel()}.`,
     ].join("\n"),
 
-  statusNone: "No encuentro un pedido a tu nombre en este número. Puedes hacerlo en tote.angelostudio.art.",
+  get statusNone() {
+    return `No encuentro un pedido a tu nombre en este número. Puedes hacerlo en ${siteLabel()}.`;
+  },
   status: (code: string, status: string) =>
     ({
       AWAITING_PAYMENT: `Tu pedido ${code} está esperando el pago. Cuando transfieras, envía el pantallazo a este chat.`,
       PENDING_REVIEW: `Tu pedido ${code} está pendiente de verificación. Te confirmamos en cuanto lo revisemos.`,
       CONFIRMED: `Tu pedido ${code} está confirmado. UNBOUND sale el ${launchDate()}.`,
       REJECTED: `Tu pedido ${code} no se pudo confirmar. Escríbenos si quieres revisarlo.`,
-      EXPIRED: `La reserva de tu pedido ${code} venció porque no recibimos el pago a tiempo. Puedes hacer un pedido nuevo en tote.angelostudio.art.`,
+      EXPIRED: `La reserva de tu pedido ${code} venció porque no recibimos el pago a tiempo. Puedes hacer un pedido nuevo en ${siteLabel()}.`,
       NEEDS_HUMAN: `Tu pedido ${code} lo está revisando una persona del equipo. Te escribimos pronto.`,
     })[status] ?? `Tu pedido ${code} está en revisión.`,
 

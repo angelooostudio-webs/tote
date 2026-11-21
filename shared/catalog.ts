@@ -34,12 +34,17 @@ export const CATALOG = {
   botNumber: "57XXXXXXXXXX", // the bot's WhatsApp number, placeholder
   instagram: "angelostudio_official",
   studioSite: "https://angelostudio.art",
+  /** where the site lives, with a trailing slash. Switch to "https://tote.angelostudio.art/" (and add site/public/CNAME) once the domain is set up. */
+  siteUrl: "https://angelooostudio-webs.github.io/tote/",
   /** Public URL of the bot Worker, used by the site for GET /stock. Empty = hide the counter. */
   botBaseUrl: "",
   ADOBE_FONTS_KIT_ID: "dzr8yxn",
 };
 
 export const TIMEZONE = "America/Bogota";
+
+/** the site address as people read it in a message: "angelooostudio-webs.github.io/tote" */
+export const siteLabel = () => CATALOG.siteUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
 /** "$45.000" — Colombian pesos, dot as thousands separator, no decimals. */
 export function formatCOP(value: number): string {

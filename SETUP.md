@@ -104,7 +104,15 @@ Needed to confirm orders to customers who haven't written in the last 24 h.
 
 Submit. Approval is usually minutes to a day.
 
-## 6. DNS for tote.angelostudio.art
+## 6. Custom domain (later): tote.angelostudio.art
+
+For now the site lives at https://angelooostudio-webs.github.io/tote/. When you want the domain:
+
+1. In `shared/catalog.ts` set `siteUrl: "https://tote.angelostudio.art/"`.
+2. Create `site/public/CNAME` containing `tote.angelostudio.art`, push.
+3. Add the DNS record below, then in GitHub → Settings → Pages enter the domain and tick Enforce HTTPS.
+
+### DNS record
 
 At the provider where `angelostudio.art` is registered, add:
 
