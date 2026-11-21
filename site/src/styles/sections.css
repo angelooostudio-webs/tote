@@ -356,6 +356,33 @@
   will-change: transform;
 }
 /* the shadow and canvas sit on the inner layer so they travel with the entrance */
+/* "next photo" badge on the front print's lower-right corner (the front print sits in slot 3) */
+.stack__next {
+  position: absolute;
+  z-index: 20;
+  left: calc(3 * var(--dx) + var(--cw) - 68px);
+  top: calc(3 * var(--dy) + var(--cw) * 1.25 - 68px);
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 10px 24px -10px rgba(17, 17, 18, 0.55);
+  transition: transform 0.35s var(--ease-out);
+  pointer-events: none;
+}
+.stack__next svg {
+  width: 20px;
+  height: 20px;
+}
+.stack:hover .stack__next {
+  transform: translateX(4px);
+}
+.stack:active .stack__next {
+  transform: scale(0.94);
+}
 .stack__inner {
   width: 100%;
   height: 100%;
@@ -374,6 +401,22 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+/* the hint under the headline: "tap" on touch screens, "click" with a mouse */
+.contigo__hint {
+  margin-top: var(--s-4);
+  color: var(--mute-ink);
+}
+.contigo__hint-click {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .contigo__hint-touch {
+    display: none;
+  }
+  .contigo__hint-click {
+    display: inline;
+  }
 }
 .contigo__title {
   margin-top: var(--s-8);
@@ -397,21 +440,17 @@
   }
   .stack {
     --w: min(40vw, 520px);
-    grid-row: 2 / span 2;
+    grid-row: 2;
     margin: var(--s-8) 0 0;
   }
-  /* headline and button read as one unit, sitting together against the stack */
-  .contigo__title {
+  /* headline, hint and button read as one block, centred against the stack */
+  .contigo__copy {
     grid-column: 2;
     grid-row: 2;
-    align-self: end;
-    margin-top: 0;
+    align-self: center;
   }
-  .contigo .order {
-    grid-column: 2;
-    grid-row: 3;
-    align-self: start;
-    margin-top: var(--s-6);
+  .contigo__title {
+    margin-top: 0;
   }
 }
 

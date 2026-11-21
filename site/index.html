@@ -88,9 +88,14 @@
 
           <button class="stack" type="button" data-stack aria-label="Ver la siguiente foto">
             <!-- cards rendered from the image manifest in src/sections/contigo.ts -->
+            <span class="stack__next" data-stack-next aria-hidden="true">
+              <svg viewBox="0 0 20 20"><path d="M3 10h13M11 4.5 16.5 10 11 15.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            </span>
           </button>
 
-          <h2 id="contigo-title" class="contigo__title">Everyone's favorite, wherever you go.</h2>
+          <div class="contigo__copy">
+          <h2 id="contigo-title" class="contigo__title">El favorito de todos, a donde vayas.</h2>
+          <p class="contigo__hint"><span class="contigo__hint-touch">Toca las fotos para ver más.</span><span class="contigo__hint-click">Haz clic en las fotos para ver más.</span></p>
 
           <div class="order" data-order>
             <div class="order__magnet">
@@ -105,6 +110,7 @@
                 <span class="mono order__note" data-order-note hidden></span>
               <span class="order__countdown" data-countdown hidden><span class="mono">Abre en</span> <span class="dot" data-countdown-digits>00:00:00:00</span></span>
             </div>
+          </div>
           </div>
         </div>
       </section>

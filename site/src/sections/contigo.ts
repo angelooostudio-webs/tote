@@ -77,6 +77,16 @@ export function initContigo(reduced: boolean) {
 
   if (reduced) return;
 
+  // the "next" arrow arrives with the front print
+  const next = stack.querySelector<HTMLElement>("[data-stack-next]");
+  if (next)
+    gsap.from(next, {
+      autoAlpha: 0,
+      scale: 0.6,
+      ease: "power3.out",
+      scrollTrigger: { trigger: stack, start: "top 55%", end: "top 35%", scrub: 0.8 },
+    });
+
   // ---- entrance: prints slide in from the lower right, one by one, lightly scrubbed ----
   const inners = order.map((c) => cards[c].inner); // back to front
   gsap.from(inners, {
