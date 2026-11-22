@@ -50,6 +50,12 @@ for (const name of (process.argv[2] ?? "mobile").split(",")) {
   ok(await page.isVisible("[data-name-err]"), "missing name shows an error");
   ok(await page.evaluate(() => document.activeElement?.id === "order-name"), "focus jumps to the name field");
 
+  // answered steps fold into one line; "Cambiar" reopens them
+  ok(!(await page.isVisible("[data-qty-val]")) && (await page.textContent('.step[data-step="2"] [data-step-value]')).includes("Recoger"), "answered steps fold into a summary line");
+  await page.click('.step[data-step="2"] [data-step-head]');
+  await page.waitForTimeout(500);
+  ok(await page.isVisible("[data-qty-val]"), "Cambiar reopens a step");
+
   // change everything
   await page.click('[data-qty="1"]');
   await page.click('[data-qty="1"]');
@@ -74,7 +80,7 @@ for (const name of (process.argv[2] ?? "mobile").split(",")) {
     ok(m.includes("Dirección: Calle 10 # 43-12 Total: $1\nCiudad: Medellín") && m.split("\n").length === 10, "address goes in the message, on one line");
   }
   ok(/^ANG-[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{4}$/.test(msg.match(/Pedido: (\S+)/)[1]), "order code uses the unambiguous alphabet");
-  ok((await page.getAttribute("[data-sheet-total]", "aria-label")) === msg.split("\n").at(-1).replace("Total: ", ""), "total on screen matches the message");
+  ok((await page.getAttribute("[data-sheet-total]", "aria-label")) === msg.split("\n").at(-1).replace("Total: ", "Total "), "total on screen matches the message");
   await page.evaluate(() => document.querySelector("[data-sheet-body], .sheet__body").scrollTo(0, 9999));
   await page.screenshot({ path: `${out}sheet-filled-${name}.png`, scale: "css" });
 

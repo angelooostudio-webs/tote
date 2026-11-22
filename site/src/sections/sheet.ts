@@ -29,7 +29,6 @@ export function initSheet(reduced: boolean) {
   const qtyBtns = [...root.querySelectorAll<HTMLButtonElement>("[data-qty]")];
   const nameInput = $<HTMLInputElement>("#order-name");
   const nameErr = $("[data-name-err]");
-  const linesEl = $("[data-sheet-lines]");
   const totalEl = $("[data-sheet-total]");
   const cta = $<HTMLAnchorElement>("[data-sheet-cta]");
   const codeEl = $("[data-sheet-code]");
@@ -41,7 +40,6 @@ export function initSheet(reduced: boolean) {
   const shipErr = $("[data-ship-err]");
   const optionErr = $("[data-option-err]");
   const deliveryErr = $("[data-delivery-err]");
-  const sumEl = $("[data-sheet-sum]");
   const scroller = panel; // the whole window scrolls as one page
 
   const order: Order = { code: "", option: "bundle", qty: 1, addOns: [], delivery: "pickup", name: "" };
@@ -72,35 +70,43 @@ export function initSheet(reduced: boolean) {
   shipOpt.hidden = !CATALOG.shipping.enabled;
   $("[data-shipping-label]").textContent = CATALOG.shipping.label;
 
-  // number the visible steps 01, 02, … (add-ons disappear when the list is empty; the address step shows only for shipping)
-  const renumber = () =>
-    [...form.querySelectorAll<HTMLElement>(".sheet__group")]
-      .filter((g) => !g.hidden)
-      .forEach((g, i) => {
-        const l = g.querySelector<HTMLElement>(".label")!;
-        l.textContent = l.textContent!.replace(/^\d+/, String(i + 1).padStart(2, "0"));
-      });
-  renumber();
-
-  // ---------- steps: each one arrives when the previous is answered ----------
-  // 1 = option · 2 = quantity, add-ons, delivery · 3 = name (+ address for shipping)
-  const steps = [...form.querySelectorAll<HTMLElement>("[data-step]")];
-  let reached = 1;
-  const reveal = (level: number, animate: boolean) => {
-    if (level <= reached) return;
-    reached = level;
-    const fresh = steps.filter((el) => Number(el.dataset.step) <= level && el.classList.contains("is-pending"));
-    fresh.forEach((el) => el.classList.remove("is-pending"));
-    const shown = fresh.filter((el) => !el.hidden);
-    if (!animate || !shown.length) return;
-    if (!reduced) gsap.fromTo(shown, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: "expo.out", stagger: 0.09, clearProps: "transform,opacity,visibility" });
-    // bring the new question into view, leaving the one just answered visible above it
-    requestAnimationFrame(() => {
-      const top = shown[0].getBoundingClientRect().top - scroller.getBoundingClientRect().top;
-      const target = scroller.scrollTop + top - scroller.clientHeight * 0.28;
-      if (target > scroller.scrollTop) scroller.scrollTo({ top: target, behavior: reduced ? "auto" : "smooth" });
-    });
+  // ---------- steps: 01 option · 02 quantity + delivery · 03 your details ----------
+  // One step open at a time. Answered steps fold into a one-line summary ("Cambiar" reopens them);
+  // steps not reached yet show only their greyed title.
+  type State = "open" | "done" | "locked";
+  const steps = [...form.querySelectorAll<HTMLElement>(".step")];
+  const stepHead = (i: number) => steps[i].querySelector<HTMLButtonElement>("[data-step-head]")!;
+  const stateOf = (i: number) => steps[i].dataset.state as State;
+  const setState = (i: number, st: State) => {
+    steps[i].dataset.state = st;
+    const h = stepHead(i);
+    h.disabled = st === "locked";
+    h.setAttribute("aria-expanded", String(st === "open"));
   };
+  /** open step i; every other reachable step folds to its summary */
+  const openStep = (i: number, scroll: boolean) => {
+    steps.forEach((_, j) => {
+      if (j === i) setState(j, "open");
+      else if (stateOf(j) === "open") setState(j, "done"); // a step once reached never locks again
+    });
+    const body = steps[i].querySelector<HTMLElement>(".step__body")!;
+    if (!reduced) gsap.fromTo(body, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: "expo.out", clearProps: "transform,opacity,visibility" });
+    if (scroll)
+      requestAnimationFrame(() => {
+        const top = steps[i].getBoundingClientRect().top - scroller.getBoundingClientRect().top - head.offsetHeight - 8;
+        scroller.scrollTo({ top: scroller.scrollTop + top, behavior: reduced ? "auto" : "smooth" });
+      });
+  };
+  const complete = (i: number) => (i === 0 ? !!chosen("option") : i === 1 ? !!chosen("delivery") : false);
+  /** after answering step i: fold it and move on to the first unanswered step */
+  const advance = (i: number) => {
+    const next = steps.findIndex((_, j) => j > i && !complete(j));
+    if (next === -1) return;
+    setState(i, "done");
+    openStep(next, true);
+  };
+  steps.forEach((_, i) => stepHead(i).addEventListener("click", () => stateOf(i) === "done" && openStep(i, false)));
+
   const chosen = (name: string) => form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value;
 
   // ---------- live state ----------
@@ -119,29 +125,27 @@ export function initSheet(reduced: boolean) {
       delete order.address;
       delete order.city;
     }
-    if (shipGroup.hidden === shipping) {
-      shipGroup.hidden = !shipping;
-      renumber();
-    }
+    shipGroup.hidden = !shipping;
 
     qtyVal.textContent = String(order.qty);
     qtyBtns[0].disabled = order.qty <= 1;
     qtyBtns[1].disabled = order.qty >= CATALOG.maxQtyPerOrder;
 
-    const { lines, total } = orderLines(order);
-    linesEl.replaceChildren(
-      ...lines.map((l) => {
-        const li = document.createElement("li");
-        li.innerHTML = "<span></span><span></span>";
-        li.firstElementChild!.textContent = l.label;
-        li.lastElementChild!.textContent = formatCOP(l.amount);
-        return li;
-      })
-    );
-    totalEl.innerHTML = formatCOP(total).replace(/\./g, '<span class="pt" aria-hidden="true"></span>');
-    totalEl.setAttribute("aria-label", formatCOP(total));
+    const { total } = orderLines(order);
+    if (hasOption) {
+      totalEl.innerHTML = formatCOP(total).replace(/\./g, '<span class="pt" aria-hidden="true"></span>');
+      totalEl.setAttribute("aria-label", `Total ${formatCOP(total)}`);
+    } else {
+      totalEl.textContent = "";
+      totalEl.removeAttribute("aria-label");
+    }
 
-    sumEl.hidden = !hasOption;
+    // the one-line answers shown when a step is folded
+    const val = (i: number, text: string) => (steps[i].querySelector<HTMLElement>("[data-step-value]")!.textContent = text);
+    val(0, hasOption ? `${CATALOG.options[order.option].label} · ${formatCOP(CATALOG.options[order.option].price)}` : "");
+    val(1, hasDelivery ? `${order.qty} × · ${order.delivery === "shipping" ? CATALOG.shipping.label : "Recoger"}` : "");
+    val(2, [order.name, shipping ? order.city : ""].filter(Boolean).join(" · "));
+
     if (hasOption) optionErr.hidden = true;
     if (hasDelivery) deliveryErr.hidden = true;
     if (!hasDelivery) {
@@ -160,8 +164,11 @@ export function initSheet(reduced: boolean) {
   form.addEventListener("change", (e) => {
     update();
     const name = (e.target as HTMLInputElement).name;
-    if (name === "option") reveal(2, true);
-    if (name === "delivery") reveal(3, true);
+    if (name === "option") advance(0);
+    if (name === "delivery") {
+      // a shipping order still needs an address in step 3; a pickup one is ready for a name
+      advance(1);
+    }
   });
   nameInput.addEventListener("input", () => {
     if (nameInput.value.trim()) setNameError(false);
@@ -191,18 +198,18 @@ export function initSheet(reduced: boolean) {
     cityInput.setAttribute("aria-invalid", String(on && cleanLine(cityInput.value).length < 2));
   };
 
-  const stop = (e: Event, err: HTMLElement, focusEl: HTMLElement) => {
+  const stop = (e: Event, step: number, err: HTMLElement, focusEl: HTMLElement) => {
     e.preventDefault();
+    if (stateOf(step) !== "open") openStep(step, true);
     err.hidden = false;
     focusEl.focus({ preventScroll: true });
-    focusEl.closest(".sheet__group")?.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
   };
+  const openDetails = () => stateOf(2) !== "open" && openStep(2, true);
   cta.addEventListener("click", (e) => {
     update();
-    if (!chosen("option")) return stop(e, optionErr, form.querySelector<HTMLInputElement>('input[name="option"]')!);
-    reveal(2, true);
-    if (!chosen("delivery")) return stop(e, deliveryErr, form.querySelector<HTMLInputElement>('input[name="delivery"]')!);
-    reveal(3, true);
+    if (!chosen("option")) return stop(e, 0, optionErr, form.querySelector<HTMLInputElement>('input[name="option"]')!);
+    if (!chosen("delivery")) return stop(e, 1, deliveryErr, form.querySelector<HTMLInputElement>('input[name="delivery"]')!);
+    if (!order.name || (order.delivery === "shipping" && !shipOk())) openDetails();
     if (!order.name) {
       e.preventDefault();
       setNameError(true);

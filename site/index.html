@@ -195,68 +195,86 @@
           </div>
 
           <form class="sheet__form" data-sheet-form novalidate>
-            <fieldset class="sheet__group" data-step="1">
-              <legend class="label">01 / Opción</legend>
-              <div class="opts" data-sheet-options></div>
-              <p class="field__err" data-option-err hidden>Elige una opción para continuar.</p>
-            </fieldset>
-
-            <div class="sheet__group sheet__row is-pending" data-step="2">
-              <p class="label" id="qty-label">02 / Cantidad</p>
-              <div class="stepper" role="group" aria-labelledby="qty-label">
-                <button type="button" class="stepper__btn" data-qty="-1" aria-label="Quitar uno">
-                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10" stroke="currentColor" stroke-width="1.5"/></svg>
-                </button>
-                <output class="stepper__val dot" data-qty-val aria-live="polite">1</output>
-                <button type="button" class="stepper__btn" data-qty="1" aria-label="Agregar uno">
-                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M10 5v10" stroke="currentColor" stroke-width="1.5"/></svg>
-                </button>
+            <!-- 1 · option -->
+            <section class="step" data-step="1" data-state="open">
+              <button type="button" class="step__head" data-step-head aria-expanded="true" aria-controls="step-1">
+                <span class="step__num mono">01</span><span class="step__title">Opción</span>
+                <span class="step__value mono" data-step-value></span><span class="step__edit mono">Cambiar</span>
+              </button>
+              <div class="step__body" id="step-1">
+                <fieldset class="step__set">
+                  <legend class="visually-hidden">Elige una opción</legend>
+                  <div class="opts" data-sheet-options></div>
+                </fieldset>
+                <p class="field__err" data-option-err hidden>Elige una opción para continuar.</p>
               </div>
-            </div>
+            </section>
 
-            <fieldset class="sheet__group is-pending" data-step="2" data-sheet-addons-group hidden>
-              <legend class="label">03 / Adicionales</legend>
-              <div class="addons" data-sheet-addons></div>
-            </fieldset>
-
-            <fieldset class="sheet__group is-pending" data-step="2">
-              <legend class="label" data-n="delivery">04 / Entrega</legend>
-              <div class="rows" data-sheet-delivery>
-                <label class="row"><input type="radio" name="delivery" value="pickup" /><span class="row__mark" aria-hidden="true"></span><span class="row__name">Recoger en El Retiro</span><span class="row__meta mono">Sin costo</span></label>
-                <label class="row" data-shipping-opt><input type="radio" name="delivery" value="shipping" /><span class="row__mark" aria-hidden="true"></span><span class="row__name" data-shipping-label>Envío</span><span class="row__meta mono">Contra entrega</span></label>
+            <!-- 2 · quantity + delivery -->
+            <section class="step" data-step="2" data-state="locked">
+              <button type="button" class="step__head" data-step-head aria-expanded="false" aria-controls="step-2" disabled>
+                <span class="step__num mono">02</span><span class="step__title">Cantidad y entrega</span>
+                <span class="step__value mono" data-step-value></span><span class="step__edit mono">Cambiar</span>
+              </button>
+              <div class="step__body" id="step-2">
+                <div class="step__line">
+                  <p class="step__label" id="qty-label">Cantidad</p>
+                  <div class="stepper" role="group" aria-labelledby="qty-label">
+                    <button type="button" class="stepper__btn" data-qty="-1" aria-label="Quitar uno">
+                      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10" stroke="currentColor" stroke-width="1.5"/></svg>
+                    </button>
+                    <output class="stepper__val dot" data-qty-val aria-live="polite">1</output>
+                    <button type="button" class="stepper__btn" data-qty="1" aria-label="Agregar uno">
+                      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M10 5v10" stroke="currentColor" stroke-width="1.5"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <fieldset class="step__set" data-sheet-addons-group hidden>
+                  <legend class="step__label">Adicionales</legend>
+                  <div class="addons" data-sheet-addons></div>
+                </fieldset>
+                <fieldset class="step__set">
+                  <legend class="step__label">Entrega</legend>
+                  <div class="rows" data-sheet-delivery>
+                    <label class="row"><input type="radio" name="delivery" value="pickup" /><span class="row__mark" aria-hidden="true"></span><span class="row__name">Recoger en El Retiro</span><span class="row__meta mono">Sin costo</span></label>
+                    <label class="row" data-shipping-opt><input type="radio" name="delivery" value="shipping" /><span class="row__mark" aria-hidden="true"></span><span class="row__name" data-shipping-label>Envío</span><span class="row__meta mono">Contra entrega</span></label>
+                  </div>
+                </fieldset>
+                <p class="field__err" data-delivery-err hidden>Elige cómo quieres recibirlo.</p>
               </div>
-              <p class="sheet__hint" data-delivery-hint></p>
-              <p class="field__err" data-delivery-err hidden>Elige cómo quieres recibirlo.</p>
-            </fieldset>
+            </section>
 
-            <div class="sheet__group is-pending" data-step="3">
-              <label class="label" for="order-name" data-n="name">05 / Nombre</label>
-              <input class="field" id="order-name" name="name" type="text" autocomplete="name" autocapitalize="words" maxlength="60" required placeholder="Como quieres que te llamemos" aria-describedby="order-name-err" />
-              <p class="field__err" id="order-name-err" data-name-err hidden>Escribe tu nombre para continuar.</p>
-            </div>
-
-            <div class="sheet__group is-pending" role="group" aria-labelledby="order-ship-label" data-step="3" data-ship-group hidden>
-              <p class="label" id="order-ship-label" data-n="address">06 / Dirección de envío</p>
-              <input class="field" aria-label="Dirección" id="order-address" name="address" type="text" autocomplete="street-address" maxlength="120" placeholder="Calle, número, apto y barrio" aria-describedby="order-ship-err" />
-              <input class="field field--stack" aria-label="Ciudad" id="order-city" name="city" type="text" autocomplete="address-level2" autocapitalize="words" maxlength="60" placeholder="Ciudad y departamento" aria-describedby="order-ship-err" />
-              <p class="field__err" id="order-ship-err" data-ship-err hidden>Escribe la dirección y la ciudad para el envío.</p>
-            </div>
+            <!-- 3 · your details -->
+            <section class="step" data-step="3" data-state="locked">
+              <button type="button" class="step__head" data-step-head aria-expanded="false" aria-controls="step-3" disabled>
+                <span class="step__num mono">03</span><span class="step__title">Tus datos</span>
+                <span class="step__value mono" data-step-value></span><span class="step__edit mono">Cambiar</span>
+              </button>
+              <div class="step__body" id="step-3">
+                <p class="sheet__hint sheet__hint--top" data-delivery-hint></p>
+                <label class="step__label" for="order-name">Nombre</label>
+                <input class="field" id="order-name" name="name" type="text" autocomplete="name" autocapitalize="words" maxlength="60" required placeholder="Como quieres que te llamemos" aria-describedby="order-name-err" />
+                <p class="field__err" id="order-name-err" data-name-err hidden>Escribe tu nombre para continuar.</p>
+                <div class="step__ship" role="group" aria-labelledby="order-ship-label" data-ship-group hidden>
+                  <p class="step__label" id="order-ship-label">Dirección de envío</p>
+                  <input class="field" aria-label="Dirección" id="order-address" name="address" type="text" autocomplete="street-address" maxlength="120" placeholder="Calle, número, apto y barrio" aria-describedby="order-ship-err" />
+                  <input class="field field--stack" aria-label="Ciudad" id="order-city" name="city" type="text" autocomplete="address-level2" autocapitalize="words" maxlength="60" placeholder="Ciudad y departamento" aria-describedby="order-ship-err" />
+                  <p class="field__err" id="order-ship-err" data-ship-err hidden>Escribe la dirección y la ciudad para el envío.</p>
+                </div>
+              </div>
+            </section>
           </form>
+          <p class="sheet__fine">Te enviamos los datos de pago por WhatsApp. Confirmamos tu pedido cuando verifiquemos el pago. <a href="{{base}}privacidad/">Aviso de privacidad</a></p>
         </div>
 
         <div class="sheet__foot">
-          <div class="sheet__sum" data-sheet-sum hidden>
-            <ul class="summary mono" data-sheet-lines></ul>
-            <div class="summary__total">
-              <span class="mono">Total</span>
-              <output class="dot" data-sheet-total aria-live="polite">$0</output>
-            </div>
-          </div>
           <a class="order-btn sheet__cta" data-sheet-cta href="#" target="_blank" rel="noopener">
-            <span class="order-btn__label">Continuar en WhatsApp</span>
-            <svg class="order-btn__arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 4.5 16.5 10 11 15.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            <span class="order-btn__label">Continuar<span class="sheet__cta-long"> en WhatsApp</span></span>
+            <span class="sheet__cta-end">
+              <output class="sheet__cta-total dot" data-sheet-total aria-live="polite"></output>
+              <svg class="order-btn__arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 4.5 16.5 10 11 15.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            </span>
           </a>
-          <p class="sheet__fine">Te enviamos los datos de pago por WhatsApp. Confirmamos tu pedido cuando verifiquemos el pago. <a href="{{base}}privacidad/">Aviso de privacidad</a></p>
         </div>
       </div>
     </div>

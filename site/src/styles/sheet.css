@@ -136,38 +136,118 @@
   color: var(--mute-ink);
 }
 
-.sheet__group {
-  margin: 0;
-  padding: var(--s-5) 0 var(--s-4);
-  border: 0;
-  border-bottom: 1px solid var(--rule);
-  min-width: 0;
+/* ---- steps: 01 Opción · 02 Cantidad y entrega · 03 Tus datos ----
+   One open at a time; answered steps fold into a one-line summary with "Cambiar";
+   steps not reached yet show only their title, greyed, so the whole path is visible. */
+.sheet__form {
+  margin-top: var(--s-2);
 }
-.sheet__group[hidden],
-.sheet__group.is-pending {
+.step {
+  border-bottom: 1px solid var(--rule);
+}
+.step__head {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr auto;
+  grid-template-areas: "num title edit" ". value value";
+  align-items: baseline;
+  gap: 2px var(--s-2);
+  width: 100%;
+  padding: var(--s-4) 0;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+.step__head:disabled {
+  cursor: default;
+}
+.step__num {
+  grid-area: num;
+  font-size: var(--t-mono-sm);
+  color: var(--mute-ink);
+}
+.step__title {
+  grid-area: title;
+  font-family: var(--f-display);
+  font-size: 1.25rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+.step__value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  grid-area: value;
+  font-size: var(--t-mono-sm);
+  letter-spacing: 0.04em;
+  color: var(--mute-ink);
+}
+.step__edit {
+  grid-area: edit;
+  font-size: var(--t-mono-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.step__head:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 2px;
+}
+/* states */
+.step[data-state="locked"] .step__head {
+  color: var(--mute);
+}
+.step[data-state="locked"] .step__num {
+  color: var(--mute);
+}
+.step:not([data-state="done"]) .step__value,
+.step:not([data-state="done"]) .step__edit {
   display: none;
 }
-.sheet__group > .label,
-.sheet__group > legend {
-  display: block;
+.step:not([data-state="open"]) .step__body {
+  display: none;
+}
+.step[data-state="open"] .step__head {
+  cursor: default;
+}
+.step__body {
+  padding: 0 0 var(--s-5);
+}
+.step__set {
+  margin: 0;
   padding: 0;
-  margin-bottom: var(--s-3);
+  border: 0;
+  min-width: 0;
 }
-/* a floated legend lays out like any block (otherwise it sits on the fieldset's edge, outside the padding) */
-.sheet__group > legend {
-  float: left;
-  width: 100%;
+.step__set + .step__set,
+.step__line + .step__set {
+  margin-top: var(--s-5);
 }
-.sheet__group > legend + * {
-  clear: both;
+.step__label {
+  display: block;
+  margin: 0 0 var(--s-2);
+  padding: 0;
+  font-family: var(--f-mono);
+  font-size: var(--t-mono-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mute-ink);
 }
-.sheet__row {
+.step__line {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--s-4);
 }
-.sheet__row > .label {
+.step__line .step__label {
   margin: 0;
+}
+.step__ship {
+  margin-top: var(--s-5);
+}
+.step__ship[hidden] {
+  display: none;
 }
 .sheet__hint {
   margin-top: var(--s-3);
@@ -175,14 +255,22 @@
   line-height: 1.45;
   color: var(--mute-ink);
 }
+.sheet__hint--top {
+  margin: 0 0 var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  border-radius: 10px;
+  background: var(--canvas);
+  color: #3d3b36; /* AA on the canvas tone */
+}
 .sheet__hint:empty {
   display: none;
 }
 
 /* options and delivery: ruled rows — square mark, name, price on the right */
-.opt + .opt,
-.row + .row {
-  border-top: 1px solid var(--rule);
+.opts,
+.rows {
+  display: grid;
+  gap: 4px;
 }
 .opt,
 .row {
@@ -193,8 +281,18 @@
   align-items: baseline;
   column-gap: var(--s-3);
   row-gap: 4px;
-  padding: var(--s-4) 0;
+  padding: var(--s-3) var(--s-3);
+  margin: 0 calc(-1 * var(--s-3));
+  border-radius: 10px;
   cursor: pointer;
+  transition: background-color 0.15s var(--ease-quart);
+}
+.opt:has(input:checked),
+.row:has(input:checked) {
+  background: var(--canvas);
+}
+.opt:has(input:checked) .opt__desc {
+  color: #3d3b36;
 }
 .opt input,
 .row input {
@@ -236,8 +334,7 @@
 }
 .opt:has(input:checked) .opt__mark,
 .row:has(input:checked) .row__mark {
-  background: var(--ink);
-  box-shadow: inset 0 0 0 3px var(--paper);
+  background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23f3efe7' stroke-width='1.8'/%3E%3C/svg%3E") center / 14px no-repeat;
 }
 .opt:has(input:checked) .opt__name,
 .row:has(input:checked) .row__name {
@@ -374,44 +471,36 @@
   display: none;
 }
 
-/* ---- foot: summary, total, CTA ---- */
+/* ---- foot: one pinned button that carries the total ---- */
 .sheet__foot {
-  flex: none;
-  padding: var(--s-4) var(--gutter) calc(var(--safe-bottom) + var(--s-4));
+  padding: var(--s-3) var(--gutter) calc(var(--safe-bottom) + var(--s-3));
   border-top: 1px solid var(--rule);
   background: var(--paper);
 }
-.summary {
-  display: grid;
-  gap: 4px;
-  font-size: var(--t-mono-sm);
-  color: var(--mute-ink);
-}
-.summary li {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--s-4);
-}
-.summary__total {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin: var(--s-2) 0 var(--s-4);
-}
-.summary__total .mono {
-  font-size: var(--t-mono);
-}
-.summary__total .dot {
-  font-size: 2rem;
-  line-height: 1;
-}
-
 .sheet__cta {
   width: 100%;
   justify-content: space-between;
 }
+.sheet__cta-end {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+.sheet__cta-total {
+  font-size: 1.125rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+@media (max-width: 419px) {
+  .sheet__cta-long {
+    display: none;
+  }
+}
+.sheet__cta-total:empty {
+  display: none;
+}
 .sheet__fine {
-  margin-top: var(--s-3);
+  margin-top: var(--s-5);
   font-size: 0.8125rem;
   line-height: 1.35;
   color: var(--mute-ink);
@@ -421,9 +510,6 @@
   position: sticky;
   bottom: 0;
   z-index: 3;
-}
-.sheet__sum[hidden] {
-  display: none;
 }
 
 @media (min-width: 768px) {
@@ -475,6 +561,17 @@
   }
   .sheet__media img {
     height: 78%;
+  }
+  /* wide column: answers sit on the title line, bodies indent under the title */
+  .step__head {
+    grid-template-columns: 2.25rem auto 1fr auto;
+    grid-template-areas: "num title value edit";
+  }
+  .step__value {
+    text-align: right;
+  }
+  .step__body {
+    padding-left: 2.75rem;
   }
   .sheet__head,
   .sheet__body,
