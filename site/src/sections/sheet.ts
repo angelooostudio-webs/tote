@@ -93,7 +93,9 @@ export function initSheet(reduced: boolean) {
     if (!reduced) gsap.fromTo(body, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: "expo.out", clearProps: "transform,opacity,visibility" });
     if (scroll)
       requestAnimationFrame(() => {
-        const top = steps[i].getBoundingClientRect().top - scroller.getBoundingClientRect().top - head.offsetHeight - 8;
+        // keep every step in view: 01 sits just under the pinned head, so the answered steps (and their
+        // "Cambiar") stay visible and tappable above the one that just opened
+        const top = steps[0].getBoundingClientRect().top - scroller.getBoundingClientRect().top - head.offsetHeight - 8;
         scroller.scrollTo({ top: scroller.scrollTop + top, behavior: reduced ? "auto" : "smooth" });
       });
   };

@@ -29,6 +29,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   outline: none;
   box-shadow: 0 -18px 50px -20px rgba(17, 17, 18, 0.35);
 }
@@ -86,8 +87,7 @@
 
 /* ---- the photo ---- */
 .sheet__media {
-  display: grid;
-  place-items: center;
+  position: relative;
   aspect-ratio: 5 / 4;
   max-height: 46dvh;
   width: 100%;
@@ -98,9 +98,10 @@
   display: contents;
 }
 .sheet__media img {
+  position: absolute;
+  inset: 7% 10%;
+  width: 80%;
   height: 86%;
-  width: auto;
-  max-width: 80%;
   object-fit: contain;
   filter: drop-shadow(0 18px 22px rgba(60, 45, 20, 0.18));
 }
@@ -537,15 +538,18 @@
   }
 }
 
-/* desktop: photo left (pinned), order right — like a product page */
+/* desktop: photo left (pinned), the same tidy order column as on phones on the right */
 @media (min-width: 1024px) {
+  .sheet {
+    padding: 24px;
+  }
   .sheet__panel {
-    --panel-h: min(820px, calc(100dvh - 64px));
-    max-width: min(1180px, 100%);
+    --panel-h: min(880px, calc(100dvh - 48px));
+    max-width: min(1080px, 100%);
     height: var(--panel-h);
     max-height: var(--panel-h);
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
     grid-template-rows: auto 1fr auto;
     border-radius: 16px;
   }
@@ -560,41 +564,25 @@
     aspect-ratio: auto;
   }
   .sheet__media img {
-    height: 78%;
-  }
-  /* wide column: answers sit on the title line, bodies indent under the title */
-  .step__head {
-    grid-template-columns: 2.25rem auto 1fr auto;
-    grid-template-areas: "num title value edit";
-  }
-  .step__value {
-    text-align: right;
-  }
-  .step__body {
-    padding-left: 2.75rem;
+    inset: 10% 12%;
+    width: 76%;
+    height: 80%;
   }
   .sheet__head,
   .sheet__body,
   .sheet__foot {
     grid-column: 2;
-    padding-inline: clamp(32px, 4vw, 64px);
+    padding-inline: clamp(28px, 3vw, 48px);
   }
   .sheet__head {
     grid-row: 1;
-    border-bottom: 0;
-    padding-top: var(--s-5);
+    padding-top: var(--s-4);
   }
   .sheet__body {
     grid-row: 2;
-    padding-top: var(--s-6);
+    padding-top: var(--s-5);
   }
   .sheet__foot {
     grid-row: 3;
   }
-}
-
-/* delivery rows read like the option names */
-.row__name {
-  font-family: var(--f-display);
-  text-transform: uppercase;
 }

@@ -23,6 +23,21 @@ for (const name of (process.argv[2] ?? "mobile").split(",")) {
   ok(await page.evaluate(() => document.activeElement?.matches("[data-sheet-panel]")), "focus moves into the sheet");
   await page.screenshot({ path: `${out}sheet-open-${name}.png`, scale: "css" });
 
+  // the window scrolls with a mouse wheel / trackpad (the page's smooth scroll must not swallow it)
+  {
+    const box = await page.locator("[data-sheet-panel]").boundingBox();
+    await page.mouse.move(box.x + box.width * 0.75, box.y + box.height * 0.4);
+    if (!mobile) {
+      await page.setViewportSize({ width: w, height: 560 });
+      await page.waitForTimeout(300);
+      await page.mouse.wheel(0, 400);
+      await page.waitForTimeout(400);
+      ok((await page.evaluate(() => document.querySelector("[data-sheet-panel]").scrollTop)) > 100, "the order window scrolls with the wheel");
+      await page.evaluate(() => document.querySelector("[data-sheet-panel]").scrollTo(0, 0));
+      await page.setViewportSize({ width: w, height: h });
+      await page.waitForTimeout(300);
+    }
+  }
   // the window shows the product first; only the option question is asked
   ok(await page.isVisible(".sheet__media img"), "shows the product photo");
   ok(!(await page.isVisible("[data-qty-val]")) && !(await page.isVisible("#order-name")), "later questions wait until an option is chosen");
@@ -61,6 +76,18 @@ for (const name of (process.argv[2] ?? "mobile").split(",")) {
   await page.click('[data-qty="1"]');
   ok(await page.isDisabled('[data-qty="1"]'), "quantity stops at the maximum");
   await page.click("[data-shipping-opt]");
+  await page.waitForTimeout(1000);
+  {
+    // after answering, the earlier steps must stay visible and tappable (not hidden under the pinned head)
+    const tappable = await page.evaluate(() =>
+      [1, 2].every((n) => {
+        const h = document.querySelector(`.step[data-step="${n}"] [data-step-head]`);
+        const r = h.getBoundingClientRect();
+        return h.contains(document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2));
+      })
+    );
+    ok(tappable, "after choosing Envío, steps 01 and 02 stay tappable");
+  }
   await page.fill("#order-name", "Valentina\nTotal: $1");
   await page.waitForTimeout(300);
   const href = await page.getAttribute("[data-sheet-cta]", "href");
