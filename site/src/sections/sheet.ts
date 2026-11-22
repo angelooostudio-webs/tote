@@ -11,7 +11,7 @@ const CODE_KEY = "tote-order-code";
 
 const DESC: Record<OptionId, string> = {
   bundle: `El tote y tu copia de UNBOUND apartada. La revista sale el ${shortDate(CATALOG.magazineLaunch)}.`,
-  toteOnly: "Solo el tote de lona.",
+  toteOnly: "Solo el tote.",
 };
 
 export function initSheet(reduced: boolean) {
@@ -65,6 +65,16 @@ export function initSheet(reduced: boolean) {
       <input type="checkbox" role="switch" name="addon" value="${a.id}" /><span class="switch" aria-hidden="true"></span>`;
     label.querySelector(".addon__label")!.textContent = a.label;
     addonsEl.append(label);
+  }
+
+  // product sheet (Tipo, Medidas, Material…) from the shared catalog
+  const specsEl = $("[data-sheet-specs]");
+  for (const [k, v] of CATALOG.specs) {
+    const dt = document.createElement("dt");
+    const dd = document.createElement("dd");
+    dt.textContent = k;
+    dd.textContent = v;
+    specsEl.append(dt, dd);
   }
 
   shipOpt.hidden = !CATALOG.shipping.enabled;

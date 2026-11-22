@@ -30,6 +30,15 @@ export const CATALOG = {
   // price 0 = the customer pays the carrier on delivery (contra entrega); nothing is added to the total
   shipping: { enabled: true, label: "Envío", carrier: "Coordinadora", price: 0, area: "" },
   pickup: { place: "", hours: "" }, // placeholder
+  /** the product sheet, shown in the order window and known by the bot */
+  specs: [
+    ["Tipo", "Tote bag"],
+    ["Marca", "Angelo Studio"],
+    ["Medidas", "50 × 33 cm (ancho × alto)"],
+    ["Peso", "82 g"],
+    ["Material", "Algodón reciclado"],
+    ["Composición", "70% algodón reciclado, 30% poliéster reciclado"],
+  ] as [string, string][],
   maxQtyPerOrder: 3,
   stockTotal: 75,
   botNumber: "573116955922", // the bot's WhatsApp number

@@ -78,7 +78,8 @@ export function systemPrompt(): string {
 Tu trabajo es clasificar el último mensaje del cliente y, solo si es una pregunta sencilla que estos datos responden, redactar la respuesta.
 
 DATOS
-- El producto: un tote de lona natural de algodón. Un lado lleva impreso en negro "YOUR FAVORITE'S FAVORITE" y "ANGELO STUDIO"; el otro lado es liso. Tiene una etiqueta gris tejida en la costura lateral y asas largas de lona.
+- El producto: un tote de algodón reciclado. Un lado lleva impreso en negro "YOUR FAVORITE'S FAVORITE" y "ANGELO STUDIO"; el otro lado es liso. Tiene una etiqueta gris tejida en la costura lateral y asas largas.
+- Ficha: ${CATALOG.specs.map(([k, v]) => `${k}: ${v}`).join("; ")}.
 - Dos opciones: el tote con una copia reservada de UNBOUND, o solo el tote.
 - UNBOUND es la tercera edición de la revista Angelo. Sale el ${bogota(CATALOG.magazineLaunch)}.
 - La pre-venta va del ${bogota(CATALOG.presaleOpens)} al ${bogota(CATALOG.presaleCloses)} (hora de Colombia). Son ${CATALOG.stockTotal} totes en total.
