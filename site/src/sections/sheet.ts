@@ -39,17 +39,21 @@ export function initSheet(reduced: boolean) {
   const addrInput = $<HTMLInputElement>("#order-address");
   const cityInput = $<HTMLInputElement>("#order-city");
   const shipErr = $("[data-ship-err]");
+  const optionErr = $("[data-option-err]");
+  const deliveryErr = $("[data-delivery-err]");
+  const sumEl = $("[data-sheet-sum]");
+  const scroller = panel; // the whole window scrolls as one page
 
   const order: Order = { code: "", option: "bundle", qty: 1, addOns: [], delivery: "pickup", name: "" };
 
   // ---------- build from the catalog ----------
-  (Object.keys(CATALOG.options) as OptionId[]).forEach((id, i) => {
+  (Object.keys(CATALOG.options) as OptionId[]).forEach((id) => {
     const o = CATALOG.options[id];
     const label = document.createElement("label");
     label.className = "opt";
-    label.innerHTML = `<input type="radio" name="option" value="${id}" ${i === 0 ? "checked" : ""} />
-      <span class="opt__name"></span><span class="opt__desc"></span>
-      <span class="opt__price">${formatCOP(o.price)}</span><span class="opt__mark" aria-hidden="true"></span>`;
+    label.innerHTML = `<input type="radio" name="option" value="${id}" />
+      <span class="opt__mark" aria-hidden="true"></span><span class="opt__name"></span>
+      <span class="opt__price">${formatCOP(o.price)}</span><span class="opt__desc"></span>`;
     label.querySelector(".opt__name")!.textContent = o.label;
     label.querySelector(".opt__desc")!.textContent = DESC[id] ?? "";
     optsEl.append(label);
@@ -78,13 +82,36 @@ export function initSheet(reduced: boolean) {
       });
   renumber();
 
+  // ---------- steps: each one arrives when the previous is answered ----------
+  // 1 = option · 2 = quantity, add-ons, delivery · 3 = name (+ address for shipping)
+  const steps = [...form.querySelectorAll<HTMLElement>("[data-step]")];
+  let reached = 1;
+  const reveal = (level: number, animate: boolean) => {
+    if (level <= reached) return;
+    reached = level;
+    const fresh = steps.filter((el) => Number(el.dataset.step) <= level && el.classList.contains("is-pending"));
+    fresh.forEach((el) => el.classList.remove("is-pending"));
+    const shown = fresh.filter((el) => !el.hidden);
+    if (!animate || !shown.length) return;
+    if (!reduced) gsap.fromTo(shown, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: "expo.out", stagger: 0.09, clearProps: "transform,opacity,visibility" });
+    // bring the new question into view, leaving the one just answered visible above it
+    requestAnimationFrame(() => {
+      const top = shown[0].getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+      const target = scroller.scrollTop + top - scroller.clientHeight * 0.28;
+      if (target > scroller.scrollTop) scroller.scrollTo({ top: target, behavior: reduced ? "auto" : "smooth" });
+    });
+  };
+  const chosen = (name: string) => form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value;
+
   // ---------- live state ----------
   const update = () => {
-    order.option = (form.querySelector<HTMLInputElement>('input[name="option"]:checked')?.value ?? "bundle") as OptionId;
+    const hasOption = !!chosen("option");
+    const hasDelivery = !!chosen("delivery");
+    order.option = (chosen("option") ?? "bundle") as OptionId;
     order.addOns = [...form.querySelectorAll<HTMLInputElement>('input[name="addon"]:checked')].map((i) => i.value);
-    order.delivery = (form.querySelector<HTMLInputElement>('input[name="delivery"]:checked')?.value ?? "pickup") as Delivery;
+    order.delivery = (chosen("delivery") ?? "pickup") as Delivery;
     order.name = cleanName(nameInput.value);
-    const shipping = order.delivery === "shipping";
+    const shipping = hasDelivery && order.delivery === "shipping";
     if (shipping) {
       order.address = cleanLine(addrInput.value);
       order.city = cleanLine(cityInput.value, 60);
@@ -114,7 +141,12 @@ export function initSheet(reduced: boolean) {
     totalEl.innerHTML = formatCOP(total).replace(/\./g, '<span class="pt" aria-hidden="true"></span>');
     totalEl.setAttribute("aria-label", formatCOP(total));
 
-    if (order.delivery === "pickup") {
+    sumEl.hidden = !hasOption;
+    if (hasOption) optionErr.hidden = true;
+    if (hasDelivery) deliveryErr.hidden = true;
+    if (!hasDelivery) {
+      hint.textContent = "";
+    } else if (order.delivery === "pickup") {
       const { place, hours } = CATALOG.pickup;
       hint.textContent = place ? `${place}${hours ? ` · ${hours}` : ""}` : "Te contamos el lugar y el horario de recogida por WhatsApp.";
     } else {
@@ -125,7 +157,12 @@ export function initSheet(reduced: boolean) {
     cta.href = whatsappLink(buildOrderMessage(order));
   };
 
-  form.addEventListener("change", update);
+  form.addEventListener("change", (e) => {
+    update();
+    const name = (e.target as HTMLInputElement).name;
+    if (name === "option") reveal(2, true);
+    if (name === "delivery") reveal(3, true);
+  });
   nameInput.addEventListener("input", () => {
     if (nameInput.value.trim()) setNameError(false);
     update();
@@ -154,8 +191,18 @@ export function initSheet(reduced: boolean) {
     cityInput.setAttribute("aria-invalid", String(on && cleanLine(cityInput.value).length < 2));
   };
 
+  const stop = (e: Event, err: HTMLElement, focusEl: HTMLElement) => {
+    e.preventDefault();
+    err.hidden = false;
+    focusEl.focus({ preventScroll: true });
+    focusEl.closest(".sheet__group")?.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
+  };
   cta.addEventListener("click", (e) => {
     update();
+    if (!chosen("option")) return stop(e, optionErr, form.querySelector<HTMLInputElement>('input[name="option"]')!);
+    reveal(2, true);
+    if (!chosen("delivery")) return stop(e, deliveryErr, form.querySelector<HTMLInputElement>('input[name="delivery"]')!);
+    reveal(3, true);
     if (!order.name) {
       e.preventDefault();
       setNameError(true);

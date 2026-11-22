@@ -171,66 +171,86 @@
         <div class="sheet__head" data-sheet-drag>
           <span class="sheet__grip" aria-hidden="true"></span>
           <div class="sheet__head-row">
-            <h2 id="sheet-title" class="sheet__title">Tu pedido</h2>
+            <h2 id="sheet-title" class="sheet__title mono">Tu pedido</h2>
+            <p class="sheet__code mono"><span class="dot" data-sheet-code>ANG-····</span></p>
             <button class="sheet__close" type="button" data-sheet-close aria-label="Cerrar">
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4 4 16" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
             </button>
           </div>
-          <p class="sheet__code mono">Código <span class="dot" data-sheet-code>ANG-····</span></p>
         </div>
 
-        <form class="sheet__body" data-sheet-form novalidate>
-          <fieldset class="sheet__group">
-            <legend class="label">01 / Opción</legend>
-            <div class="opts" data-sheet-options></div>
-          </fieldset>
+        <div class="sheet__media" aria-hidden="true">
+          <picture>
+            <source type="image/webp" srcset="{{base}}assets/hero-poster-print-600.webp 600w, {{base}}assets/hero-poster-print.webp 1000w" sizes="(min-width: 1024px) 40vw, 60vw" />
+            <img src="{{base}}assets/hero-poster-print-600.webp" alt="" width="600" height="910" loading="lazy" decoding="async" />
+          </picture>
+        </div>
 
-          <div class="sheet__group sheet__row">
-            <p class="label" id="qty-label">02 / Cantidad</p>
-            <div class="stepper" role="group" aria-labelledby="qty-label">
-              <button type="button" class="stepper__btn" data-qty="-1" aria-label="Quitar uno">
-                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10" stroke="currentColor" stroke-width="1.5"/></svg>
-              </button>
-              <output class="stepper__val dot" data-qty-val aria-live="polite">1</output>
-              <button type="button" class="stepper__btn" data-qty="1" aria-label="Agregar uno">
-                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M10 5v10" stroke="currentColor" stroke-width="1.5"/></svg>
-              </button>
+        <div class="sheet__body">
+          <div class="sheet__product">
+            <p class="sheet__kicker mono">Pre-venta · {{opensShort}} — {{closesShort}}</p>
+            <h3 class="sheet__name">Tote Angelo Studio</h3>
+            <p class="sheet__from mono">Desde {{fromPrice}}</p>
+            <p class="sheet__about">Lona de algodón natural. «Your favorite's favorite» impreso en negro a un lado; el otro, liso. Asas largas de lona.</p>
+          </div>
+
+          <form class="sheet__form" data-sheet-form novalidate>
+            <fieldset class="sheet__group" data-step="1">
+              <legend class="label">01 / Opción</legend>
+              <div class="opts" data-sheet-options></div>
+              <p class="field__err" data-option-err hidden>Elige una opción para continuar.</p>
+            </fieldset>
+
+            <div class="sheet__group sheet__row is-pending" data-step="2">
+              <p class="label" id="qty-label">02 / Cantidad</p>
+              <div class="stepper" role="group" aria-labelledby="qty-label">
+                <button type="button" class="stepper__btn" data-qty="-1" aria-label="Quitar uno">
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10" stroke="currentColor" stroke-width="1.5"/></svg>
+                </button>
+                <output class="stepper__val dot" data-qty-val aria-live="polite">1</output>
+                <button type="button" class="stepper__btn" data-qty="1" aria-label="Agregar uno">
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M10 5v10" stroke="currentColor" stroke-width="1.5"/></svg>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <fieldset class="sheet__group" data-sheet-addons-group hidden>
-            <legend class="label">03 / Adicionales</legend>
-            <div class="addons" data-sheet-addons></div>
-          </fieldset>
+            <fieldset class="sheet__group is-pending" data-step="2" data-sheet-addons-group hidden>
+              <legend class="label">03 / Adicionales</legend>
+              <div class="addons" data-sheet-addons></div>
+            </fieldset>
 
-          <fieldset class="sheet__group">
-            <legend class="label" data-n="delivery">04 / Entrega</legend>
-            <div class="seg" data-sheet-delivery>
-              <label class="seg__opt"><input type="radio" name="delivery" value="pickup" checked /><span>Recoger en El Retiro</span></label>
-              <label class="seg__opt" data-shipping-opt><input type="radio" name="delivery" value="shipping" /><span data-shipping-label>Envío</span></label>
+            <fieldset class="sheet__group is-pending" data-step="2">
+              <legend class="label" data-n="delivery">04 / Entrega</legend>
+              <div class="rows" data-sheet-delivery>
+                <label class="row"><input type="radio" name="delivery" value="pickup" /><span class="row__mark" aria-hidden="true"></span><span class="row__name">Recoger en El Retiro</span><span class="row__meta mono">Sin costo</span></label>
+                <label class="row" data-shipping-opt><input type="radio" name="delivery" value="shipping" /><span class="row__mark" aria-hidden="true"></span><span class="row__name" data-shipping-label>Envío</span><span class="row__meta mono">Contra entrega</span></label>
+              </div>
+              <p class="sheet__hint" data-delivery-hint></p>
+              <p class="field__err" data-delivery-err hidden>Elige cómo quieres recibirlo.</p>
+            </fieldset>
+
+            <div class="sheet__group is-pending" data-step="3">
+              <label class="label" for="order-name" data-n="name">05 / Nombre</label>
+              <input class="field" id="order-name" name="name" type="text" autocomplete="name" autocapitalize="words" maxlength="60" required placeholder="Como quieres que te llamemos" aria-describedby="order-name-err" />
+              <p class="field__err" id="order-name-err" data-name-err hidden>Escribe tu nombre para continuar.</p>
             </div>
-            <p class="sheet__hint" data-delivery-hint></p>
-          </fieldset>
 
-          <div class="sheet__group">
-            <label class="label" for="order-name" data-n="name">05 / Nombre</label>
-            <input class="field" id="order-name" name="name" type="text" autocomplete="name" autocapitalize="words" maxlength="60" required placeholder="Como quieres que te llamemos" aria-describedby="order-name-err" />
-            <p class="field__err" id="order-name-err" data-name-err hidden>Escribe tu nombre para continuar.</p>
-          </div>
-
-          <div class="sheet__group" role="group" aria-labelledby="order-ship-label" data-ship-group hidden>
-            <p class="label" id="order-ship-label" data-n="address">06 / Dirección de envío</p>
-            <input class="field" aria-label="Dirección" id="order-address" name="address" type="text" autocomplete="street-address" maxlength="120" placeholder="Calle, número, apto y barrio" aria-describedby="order-ship-err" />
-            <input class="field field--stack" aria-label="Ciudad" id="order-city" name="city" type="text" autocomplete="address-level2" autocapitalize="words" maxlength="60" placeholder="Ciudad y departamento" aria-describedby="order-ship-err" />
-            <p class="field__err" id="order-ship-err" data-ship-err hidden>Escribe la dirección y la ciudad para el envío.</p>
-          </div>
-        </form>
+            <div class="sheet__group is-pending" role="group" aria-labelledby="order-ship-label" data-step="3" data-ship-group hidden>
+              <p class="label" id="order-ship-label" data-n="address">06 / Dirección de envío</p>
+              <input class="field" aria-label="Dirección" id="order-address" name="address" type="text" autocomplete="street-address" maxlength="120" placeholder="Calle, número, apto y barrio" aria-describedby="order-ship-err" />
+              <input class="field field--stack" aria-label="Ciudad" id="order-city" name="city" type="text" autocomplete="address-level2" autocapitalize="words" maxlength="60" placeholder="Ciudad y departamento" aria-describedby="order-ship-err" />
+              <p class="field__err" id="order-ship-err" data-ship-err hidden>Escribe la dirección y la ciudad para el envío.</p>
+            </div>
+          </form>
+        </div>
 
         <div class="sheet__foot">
-          <ul class="summary mono" data-sheet-lines></ul>
-          <div class="summary__total">
-            <span class="mono">Total</span>
-            <output class="dot" data-sheet-total aria-live="polite">$0</output>
+          <div class="sheet__sum" data-sheet-sum hidden>
+            <ul class="summary mono" data-sheet-lines></ul>
+            <div class="summary__total">
+              <span class="mono">Total</span>
+              <output class="dot" data-sheet-total aria-live="polite">$0</output>
+            </div>
           </div>
           <a class="order-btn sheet__cta" data-sheet-cta href="#" target="_blank" rel="noopener">
             <span class="order-btn__label">Continuar en WhatsApp</span>

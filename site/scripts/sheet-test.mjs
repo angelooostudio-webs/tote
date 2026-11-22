@@ -23,14 +23,34 @@ for (const name of (process.argv[2] ?? "mobile").split(",")) {
   ok(await page.evaluate(() => document.activeElement?.matches("[data-sheet-panel]")), "focus moves into the sheet");
   await page.screenshot({ path: `${out}sheet-open-${name}.png`, scale: "css" });
 
-  // empty name → error, no navigation
+  // the window shows the product first; only the option question is asked
+  ok(await page.isVisible(".sheet__media img"), "shows the product photo");
+  ok(!(await page.isVisible("[data-qty-val]")) && !(await page.isVisible("#order-name")), "later questions wait until an option is chosen");
+
+  // nothing chosen → option error, no navigation
+  await page.click("[data-sheet-cta]");
+  await page.waitForTimeout(400);
+  ok(await page.isVisible("[data-option-err]"), "no option shows an error");
+
+  // choosing an option brings in quantity and delivery
+  await page.click("label.opt:nth-child(2)");
+  await page.waitForTimeout(800);
+  ok(await page.isVisible("[data-qty-val]") && await page.isVisible("[data-shipping-opt]"), "choosing an option brings in quantity and delivery");
+  ok(!(await page.isVisible("#order-name")), "name waits for delivery");
+  await page.click("[data-sheet-cta]");
+  await page.waitForTimeout(400);
+  ok(await page.isVisible("[data-delivery-err]"), "no delivery shows an error");
+
+  // choosing delivery brings in the name; empty name → error
+  await page.click("label.row:first-child");
+  await page.waitForTimeout(800);
+  ok(await page.isVisible("#order-name"), "choosing delivery brings in the name");
   await page.click("[data-sheet-cta]");
   await page.waitForTimeout(400);
   ok(await page.isVisible("[data-name-err]"), "missing name shows an error");
   ok(await page.evaluate(() => document.activeElement?.id === "order-name"), "focus jumps to the name field");
 
   // change everything
-  await page.click("label.opt:nth-child(2)");
   await page.click('[data-qty="1"]');
   await page.click('[data-qty="1"]');
   ok(await page.isDisabled('[data-qty="1"]'), "quantity stops at the maximum");
