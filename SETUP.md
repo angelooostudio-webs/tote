@@ -2,7 +2,7 @@
 
 Do these in order. **Start step 3 today**: Meta's business checks and the
 message-template review can take several days, and the pre-sale opens on
-27.11.
+28.11.
 
 Nothing here goes in the repo. The repo is public.
 

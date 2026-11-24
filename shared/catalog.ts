@@ -16,7 +16,7 @@ export interface AddOn {
 }
 
 export const CATALOG = {
-  presaleOpens: "2026-11-27T00:00:00-05:00",
+  presaleOpens: "2026-11-28T00:00:00-05:00",
   presaleCloses: "2026-12-02T23:59:59-05:00",
   magazineLaunch: "2026-12-04T00:00:00-05:00", // the "fecha de lanzamiento" the bot sends
   options: {
@@ -80,7 +80,7 @@ export function lowestPrice(): number {
   return Math.min(...Object.values(CATALOG.options).map((o) => o.price));
 }
 
-/** "27.11" in Bogotá time. */
+/** "28.11" in Bogotá time. */
 export function shortDate(iso: string): string {
   const parts = new Intl.DateTimeFormat("es-CO", {
     timeZone: TIMEZONE,

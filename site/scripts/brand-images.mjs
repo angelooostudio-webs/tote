@@ -3,6 +3,7 @@
 //   node scripts/brand-images.mjs [http://localhost:5173]
 import { chromium } from "playwright";
 import sharp from "sharp";
+import { CATALOG, shortDate, siteLabel } from "../../shared/catalog.ts";
 import { fileURLToPath } from "node:url";
 
 const base = process.argv[2] ?? "http://localhost:5173";
@@ -39,9 +40,9 @@ const og = await shoot(
   630,
   `<div style="position:absolute;inset:0;display:grid;grid-template-columns:1fr 470px;align-items:center">
      <div style="padding:0 0 0 84px">
-       <div class="mono" style="font-size:18px;color:#6b685f;margin-bottom:34px">Angelo Studio · Pre-venta 27.11 → 02.12</div>
+       <div class="mono" style="font-size:18px;color:#6b685f;margin-bottom:34px">Angelo Studio · Pre-venta ${shortDate(CATALOG.presaleOpens)} → ${shortDate(CATALOG.presaleCloses)}</div>
        <div class="spalla" style="font-size:92px;line-height:.95;font-weight:400">Your new<br><b style="font-weight:700">FAVORITE</b><br>Tote</div>
-       <div class="mono" style="font-size:18px;color:#111112;margin-top:40px">tote.angelostudio.art</div>
+       <div class="mono" style="font-size:18px;color:#111112;margin-top:40px">${siteLabel()}</div>
      </div>
      <img src="${base}/assets/hero-poster-print.webp" style="height:560px;justify-self:center">
    </div>`

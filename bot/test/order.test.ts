@@ -35,9 +35,10 @@ describe("order codes", () => {
 });
 
 describe("pre-sale window (America/Bogota)", () => {
-  it("opens at 00:00 on 27.11 and closes after 23:59:59 on 02.12, Bogotá time", () => {
+  it("opens at 00:00 on 28.11 and closes after 23:59:59 on 02.12, Bogotá time", () => {
     expect(presalePhase(new Date("2026-11-26T23:59:59-05:00"))).toBe("before");
-    expect(presalePhase(new Date("2026-11-27T00:00:00-05:00"))).toBe("open");
+    expect(presalePhase(new Date("2026-11-27T23:59:59-05:00"))).toBe("before");
+    expect(presalePhase(new Date("2026-11-28T00:00:00-05:00"))).toBe("open");
     expect(presalePhase(new Date("2026-12-02T23:59:59-05:00"))).toBe("open");
     expect(presalePhase(new Date("2026-12-03T00:00:00-05:00"))).toBe("closed");
   });

@@ -5,7 +5,7 @@ import { gsap } from "../lib/scroll";
 /**
  * Both Order buttons. They read the date (America/Bogota, via the ISO offsets
  * in the catalog) and switch between:
- *   before → disabled look, "Disponible 27.11" + live countdown
+ *   before → disabled look, "Disponible 28.11" + live countdown
  *   open   → "Ordenar", opens the order sheet
  *   closed → "Pre-venta cerrada", links to UNBOUND drop info on Instagram
  * Stock from the bot (GET /stock) can turn them into "Agotado".
