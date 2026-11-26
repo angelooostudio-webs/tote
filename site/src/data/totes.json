@@ -79,7 +79,32 @@
       "role": "",
       "instagram": "_salo.0209_",
       "photo": "totes/salome.jpg",
-      "items": []
+      "items": [
+        {
+          "label": "El libro que esté leyendo"
+        },
+        {
+          "label": "Gloss"
+        },
+        {
+          "label": "Espejito de mano"
+        },
+        {
+          "label": "Billetera"
+        },
+        {
+          "label": "Celular"
+        },
+        {
+          "label": "Pañitos"
+        },
+        {
+          "label": "Batería portátil"
+        },
+        {
+          "label": "Chicles"
+        }
+      ]
     },
     {
       "slug": "juan-sebastian",
