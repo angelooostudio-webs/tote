@@ -27,11 +27,16 @@ export function makeCtx(env: Env): Ctx {
 let ctxFactory: (env: Env) => Ctx = makeCtx;
 export const setCtxFactory = (f: (env: Env) => Ctx) => void (ctxFactory = f);
 
-const cors = (env: Env) => ({
-  "Access-Control-Allow-Origin": env.SITE_ORIGIN || "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
-  Vary: "Origin",
-});
+/** SITE_ORIGIN may list several origins (comma-separated); the one the request came from is echoed back. */
+const cors = (env: Env, req?: Request) => {
+  const allowed = (env.SITE_ORIGIN || "*").split(",").map((s) => s.trim());
+  const origin = req?.headers.get("Origin") ?? "";
+  return {
+    "Access-Control-Allow-Origin": allowed.includes(origin) ? origin : allowed[0],
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    Vary: "Origin",
+  };
+};
 
 /** Processes a verified webhook body. Exported so the simulator can drive it. */
 export async function processWebhook(ctx: Ctx, payload: WebhookPayload) {
@@ -87,11 +92,11 @@ export default {
       return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "x-robots-tag": "noindex" } });
     }
     if (url.pathname === "/stock") {
-      if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env) });
+      if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env, req) });
       const remaining = await remainingStock(env.DB, ctxFactory === makeCtx ? new Date() : ctxFactory(env).now());
       return Response.json(
         { remaining, total: CATALOG.stockTotal },
-        { headers: { ...cors(env), "Cache-Control": "public, max-age=60" } }
+        { headers: { ...cors(env, req), "Cache-Control": "public, max-age=60" } }
       );
     }
 
