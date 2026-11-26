@@ -104,7 +104,7 @@ Needed to confirm orders to customers who haven't written in the last 24 h.
 
 Submit. Approval is usually minutes to a day.
 
-## 6. Custom domain (later): tote.angelostudio.art
+## 6. Custom domain: tote.angelostudio.art (live)
 
 For now the site lives at https://angelooostudio-webs.github.io/tote/. When you want the domain:
 

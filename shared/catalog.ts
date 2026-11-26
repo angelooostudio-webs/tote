@@ -45,7 +45,7 @@ export const CATALOG = {
   instagram: "angelostudio_official",
   studioSite: "https://angelostudio.art",
   /** where the site lives, with a trailing slash. Must match the custom domain set in GitHub → Settings → Pages. */
-  siteUrl: "https://angelostudio.art/",
+  siteUrl: "https://tote.angelostudio.art/",
   /** Public URL of the bot Worker, used by the site for GET /stock. Empty = hide the counter. */
   botBaseUrl: "https://tote-bot.angelo-tote-bot.workers.dev",
   ADOBE_FONTS_KIT_ID: "dzr8yxn",

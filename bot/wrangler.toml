@@ -5,7 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 # where the site lives (CORS for GET /stock)
-SITE_ORIGIN = "https://angelostudio.art,http://angelostudio.art,https://www.angelostudio.art,https://angelooostudio-webs.github.io"
+SITE_ORIGIN = "https://tote.angelostudio.art,http://tote.angelostudio.art,https://angelostudio.art,https://angelooostudio-webs.github.io"
 # Meta → WhatsApp → API Setup. An ID, not a credential, so it can live here.
 WHATSAPP_PHONE_NUMBER_ID = "1495160933674987"
 
