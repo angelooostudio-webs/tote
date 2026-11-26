@@ -98,8 +98,8 @@ export function initLlevan(reduced = false) {
     track.append(art);
   });
 
-  // the cut-outs fall out of the bag (from the photo above) and settle next to their item,
-  // one after another, the first time each list comes into view (also when swiped into view)
+  // the cut-outs fly in from the left edge of the screen, spinning, and glide to a stop next to
+  // their item, one after another, the first time each list comes into view (also when swiped in)
   const drops = [...track.querySelectorAll<HTMLElement>(".person__drop")];
   if (!reduced && drops.length && "IntersectionObserver" in window) {
     const lists = new Map<Element, HTMLElement[]>();
@@ -115,17 +115,16 @@ export function initLlevan(reduced = false) {
           if (!e.isIntersecting) continue;
           io.unobserve(e.target);
           const group = lists.get(e.target)!;
-          const list = e.target as HTMLElement;
           group.forEach((d, i) => {
-            // start up at the bag: the top of the list, a little to the side, spinning
-            const fall = d.getBoundingClientRect().top - list.getBoundingClientRect().top + 140;
-            const spin = (i % 2 ? 1 : -1) * (25 + 10 * (i % 3));
+            // start just past the left edge of the screen, a little higher, then glide in on a soft arc
+            const r = d.getBoundingClientRect();
+            const from = -(r.right + 40);
             gsap
-              .timeline({ delay: 0.15 + i * 0.18 })
+              .timeline({ delay: 0.1 + i * 0.16 })
               .set(d, { autoAlpha: 1 })
-              .fromTo(d, { y: -fall, x: (i % 2 ? 18 : -18), rotation: spin }, { y: 6, x: 0, duration: 0.7, ease: "power2.in" })
-              .to(d, { rotation: 0, duration: 0.9, ease: "power3.out" }, 0)
-              .to(d, { y: 0, duration: 0.45, ease: "power2.out" }); // settle, no bounce
+              .fromTo(d, { x: from }, { x: 0, duration: 1.15, ease: "power3.out" }, 0)
+              .fromTo(d, { y: -70 - (i % 3) * 20 }, { y: 0, duration: 1.15, ease: "sine.inOut" }, 0)
+              .fromTo(d, { rotation: -300 - (i % 2) * 90 }, { rotation: 0, duration: 1.2, ease: "power3.out" }, 0);
           });
         }
       },
