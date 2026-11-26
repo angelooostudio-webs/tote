@@ -49,17 +49,20 @@ const og = await shoot(
 );
 await sharp(og).jpeg({ quality: 84, mozjpeg: true }).toFile(pub + "assets/og.jpg");
 
-// ---- icons: Spalla A on ink ----
-const icon = await shoot(
-  512,
-  512,
-  `<div style="position:absolute;inset:0;background:#111112;border-radius:112px;display:grid;place-items:center">
-     <span class="spalla" style="color:#f3efe7;font-weight:700;font-size:400px;line-height:1;transform:translateY(6%)">A</span></div>`,
-  null,
-  "png-alpha"
-);
-await sharp(icon).resize(180).png().toFile(pub + "apple-touch-icon.png");
-await sharp(icon).resize(32).png().toFile(pub + "favicon-32.png");
-await sharp(icon).resize(192).png().toFile(pub + "icon-192.png");
+// ---- icons: the last frame of the tote turn (print facing you) ----
+// favicon: cut-out on transparent, so it sits on light and dark tabs;
+// home-screen icons: on paper, because iOS/Android fill transparency with black.
+const lastFrame = pub + "assets/turn/lg/28.webp";
+const tote = (h) => sharp(lastFrame).resize({ height: h, fit: "inside" }).png().toBuffer();
+const square = async (size, pad, bg) =>
+  sharp({ create: { width: size, height: size, channels: 4, background: bg } })
+    .composite([{ input: await tote(Math.round(size * (1 - pad * 2))), gravity: "center" }])
+    .png()
+    .toBuffer();
+const clear = { r: 0, g: 0, b: 0, alpha: 0 };
+const paper = { r: 243, g: 239, b: 231, alpha: 1 };
+await sharp(await square(32, 0, clear)).toFile(pub + "favicon-32.png");
+await sharp(await square(180, 0.08, paper)).toFile(pub + "apple-touch-icon.png");
+await sharp(await square(192, 0.08, paper)).toFile(pub + "icon-192.png");
 await browser.close();
 console.log("og.jpg, apple-touch-icon.png, favicon-32.png, icon-192.png written");
