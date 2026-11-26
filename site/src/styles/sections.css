@@ -703,6 +703,12 @@
 .person__tail {
   white-space: nowrap;
 }
+.person__drop {
+  position: relative;
+  z-index: 2; /* falls over the photo and the rows above */
+  display: inline-block;
+  vertical-align: middle;
+}
 /* a small cut-out next to an item in a tote list (e.g. the Sonny Angel) */
 .person__sticker {
   display: inline-block;

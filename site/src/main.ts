@@ -21,7 +21,7 @@ const setPill = (phase: PresalePhase) => {
 initScroll(reduced);
 initHeader(reduced);
 initContigo(reduced);
-initLlevan();
+initLlevan(reduced);
 initOrderButtons(setPill);
 initSheet(reduced);
 

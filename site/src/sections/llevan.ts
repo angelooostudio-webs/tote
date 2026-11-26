@@ -1,13 +1,14 @@
 import data from "../data/totes.json";
 import { asset } from "../lib/base";
 import { picture } from "../lib/picture";
+import { gsap } from "../lib/scroll";
 
 type Item = { label: string; x?: number; y?: number; sticker?: string }; // x/y: optional hotspot on the photo, 0–1
 type Person = { slug: string; name: string; role: string; instagram: string; photo: string; items: Item[] };
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-export function initLlevan() {
+export function initLlevan(reduced = false) {
   const track = document.querySelector<HTMLElement>("[data-llevan-track]");
   const counter = document.querySelector<HTMLElement>("[data-llevan-counter]");
   if (!track) return;
@@ -73,7 +74,11 @@ export function initLlevan() {
         const tail = document.createElement("span");
         tail.className = "person__tail";
         tail.textContent = it.label.slice(cut + 1);
-        tail.append(img);
+        // the img keeps its tilt and hover in CSS; the drop-in animates this wrapper
+        const drop = document.createElement("span");
+        drop.className = "person__drop";
+        drop.append(img);
+        tail.append(drop);
         label.textContent = it.label.slice(0, cut + 1);
         label.append(tail);
       }
@@ -92,6 +97,42 @@ export function initLlevan() {
     if (p.items.length) art.append(list);
     track.append(art);
   });
+
+  // the cut-outs fall out of the bag (from the photo above) and settle next to their item,
+  // one after another, the first time each list comes into view (also when swiped into view)
+  const drops = [...track.querySelectorAll<HTMLElement>(".person__drop")];
+  if (!reduced && drops.length && "IntersectionObserver" in window) {
+    const lists = new Map<Element, HTMLElement[]>();
+    for (const d of drops) {
+      const list = d.closest(".person__items")!;
+      if (!lists.has(list)) lists.set(list, []);
+      lists.get(list)!.push(d);
+    }
+    for (const group of lists.values()) gsap.set(group, { autoAlpha: 0 });
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          io.unobserve(e.target);
+          const group = lists.get(e.target)!;
+          const list = e.target as HTMLElement;
+          group.forEach((d, i) => {
+            // start up at the bag: the top of the list, a little to the side, spinning
+            const fall = d.getBoundingClientRect().top - list.getBoundingClientRect().top + 140;
+            const spin = (i % 2 ? 1 : -1) * (25 + 10 * (i % 3));
+            gsap
+              .timeline({ delay: 0.15 + i * 0.18 })
+              .set(d, { autoAlpha: 1 })
+              .fromTo(d, { y: -fall, x: (i % 2 ? 18 : -18), rotation: spin }, { y: 6, x: 0, duration: 0.7, ease: "power2.in" })
+              .to(d, { rotation: 0, duration: 0.9, ease: "power3.out" }, 0)
+              .to(d, { y: 0, duration: 0.45, ease: "power2.out" }); // settle, no bounce
+          });
+        }
+      },
+      { threshold: 0.35 }
+    );
+    for (const list of lists.keys()) io.observe(list);
+  }
 
   // "01/06" counter while swiping on mobile
   if (counter) {
