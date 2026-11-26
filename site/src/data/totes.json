@@ -9,7 +9,7 @@
       "photo": "totes/miguel.jpg",
       "items": [
         {
-          "label": "The Blue Envelope",
+          "label": "El Sobre Azul",
           "sticker": "stickers/blue-envelope.webp"
         },
         {
@@ -41,7 +41,7 @@
       "photo": "totes/samantha.jpg",
       "items": [
         {
-          "label": "Mac"
+          "label": "Computador"
         },
         {
           "label": "Aquaphor",
@@ -57,7 +57,7 @@
           "label": "Hebilla con botón de Angelo Studio"
         },
         {
-          "label": "Angelo by Angelo Studio"
+          "label": "Nueva edición de Angelo by Angelo Studio"
         },
         {
           "label": "Presupuesto mensual del estudio"
