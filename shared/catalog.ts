@@ -40,7 +40,7 @@ export const CATALOG = {
     ["Composición", "70% algodón reciclado, 30% poliéster reciclado"],
   ] as [string, string][],
   maxQtyPerOrder: 3,
-  stockTotal: 75,
+  stockTotal: 30,
   botNumber: "573116955922", // the bot's WhatsApp number
   instagram: "angelostudio_official",
   studioSite: "https://angelostudio.art",
