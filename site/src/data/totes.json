@@ -102,7 +102,8 @@
           "label": "Estuche de las gafas"
         },
         {
-          "label": "Audífonos"
+          "label": "Audífonos",
+          "sticker": "stickers/headphones.webp"
         },
         {
           "label": "Loción"
