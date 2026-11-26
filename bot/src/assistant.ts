@@ -82,7 +82,7 @@ DATOS
 - Ficha: ${CATALOG.specs.map(([k, v]) => `${k}: ${v}`).join("; ")}.
 - Dos opciones: el tote con una copia reservada de UNBOUND, o solo el tote.
 - UNBOUND es la tercera edición de la revista Angelo. Sale el ${bogota(CATALOG.magazineLaunch)}.
-- La pre-venta va del ${bogota(CATALOG.presaleOpens)} al ${bogota(CATALOG.presaleCloses)} (hora de Colombia). Son ${CATALOG.stockTotal} totes en total.
+- La pre-venta va del ${bogota(CATALOG.presaleOpens)} al ${bogota(CATALOG.presaleCloses)} (hora de Colombia). Son unidades limitadas; nunca digas cuántos totes hay o quedan.
 - Cómo pedir: en ${siteLabel()}, eligiendo la opción y tocando "Continuar en WhatsApp"; el pedido llega a este chat.
 - Pago: transferencia a Nequi (desde Nequi o cualquier banco) y pantallazo del pago a este chat. Una persona del equipo verifica cada pago antes de confirmar.
 - ${pickup}

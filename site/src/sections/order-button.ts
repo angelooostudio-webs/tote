@@ -162,31 +162,26 @@ const STOCK_KEY = "tote-stock";
 async function loadStock() {
   const base = CATALOG.botBaseUrl;
   if (!base) return; // no bot yet: never show a number we don't have
-  let remaining: number | null = null;
+  // the bot only says whether it's sold out; the number of totes is never shown
+  let out: boolean | null = null;
   try {
     const cached = JSON.parse(sessionStorage.getItem(STOCK_KEY) ?? "null");
-    if (cached && Date.now() - cached.at < 60_000) remaining = cached.remaining;
+    if (cached && Date.now() - cached.at < 60_000 && typeof cached.soldOut === "boolean") out = cached.soldOut;
   } catch {}
-  if (remaining === null) {
+  if (out === null) {
     try {
       const res = await fetch(`${base.replace(/\/$/, "")}/stock`, { cache: "no-store" });
       if (!res.ok) throw new Error(String(res.status));
       const data = await res.json();
-      if (typeof data.remaining !== "number" || data.remaining < 0) throw new Error("bad");
-      remaining = data.remaining;
+      if (typeof data.soldOut !== "boolean") throw new Error("bad");
+      out = data.soldOut;
       try {
-        sessionStorage.setItem(STOCK_KEY, JSON.stringify({ at: Date.now(), remaining }));
+        sessionStorage.setItem(STOCK_KEY, JSON.stringify({ at: Date.now(), soldOut: out }));
       } catch {}
     } catch {
-      return; // fetch failed: keep the counter hidden
+      return; // fetch failed: assume available; the bot still refuses orders past the stock
     }
   }
-  const r = remaining as number;
-  for (const b of blocks) {
-    if (!b.stock) continue;
-    b.stock.textContent = `Quedan ${pad(r)} de ${CATALOG.stockTotal}`;
-    b.stock.hidden = false;
-  }
-  soldOut = r <= 0;
+  soldOut = !!out;
   if (current) render(current);
 }

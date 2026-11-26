@@ -96,7 +96,7 @@ describe("order received", () => {
     expect(await remainingStock(ctx.env.DB, ctx.now())).toBe(left);
     await processWebhook(ctx, inbound(CUSTOMER, { text: buildOrderMessage(order({ code: "ANG-ZZZZ", qty: 3 })) }));
     expect(await getOrder(ctx.env.DB, "ANG-ZZZZ")).toBeNull();
-    expect(wa.last(CUSTOMER)!.body).toMatch(left === 0 ? /no quedan/ : /Solo quedan/);
+    expect(wa.last(CUSTOMER)!.body).toMatch(left === 0 ? /no quedan/ : /No quedan suficientes/);
     // 24 h later every unpaid reservation has lapsed, so the stock is free again
     advance(24 * 3600_000 + 1000);
     expect(await remainingStock(ctx.env.DB, ctx.now())).toBe(CATALOG.stockTotal);
@@ -162,13 +162,14 @@ describe("HTTP routes", () => {
     expect(wa.last(CUSTOMER)!.body).toContain("ANG-7F3K");
   });
 
-  it("serves the stock with CORS for the site", async () => {
+  it("tells the site only whether it is sold out, with CORS", async () => {
     const { ctx } = testCtx();
     setCtxFactory(() => ctx);
     const res = await worker.fetch(new Request("https://bot/stock"), ctx.env, exec().e);
     expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://tote.angelostudio.art");
     expect(res.headers.get("Cache-Control")).toContain("max-age=60");
-    expect(await res.json()).toEqual({ remaining: CATALOG.stockTotal, total: CATALOG.stockTotal });
+    // only sold-out or not: the number of totes is never public
+    expect(await res.json()).toEqual({ soldOut: false });
   });
 
   it("serves the Google Sheet feeds only with the key, pickup list = confirmed orders with short phone", async () => {

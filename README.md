@@ -116,7 +116,7 @@ Tu pedido {{1}} está confirmado. UNBOUND sale el {{2}}. Te escribimos por este 
 
 Once the bot is deployed, put its URL in `shared/catalog.ts` → `botBaseUrl`
 (e.g. `"https://tote-bot.<subdomain>.workers.dev"`) and push. The site then shows
-"QUEDAN XX DE 30" from `GET /stock`; until then the counter stays hidden.
+`GET /stock` only says whether it is sold out (`{ soldOut }`); the number of totes is never shown publicly.
 
 ## Seeing every pre-sale state locally
 

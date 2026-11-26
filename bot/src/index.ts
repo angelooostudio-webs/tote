@@ -93,9 +93,10 @@ export default {
     }
     if (url.pathname === "/stock") {
       if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env, req) });
+      // public: only whether it's sold out — never how many are left
       const remaining = await remainingStock(env.DB, ctxFactory === makeCtx ? new Date() : ctxFactory(env).now());
       return Response.json(
-        { remaining, total: CATALOG.stockTotal },
+        { soldOut: remaining <= 0 },
         { headers: { ...cors(env, req), "Cache-Control": "public, max-age=60" } }
       );
     }

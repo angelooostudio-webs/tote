@@ -58,7 +58,7 @@ export const T = {
   presaleClosed: () => `La pre-venta ya cerró. UNBOUND sale el ${launchDate()}; síguenos en Instagram @${CATALOG.instagram} para las novedades.`,
   soldOut: "Lo sentimos, ya no quedan totes para la pre-venta. Gracias por tu interés.",
   notEnoughStock: (left: number) =>
-    `Solo quedan ${left} ${left === 1 ? "tote" : "totes"}. Si quieres, haz el pedido de nuevo en la página con esa cantidad.`,
+    `No quedan suficientes totes para esa cantidad${left > 0 ? "; prueba con una cantidad menor en la página" : ""}.`,
 
   badOrder: (problems: string[]) =>
     [
