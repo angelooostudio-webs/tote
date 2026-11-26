@@ -1,5 +1,6 @@
 import { CATALOG, formatCOP, shortDate, type OptionId } from "../../../shared/catalog";
 import { SHIPPING_NOTE, buildOrderMessage, cleanLine, cleanName, makeOrderCode, orderLines, whatsappLink, type Delivery, type Order } from "../../../shared/order";
+import { testKey } from "../lib/clock";
 import { gsap, getLenis } from "../lib/scroll";
 
 /**
@@ -170,7 +171,7 @@ export function initSheet(reduced: boolean) {
       hint.textContent = `${area}${SHIPPING_NOTE}`;
     }
 
-    cta.href = whatsappLink(buildOrderMessage(order));
+    cta.href = whatsappLink(buildOrderMessage(order) + (testKey ? `\nPrueba: ${testKey}` : ""));
   };
 
   form.addEventListener("change", (e) => {

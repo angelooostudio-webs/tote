@@ -21,7 +21,7 @@ import { CATALOG, type OptionId } from "../../shared/catalog.ts";
 import { CODE_RE, DELIVERY_LABEL, cleanLine, cleanName, type Delivery, type Order } from "../../shared/order.ts";
 
 export type ParseResult =
-  | { ok: true; order: Order; statedTotal: number | null }
+  | { ok: true; order: Order; statedTotal: number | null; testKey?: string }
   | { ok: false; looksLikeOrder: boolean; errors: string[] };
 
 /** lowercase, no accents, no WhatsApp formatting marks, single spaces */
@@ -44,9 +44,10 @@ const KEYS: Record<string, keyof Fields> = {
   nombre: "name",
   direccion: "address",
   ciudad: "city",
+  prueba: "testKey",
   total: "total",
 };
-type Fields = { code: string; option: string; qty: string; addOns: string; delivery: string; name: string; address: string; city: string; total: string };
+type Fields = { code: string; option: string; qty: string; addOns: string; delivery: string; name: string; address: string; city: string; testKey: string; total: string };
 
 export function parseOrderMessage(text: string): ParseResult {
   const fields: Partial<Fields> = {};
@@ -106,6 +107,7 @@ export function parseOrderMessage(text: string): ParseResult {
   return {
     ok: true,
     statedTotal,
+    ...(fields.testKey ? { testKey: fields.testKey.trim() } : {}),
     order: { code, option: option!, qty, addOns, delivery: delivery!, name, ...(delivery === "shipping" ? { address, city } : {}) },
   };
 }

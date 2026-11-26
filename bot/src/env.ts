@@ -20,6 +20,8 @@ export interface Env {
   SHEET_KEY?: string;
   /** ntfy.sh topic for phone push notifications (optional) */
   NTFY_TOPIC?: string;
+  /** secret in the site's test link (?prueba=…): orders carrying it are accepted before the pre-sale opens */
+  TEST_KEY?: string;
   PAYMENT_NEQUI: string;
   PAYMENT_BANCOLOMBIA: string;
   PAYMENT_HOLDER_NAME: string;

@@ -78,7 +78,7 @@ export async function handleInbound(ctx: Ctx, msg: InboundMessage, profileName?:
 
 async function handleText(ctx: Ctx, waId: string, text: string, profileName?: string) {
   const parsed = parseOrderMessage(text);
-  if (parsed.ok) return handleOrder(ctx, waId, parsed.order, parsed.statedTotal);
+  if (parsed.ok) return handleOrder(ctx, waId, parsed.order, parsed.statedTotal, parsed.testKey);
   if (parsed.looksLikeOrder) {
     const problems = parsed.errors.map((e) => T.fieldNames[e] ?? e);
     return say(ctx, waId, T.badOrder(problems));
@@ -86,13 +86,16 @@ async function handleText(ctx: Ctx, waId: string, text: string, profileName?: st
   return handleFreeForm(ctx, waId, text, profileName);
 }
 
-export async function handleOrder(ctx: Ctx, waId: string, order: Order, statedTotal: number | null) {
+export async function handleOrder(ctx: Ctx, waId: string, order: Order, statedTotal: number | null, testKey?: string) {
   const db = ctx.env.DB;
   const now = ctx.now();
   const first = await isFirstContact(db, waId);
 
   const phase = presalePhase(now);
-  if (phase === "before" && !(adminTesting(ctx) && waId === ctx.env.ADMIN_NUMBER)) return say(ctx, waId, T.presaleNotOpen() + (first ? `\n\n${T.privacyLine}` : ""));
+  // the test link (?prueba=<TEST_KEY>) lets a tester order before opening
+  const tester = !!ctx.env.TEST_KEY && testKey === ctx.env.TEST_KEY;
+  if (tester) console.log(`test order ${order.code} from the test link`);
+  if (phase === "before" && !tester && !(adminTesting(ctx) && waId === ctx.env.ADMIN_NUMBER)) return say(ctx, waId, T.presaleNotOpen() + (first ? `\n\n${T.privacyLine}` : ""));
   if (phase === "closed") return say(ctx, waId, T.presaleClosed() + (first ? `\n\n${T.privacyLine}` : ""));
 
   // the same order sent twice (or re-sent later): answer with where it stands, never create it twice
@@ -114,8 +117,7 @@ export async function handleOrder(ctx: Ctx, waId: string, order: Order, statedTo
     return say(ctx, waId, left <= 0 ? T.soldOut : T.notEnoughStock(left));
   }
   await say(ctx, waId, paymentInstructions(order, paymentDetails(ctx), first), order.code);
-  const left = await remainingStock(db, now);
-  await push(ctx, `Nuevo pedido ${order.code}`, `${order.qty} × ${CATALOG.options[order.option].label} · ${formatCOP(total)} · esperando pago · quedan ${left}`, { tags: ["shopping_bags"] });
+  await push(ctx, `Nuevo pedido ${order.code}`, `${order.qty} × ${CATALOG.options[order.option].label} · ${formatCOP(total)} · esperando pago`, { tags: ["shopping_bags"] });
 }
 
 async function handleFreeForm(ctx: Ctx, waId: string, text: string, profileName?: string) {

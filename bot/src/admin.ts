@@ -81,7 +81,7 @@ export async function confirmOrder(ctx: Ctx, code: string) {
   if (!holdsStock) {
     // its stock may have gone to someone else: only confirm if there's still room
     const left = await remainingStock(db, ctx.now());
-    if (left < o.qty) return say(ctx, ctx.env.ADMIN_NUMBER, `${code} está ${STATUS_ES[o.status]} y ya no hay stock para confirmarlo (quedan ${left}).`);
+    if (left < o.qty) return say(ctx, ctx.env.ADMIN_NUMBER, `${code} está ${STATUS_ES[o.status]} y ya no hay stock para confirmarlo.`);
   }
   const now = ctx.now();
   await setStatus(db, code, "CONFIRMED", now, { confirmed_at: now.toISOString() });

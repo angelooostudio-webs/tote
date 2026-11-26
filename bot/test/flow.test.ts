@@ -238,4 +238,19 @@ describe("HTTP routes", () => {
     expect(done).toContain("lo pagas al recibir");
     expect(done).toMatch(/Gracias por su compra\.$/);
   });
+
+  it("test link: an order carrying the right TEST_KEY is accepted before opening; a wrong key is not", async () => {
+    const at = "2026-11-26T12:00:00-05:00";
+    const env = { ...testCtx().ctx.env, TEST_KEY: "abc123" };
+    {
+      const { ctx, wa } = testCtx({ at, env: { ...env } });
+      await processWebhook(ctx, inbound(CUSTOMER, { text: buildOrderMessage(order()) + "\nPrueba: nope" }));
+      expect(await getOrder(ctx.env.DB, "ANG-7F3K")).toBeNull();
+      expect(wa.last(CUSTOMER)!.body).toContain("abre el");
+    }
+    const { ctx, wa } = testCtx({ at, env: { ...env } });
+    await processWebhook(ctx, inbound(CUSTOMER, { text: buildOrderMessage(order()) + "\nPrueba: abc123" }));
+    expect(await getOrder(ctx.env.DB, "ANG-7F3K")).toMatchObject({ status: "AWAITING_PAYMENT" });
+    expect(wa.last(CUSTOMER)!.body).toContain("Nequi");
+  });
 });
