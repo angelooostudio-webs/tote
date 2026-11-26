@@ -9,16 +9,25 @@
       "photo": "totes/miguel.jpg",
       "items": [
         {
-          "label": "Cámara Nikon Z6 III"
+          "label": "Diario"
         },
         {
-          "label": "Libreta de bocetos"
-        },
-        {
-          "label": "Prueba de impresión UNBOUND"
+          "label": "Cámara Polaroid"
         },
         {
           "label": "Audífonos"
+        },
+        {
+          "label": "Reproductor MP3"
+        },
+        {
+          "label": "Sonny Angel"
+        },
+        {
+          "label": "Coral Blush"
+        },
+        {
+          "label": "Protector solar"
         }
       ]
     },
