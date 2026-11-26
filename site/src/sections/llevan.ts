@@ -67,7 +67,15 @@ export function initLlevan() {
         img.addEventListener("load", () => img.classList.toggle("is-wide", img.naturalWidth > img.naturalHeight), { once: true });
         img.loading = "lazy";
         img.decoding = "async";
-        li.lastElementChild!.append(img);
+        // the last word and the cut-out travel together, so the cut-out never wraps onto a line of its own
+        const label = li.lastElementChild!;
+        const cut = it.label.lastIndexOf(" ");
+        const tail = document.createElement("span");
+        tail.className = "person__tail";
+        tail.textContent = it.label.slice(cut + 1);
+        tail.append(img);
+        label.textContent = it.label.slice(0, cut + 1);
+        label.append(tail);
       }
       const on = (v: boolean) => {
         li.classList.toggle("is-on", v);

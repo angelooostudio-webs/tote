@@ -57,7 +57,8 @@
           "label": "Nueva edición de Angelo by Angelo Studio"
         },
         {
-          "label": "Presupuesto mensual del estudio"
+          "label": "Presupuesto mensual del estudio",
+          "sticker": "stickers/budget-folder.webp"
         },
         {
           "label": "Botella de agua"

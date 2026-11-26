@@ -580,7 +580,7 @@
   text-transform: uppercase;
   transition: background-color 0.2s var(--ease-quart);
 }
-.person__items li span:first-child {
+.person__items li > span:first-child {
   color: var(--mute-ink);
   font-variant-numeric: tabular-nums;
 }
@@ -700,6 +700,9 @@
   }
 }
 
+.person__tail {
+  white-space: nowrap;
+}
 /* a small cut-out next to an item in a tote list (e.g. the Sonny Angel) */
 .person__sticker {
   display: inline-block;
@@ -714,9 +717,9 @@
     filter 0.3s var(--ease-quart);
 }
 .person__sticker.is-wide {
-  height: 2.3em;
-  margin-top: -0.7em;
-  margin-bottom: -0.5em;
+  height: 2em;
+  margin-top: -0.35em;
+  margin-bottom: -0.35em;
 }
 /* cursor over it (or its row): it grows a little and swings the other way */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
