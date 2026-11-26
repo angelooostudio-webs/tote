@@ -32,6 +32,14 @@
       ]
     },
     {
+      "slug": "samantha",
+      "name": "Samantha Zuluaga Cuartas",
+      "role": "Producción editorial",
+      "instagram": "samanthazuluagaa",
+      "photo": "totes/samantha.jpg",
+      "items": []
+    },
+    {
       "slug": "jhohan",
       "name": "Jhohan González",
       "role": "Dirección audiovisual",
@@ -53,14 +61,6 @@
       "role": "",
       "instagram": "jsbravo_1808",
       "photo": "totes/juan-sebastian.jpg",
-      "items": []
-    },
-    {
-      "slug": "samantha",
-      "name": "Samantha Zuluaga Cuartas",
-      "role": "Producción editorial",
-      "instagram": "samanthazuluagaa",
-      "photo": "totes/samantha.jpg",
       "items": []
     }
   ]
