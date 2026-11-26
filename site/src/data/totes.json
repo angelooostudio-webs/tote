@@ -38,7 +38,24 @@
       "role": "Producción editorial",
       "instagram": "samanthazuluagaa",
       "photo": "totes/samantha.jpg",
-      "items": []
+      "items": [
+        {
+          "label": "Mac"
+        },
+        {
+          "label": "Aquaphor",
+          "sticker": "stickers/aquaphor.webp"
+        },
+        {
+          "label": "Gafas de sol"
+        },
+        {
+          "label": "Agenda"
+        },
+        {
+          "label": "Gancho de pelo con botón de Angelo Studio"
+        }
+      ]
     },
     {
       "slug": "jhohan",
