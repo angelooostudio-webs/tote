@@ -315,6 +315,14 @@
   background: var(--canvas);
   color: #3d3b36; /* AA on the canvas tone */
 }
+.sheet__hint--pay {
+  margin-bottom: var(--s-2);
+  background: var(--sky);
+  color: var(--ink);
+}
+.sheet__hint--pay strong {
+  font-weight: 700;
+}
 .sheet__hint:empty {
   display: none;
 }

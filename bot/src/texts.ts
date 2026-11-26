@@ -40,7 +40,7 @@ export function paymentInstructions(o: Order, pay: PaymentDetails, firstContact:
     orderSummary(o),
     "",
     ...(o.delivery === "shipping" ? [SHIPPING_NOTE, ""] : []),
-    "Para pagar, transfiere el valor exacto a:",
+    "Solo aceptamos transferencias (no efectivo ni tarjeta). Para pagar, transfiere el valor exacto a:",
     ...accounts,
     "",
     `Envía el pantallazo del pago por el valor exacto de ${total} a este chat. Incluye tu código de pedido ${o.code} en la descripción de la transferencia si tu banco lo permite.`,
