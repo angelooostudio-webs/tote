@@ -9,7 +9,8 @@
       "photo": "totes/miguel.jpg",
       "items": [
         {
-          "label": "Libreta"
+          "label": "The Blue Envelope",
+          "sticker": "stickers/blue-envelope.webp"
         },
         {
           "label": "Cámara Polaroid"
@@ -25,7 +26,7 @@
           "sticker": "stickers/sonny-angel.webp"
         },
         {
-          "label": "Última edición de Angelo por Angelo Studio"
+          "label": "Steal Like an Artist, de Austin Kleon"
         },
         {
           "label": "Protector solar"
@@ -53,7 +54,16 @@
           "label": "Agenda"
         },
         {
-          "label": "Gancho de pelo con botón de Angelo Studio"
+          "label": "Hebilla con botón de Angelo Studio"
+        },
+        {
+          "label": "Angelo by Angelo Studio"
+        },
+        {
+          "label": "Presupuesto mensual del estudio"
+        },
+        {
+          "label": "Botella de agua"
         }
       ]
     },

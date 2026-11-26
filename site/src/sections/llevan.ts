@@ -63,8 +63,8 @@ export function initLlevan() {
         img.className = "person__sticker";
         img.src = asset(`assets/${it.sticker}`);
         img.alt = "";
-        img.width = 49;
-        img.height = 100;
+        // landscape cut-outs (an envelope) sit a little smaller than standing ones (a figure, a tube)
+        img.addEventListener("load", () => img.classList.toggle("is-wide", img.naturalWidth > img.naturalHeight), { once: true });
         img.loading = "lazy";
         img.decoding = "async";
         li.lastElementChild!.append(img);
