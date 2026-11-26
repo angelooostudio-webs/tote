@@ -1,5 +1,5 @@
 {
-  "_comment": "Edit freely. Order here = order on the site. photo = file in public/assets/totes/ (3:4 portrait). items = what they carry, listed under the photo (leave [] to hide the list). instagram = handle without @.",
+  "_comment": "Edit freely. Order here = order on the site. photo = file in public/assets/totes/ (3:4 portrait). items = what they carry, listed under the photo (leave [] to hide the list). instagram = handle without @. items[].sticker = optional small cut-out shown tilted next to the item (file in public/assets/).",
   "people": [
     {
       "slug": "miguel",
@@ -21,7 +21,8 @@
           "label": "Reproductor MP3"
         },
         {
-          "label": "Sonny Angel"
+          "label": "Sonny Angel",
+          "sticker": "stickers/sonny-angel.webp"
         },
         {
           "label": "Coral Blush"

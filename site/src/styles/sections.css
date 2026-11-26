@@ -699,3 +699,15 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* a small cut-out next to an item in a tote list (e.g. the Sonny Angel) */
+.person__sticker {
+  display: inline-block;
+  width: auto;
+  height: 3.4em;
+  margin: -1.3em 0 -1.1em 0.6em;
+  vertical-align: middle;
+  transform: rotate(-12deg);
+  filter: drop-shadow(0 3px 4px rgba(17, 17, 18, 0.18));
+  pointer-events: none;
+}

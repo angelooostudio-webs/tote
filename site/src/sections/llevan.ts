@@ -1,7 +1,8 @@
 import data from "../data/totes.json";
+import { asset } from "../lib/base";
 import { picture } from "../lib/picture";
 
-type Item = { label: string; x?: number; y?: number }; // x/y: optional hotspot on the photo, 0–1
+type Item = { label: string; x?: number; y?: number; sticker?: string }; // x/y: optional hotspot on the photo, 0–1
 type Person = { slug: string; name: string; role: string; instagram: string; photo: string; items: Item[] };
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -56,6 +57,18 @@ export function initLlevan() {
       const li = document.createElement("li");
       li.innerHTML = `<span>${pad(i + 1)}</span><span></span>`;
       li.lastElementChild!.textContent = it.label;
+      if (it.sticker) {
+        // a little cut-out of the thing itself, tilted, for personality
+        const img = document.createElement("img");
+        img.className = "person__sticker";
+        img.src = asset(`assets/${it.sticker}`);
+        img.alt = "";
+        img.width = 49;
+        img.height = 100;
+        img.loading = "lazy";
+        img.decoding = "async";
+        li.lastElementChild!.append(img);
+      }
       const on = (v: boolean) => {
         li.classList.toggle("is-on", v);
         spots[i]?.classList.toggle("is-on", v);
