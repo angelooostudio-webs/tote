@@ -98,39 +98,45 @@ export function initLlevan(reduced = false) {
     track.append(art);
   });
 
-  // the cut-outs fly in from the left edge of the screen, spinning, and glide to a stop next to
-  // their item, one after another, the first time each list comes into view (also when swiped in)
-  const drops = [...track.querySelectorAll<HTMLElement>(".person__drop")];
-  if (!reduced && drops.length && "IntersectionObserver" in window) {
-    const lists = new Map<Element, HTMLElement[]>();
-    for (const d of drops) {
-      const list = d.closest(".person__items")!;
-      if (!lists.has(list)) lists.set(list, []);
-      lists.get(list)!.push(d);
-    }
-    for (const group of lists.values()) gsap.set(group, { autoAlpha: 0 });
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (!e.isIntersecting) continue;
-          io.unobserve(e.target);
-          const group = lists.get(e.target)!;
-          group.forEach((d, i) => {
-            // start just past the left edge of the screen, a little higher, then glide in on a soft arc
-            const r = d.getBoundingClientRect();
-            const from = -(r.right + 40);
-            gsap
-              .timeline({ delay: 0.1 + i * 0.16 })
-              .set(d, { autoAlpha: 1 })
-              .fromTo(d, { x: from }, { x: 0, duration: 1.15, ease: "power3.out" }, 0)
-              .fromTo(d, { y: -70 - (i % 3) * 20 }, { y: 0, duration: 1.15, ease: "sine.inOut" }, 0)
-              .fromTo(d, { rotation: -300 - (i % 2) * 90 }, { rotation: 0, duration: 1.2, ease: "power3.out" }, 0);
-          });
+  // click a row that has a cut-out and the cut-out falls off the page; click again and it drops back in.
+  // The fall is done by a fixed-position copy, so the carousel's edges can't clip it.
+  for (const d of track.querySelectorAll<HTMLElement>(".person__drop")) {
+    const row = d.closest("li")!;
+    const img = d.querySelector("img")!;
+    row.classList.add("has-sticker");
+    let gone = false;
+    let busy = false;
+    row.addEventListener("click", () => {
+      if (busy) return;
+      busy = true;
+      if (!gone) {
+        const r = img.getBoundingClientRect();
+        const copy = img.cloneNode() as HTMLImageElement;
+        copy.className = `${img.className} person__sticker--falling`;
+        Object.assign(copy.style, { position: "fixed", left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px`, margin: "0", zIndex: "60" });
+        document.body.append(copy);
+        gsap.set(d, { autoAlpha: 0 });
+        const side = Math.random() < 0.5 ? -1 : 1;
+        if (reduced) {
+          copy.remove();
+          gone = true;
+          busy = false;
+          return;
         }
-      },
-      { threshold: 0.35 }
-    );
-    for (const list of lists.keys()) io.observe(list);
+        gsap
+          .timeline({ onComplete: () => (copy.remove(), (gone = true), (busy = false)) })
+          .to(copy, { y: -28, x: side * 10, rotation: side * 18, duration: 0.18, ease: "power2.out" }) // a little hop off the row
+          .to(copy, { y: innerHeight - r.top + 80, x: side * (40 + Math.random() * 60), rotation: side * (160 + Math.random() * 140), duration: 1.0, ease: "power2.in" });
+      } else {
+        gone = false;
+        if (reduced) {
+          gsap.set(d, { autoAlpha: 1 });
+          busy = false;
+          return;
+        }
+        gsap.fromTo(d, { autoAlpha: 0, y: -90, rotation: -40 }, { autoAlpha: 1, y: 0, rotation: 0, duration: 0.6, ease: "power3.out", onComplete: () => void (busy = false) });
+      }
+    });
   }
 
   // "01/06" counter while swiping on mobile

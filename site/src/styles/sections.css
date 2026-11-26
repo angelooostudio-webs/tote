@@ -703,6 +703,13 @@
 .person__tail {
   white-space: nowrap;
 }
+.person__items li.has-sticker {
+  cursor: pointer;
+}
+.person__sticker--falling {
+  pointer-events: none;
+  transition: none;
+}
 .person__drop {
   position: relative;
   z-index: 2; /* falls over the photo and the rows above */
