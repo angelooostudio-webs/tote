@@ -84,10 +84,30 @@
     {
       "slug": "juan-sebastian",
       "name": "Juan Sebastián Bravo",
-      "role": "",
+      "role": "Audio y composición",
       "instagram": "jsbravo_1808",
       "photo": "totes/juan-sebastian.jpg",
-      "items": []
+      "items": [
+        {
+          "label": "Termo"
+        },
+        {
+          "label": "Libreta para componer",
+          "sticker": "stickers/trumpet.webp"
+        },
+        {
+          "label": "Chapstick"
+        },
+        {
+          "label": "Estuche de las gafas"
+        },
+        {
+          "label": "Audífonos"
+        },
+        {
+          "label": "Loción"
+        }
+      ]
     }
   ]
 }
