@@ -1,7 +1,7 @@
 import data from "../data/totes.json";
 import { picture } from "../lib/picture";
 
-type Item = { label: string; x: number; y: number };
+type Item = { label: string; x?: number; y?: number }; // x/y: optional hotspot on the photo, 0–1
 type Person = { slug: string; name: string; role: string; instagram: string; photo: string; items: Item[] };
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -19,8 +19,9 @@ export function initLlevan() {
 
     const photo = document.createElement("div");
     photo.className = "person__photo";
-    photo.append(picture(p.photo, `Lo que lleva ${p.name.split(" ")[0]} en su tote, visto desde arriba`, "(min-width: 1200px) 400px, (min-width: 768px) 45vw, 80vw"));
+    photo.append(picture(p.photo, `${p.name.split(" ")[0]} con el tote de Angelo Studio`, "(min-width: 1200px) 400px, (min-width: 768px) 45vw, 80vw"));
     const spots = p.items.map((it) => {
+      if (it.x == null || it.y == null) return null;
       const s = document.createElement("span");
       s.className = "person__spot";
       s.style.left = `${it.x * 100}%`;
@@ -57,14 +58,17 @@ export function initLlevan() {
       li.lastElementChild!.textContent = it.label;
       const on = (v: boolean) => {
         li.classList.toggle("is-on", v);
-        spots[i].classList.toggle("is-on", v);
+        spots[i]?.classList.toggle("is-on", v);
       };
       li.addEventListener("pointerenter", () => on(true));
       li.addEventListener("pointerleave", () => on(false));
       list.append(li);
     });
 
-    art.append(photo, name, role, ig, list);
+    art.append(photo, name);
+    if (p.role) art.append(role);
+    art.append(ig);
+    if (p.items.length) art.append(list);
     track.append(art);
   });
 

@@ -511,7 +511,7 @@
 }
 .person__photo {
   position: relative;
-  aspect-ratio: 1;
+  aspect-ratio: 3 / 4;
   background: var(--canvas);
   border-radius: 3px;
   overflow: hidden;
