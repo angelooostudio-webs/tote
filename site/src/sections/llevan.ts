@@ -110,10 +110,23 @@ export function initLlevan(reduced = false) {
       if (busy) return;
       busy = true;
       if (!gone) {
+        // place the copy exactly over the original: its real (untilted) size, centred on the same spot,
+        // with the same tilt/scale it has right now (hovered or not), so nothing jumps or squashes
         const r = img.getBoundingClientRect();
+        const w = img.offsetWidth;
+        const h = img.offsetHeight;
         const copy = img.cloneNode() as HTMLImageElement;
         copy.className = `${img.className} person__sticker--falling`;
-        Object.assign(copy.style, { position: "fixed", left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px`, margin: "0", zIndex: "60" });
+        Object.assign(copy.style, {
+          position: "fixed",
+          left: `${r.left + r.width / 2 - w / 2}px`,
+          top: `${r.top + r.height / 2 - h / 2}px`,
+          width: `${w}px`,
+          height: `${h}px`,
+          margin: "0",
+          zIndex: "60",
+          transform: getComputedStyle(img).transform,
+        });
         document.body.append(copy);
         gsap.set(d, { autoAlpha: 0 });
         const side = Math.random() < 0.5 ? -1 : 1;
