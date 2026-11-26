@@ -102,7 +102,8 @@
           "label": "Batería portátil"
         },
         {
-          "label": "Chicles"
+          "label": "Chicles",
+          "sticker": "stickers/trident.webp"
         }
       ]
     },
