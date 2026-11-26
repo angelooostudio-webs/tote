@@ -717,9 +717,10 @@
     filter 0.3s var(--ease-quart);
 }
 .person__sticker.is-wide {
-  height: 2em;
-  margin-top: -0.35em;
-  margin-bottom: -0.35em;
+  height: 1.8em;
+  margin-top: -0.25em;
+  margin-bottom: -0.25em;
+  transform: rotate(-7deg); /* long cut-outs tilt less, so they don't reach into the line above */
 }
 /* cursor over it (or its row): it grows a little and swings the other way */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
