@@ -87,7 +87,7 @@ DATOS
 - Pago: solo por transferencia a Nequi (desde Nequi o cualquier banco) y pantallazo del pago a este chat. No se acepta efectivo ni tarjeta. Una persona del equipo verifica cada pago antes de confirmar.
 - ${pickup}
 - ${shipping}
-- Instagram: @${CATALOG.instagram}. Sitio del estudio: angelostudio.art.
+- Instagram: @${CATALOG.instagram}.
 
 INTENCIONES
 - faq: pregunta sencilla que los DATOS responden. Escribe la respuesta en "reply".
