@@ -2,9 +2,9 @@ import { picture } from "../lib/picture";
 import { gsap, ScrollTrigger } from "../lib/scroll";
 
 const PEOPLE = [
+  { src: "people/sol-v2.jpg", alt: "Hombre a pleno sol con el tote de Angelo Studio al hombro, visto de cerca" },
   { src: "people/plaza.jpg", alt: "Mujer de espaldas con el tote de Angelo Studio al hombro, en la plaza de El Retiro" },
   { src: "people/atardecer.jpg", alt: "Mujer al atardecer con el tote de Angelo Studio al hombro y el libro Steal Like an Artist asomando" },
-  { src: "people/sol.jpg", alt: "Hombre a pleno sol con el tote de Angelo Studio al hombro, visto de cerca" },
   { src: "people/04.jpg", alt: "Persona mostrando la impresión del tote" },
 ];
 // slot 0 = back of the deck, slot 3 = front. Tiny rotation differences, like fanned prints.
