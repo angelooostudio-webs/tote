@@ -253,4 +253,13 @@ describe("HTTP routes", () => {
     expect(await getOrder(ctx.env.DB, "ANG-7F3K")).toMatchObject({ status: "AWAITING_PAYMENT" });
     expect(wa.last(CUSTOMER)!.body).toContain("Nequi");
   });
+
+  it("the admin number can order like anyone during the pre-sale, and AYUDA lists the commands", async () => {
+    const { ctx, wa } = testCtx(); // 28.11, pre-sale open, no test mode
+    await processWebhook(ctx, inbound(ADMIN, { text: buildOrderMessage(order()) }));
+    expect(await getOrder(ctx.env.DB, "ANG-7F3K")).toMatchObject({ status: "AWAITING_PAYMENT", wa_id: ADMIN });
+    expect(wa.last(ADMIN)!.body).toContain("Nequi");
+    await processWebhook(ctx, inbound(ADMIN, { text: "ayuda" }));
+    expect(wa.last(ADMIN)!.body).toContain("Comandos");
+  });
 });

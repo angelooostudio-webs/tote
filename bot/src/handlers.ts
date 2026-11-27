@@ -60,8 +60,9 @@ export async function handleInbound(ctx: Ctx, msg: InboundMessage, profileName?:
   const isNew = await logInbound(db, msg.id, waId, msg.type, body, ctx.now());
   if (!isNew) return;
 
-  // test mode: the admin can also act as a customer (orders, screenshots) before the pre-sale opens
-  if (waId === ctx.env.ADMIN_NUMBER && (!adminTesting(ctx) || isAdminCommand(msg))) return handleAdmin(ctx, msg);
+  // the admin number: commands (OK, NO, RESUMEN, PENDIENTES, PEDIDO, EXPORTAR, AYUDA) go to the admin
+  // handler; anything else (an order, a screenshot, a question) is handled like any customer's
+  if (waId === ctx.env.ADMIN_NUMBER && isAdminCommand(msg)) return handleAdmin(ctx, msg);
 
   switch (msg.type) {
     case "text":

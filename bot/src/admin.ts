@@ -181,7 +181,7 @@ export function isAdminCommand(msg: InboundMessage): boolean {
   const text = (msg.text?.body ?? "").trim();
   const hasCode = /ANG-[A-Z0-9]{4}/.test(text.toUpperCase());
   const cmd = norm(text).split(" ")[0];
-  return ((cmd === "ok" || cmd === "no" || cmd === "pedido") && hasCode) || cmd === "resumen" || cmd === "pendientes" || cmd === "exportar";
+  return ((cmd === "ok" || cmd === "no" || cmd === "pedido") && hasCode) || ["resumen", "pendientes", "exportar", "ayuda", "comandos"].includes(cmd);
 }
 
 export async function handleAdmin(ctx: Ctx, msg: InboundMessage) {
@@ -201,5 +201,6 @@ export async function handleAdmin(ctx: Ctx, msg: InboundMessage) {
   if (cmd === "pendientes") return pending(ctx);
   if (cmd === "pedido" && code) return detail(ctx, code);
   if (cmd === "exportar") return exportCsv(ctx);
+  // "ayuda" / "comandos", or anything else that reached here, gets the list of commands
   return say(ctx, ctx.env.ADMIN_NUMBER, HELP);
 }
