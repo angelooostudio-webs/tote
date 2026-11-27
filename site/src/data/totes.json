@@ -81,29 +81,29 @@
       "photo": "totes/salome.jpg",
       "items": [
         {
-          "label": "El libro que esté leyendo"
-        },
-        {
           "label": "Gloss"
-        },
-        {
-          "label": "Espejito de mano"
-        },
-        {
-          "label": "Billetera"
         },
         {
           "label": "Celular"
         },
         {
-          "label": "Pañitos"
+          "label": "El libro que esté leyendo"
+        },
+        {
+          "label": "Chicles",
+          "sticker": "stickers/trident.webp"
+        },
+        {
+          "label": "Billetera"
         },
         {
           "label": "Batería portátil"
         },
         {
-          "label": "Chicles",
-          "sticker": "stickers/trident.webp"
+          "label": "Espejito de mano"
+        },
+        {
+          "label": "Pañitos"
         }
       ]
     },
