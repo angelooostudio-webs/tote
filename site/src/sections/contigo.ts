@@ -3,7 +3,7 @@ import { gsap, ScrollTrigger } from "../lib/scroll";
 
 const PEOPLE = [
   { src: "people/plaza.jpg", alt: "Mujer de espaldas con el tote de Angelo Studio al hombro, en la plaza de El Retiro" },
-  { src: "people/02.jpg", alt: "Persona con el tote al hombro" },
+  { src: "people/atardecer.jpg", alt: "Mujer al atardecer con el tote de Angelo Studio al hombro y el libro Steal Like an Artist asomando" },
   { src: "people/03.jpg", alt: "Persona caminando con el tote" },
   { src: "people/04.jpg", alt: "Persona mostrando la impresión del tote" },
 ];
