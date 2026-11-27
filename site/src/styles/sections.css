@@ -411,6 +411,7 @@
 /* the hint under the headline: "tap" on touch screens, "click" with a mouse */
 .contigo__hint {
   margin-top: var(--space-step);
+  max-width: 34rem;
   color: var(--mute-ink);
 }
 .contigo__hint-click {
