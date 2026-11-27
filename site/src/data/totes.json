@@ -105,7 +105,8 @@
           "label": "Gloss"
         },
         {
-          "label": "Celular"
+          "label": "Celular",
+          "sticker": "stickers/flip-phone.webp"
         },
         {
           "label": "El libro que esté leyendo"
