@@ -340,13 +340,14 @@
 }
 .stack {
   --w: min(84vw, 460px);
+  --steps: 2; /* cards in the deck minus one (3 photos) */
   --dx: calc(var(--w) * 0.055);
   --dy: calc(var(--dx) * 1.25);
-  --cw: calc(var(--w) - 3 * var(--dx));
+  --cw: calc(var(--w) - var(--steps) * var(--dx));
   position: relative;
   display: block;
   width: var(--w);
-  height: calc(var(--cw) * 1.25 + 3 * var(--dy));
+  height: calc(var(--cw) * 1.25 + var(--steps) * var(--dy));
   margin: var(--space-head) auto 0;
   cursor: pointer;
   border-radius: 4px;
@@ -365,8 +366,8 @@
 .stack__next {
   position: absolute;
   z-index: 20;
-  left: calc(3 * var(--dx) + var(--cw) - 68px);
-  top: calc(3 * var(--dy) + var(--cw) * 1.25 - 68px);
+  left: calc(var(--steps) * var(--dx) + var(--cw) - 68px);
+  top: calc(var(--steps) * var(--dy) + var(--cw) * 1.25 - 68px);
   display: grid;
   place-items: center;
   width: 48px;
