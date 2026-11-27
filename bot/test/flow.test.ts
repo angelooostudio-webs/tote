@@ -4,6 +4,7 @@ import { CODE_ALPHABET, buildOrderMessage, type Order } from "../../shared/order
 import worker, { processWebhook, setCtxFactory } from "../src/index.ts";
 import { getOrder, remainingStock } from "../src/db.ts";
 import { ADMIN, CUSTOMER, inbound, sign, testCtx } from "./harness.ts";
+import { CloudApiMessenger } from "../src/messenger.ts";
 
 const order = (o: Partial<Order> = {}): Order => ({ code: "ANG-7F3K", option: "bundle", qty: 1, addOns: [], delivery: "pickup", name: "Valentina", ...o });
 
@@ -261,5 +262,38 @@ describe("HTTP routes", () => {
     expect(wa.last(ADMIN)!.body).toContain("Nequi");
     await processWebhook(ctx, inbound(ADMIN, { text: "ayuda" }));
     expect(wa.last(ADMIN)!.body).toContain("Comandos");
+  });
+
+  it("customers who hide their number (WhatsApp username): read from_user_id and reply to it", async () => {
+    const { ctx, wa } = testCtx();
+    const uid = "CO.4829103948571029384";
+    const payload = inbound(CUSTOMER, { text: buildOrderMessage(order()) });
+    const v = payload.entry![0].changes![0].value!;
+    const m = v.messages![0] as unknown as Record<string, unknown>;
+    delete m.from;
+    m.from_user_id = uid;
+    v.contacts = [{ user_id: uid, profile: { name: "Sam" } }];
+    await processWebhook(ctx, payload);
+    expect(await getOrder(ctx.env.DB, "ANG-7F3K")).toMatchObject({ wa_id: uid, status: "AWAITING_PAYMENT" });
+    expect(wa.last(uid)!.body).toContain("Nequi");
+  });
+
+  it("sends to a user ID with recipient, to a phone number with to", async () => {
+    const bodies: any[] = [];
+    const spy = vi.spyOn(globalThis, "fetch").mockImplementation(async (_u, init) => {
+      bodies.push(JSON.parse(String(init?.body)));
+      return new Response(JSON.stringify({ messages: [{ id: "x" }] }));
+    });
+    try {
+      const m = new CloudApiMessenger("t", "123");
+      await m.sendText("CO.4829103948571029384", "hola");
+      await m.sendText("573001112233", "hola");
+      expect(bodies[0]).toMatchObject({ recipient: "CO.4829103948571029384" });
+      expect(bodies[0].to).toBeUndefined();
+      expect(bodies[1]).toMatchObject({ to: "573001112233" });
+      expect(bodies[1].recipient).toBeUndefined();
+    } finally {
+      spy.mockRestore();
+    }
   });
 });

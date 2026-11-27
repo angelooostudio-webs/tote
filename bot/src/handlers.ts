@@ -22,6 +22,7 @@ import type { InboundMessage } from "./whatsapp.ts";
 import { push } from "./notify.ts";
 import { handleAdmin, isAdminCommand } from "./admin.ts";
 import { handleImage } from "./payments.ts";
+import { contactLabel } from "./messenger.ts";
 
 /** Sends a text and logs it (the log also tells us whether we've written to this number before). */
 export async function say(ctx: Ctx, to: string, body: string, orderCode: string | null = null) {
@@ -40,7 +41,7 @@ export async function forwardToAdmin(ctx: Ctx, waId: string, reason: string, nam
   const convo = await recentConversation(ctx.env.DB, waId, 8);
   const lines = convo.map((m) => `${m.direction === "in" ? "Cliente" : "Bot"}: ${(m.body ?? `[${m.kind}]`).slice(0, 300)}`);
   await push(ctx, "Un cliente necesita respuesta", reason, { priority: 4, tags: ["speech_balloon"] });
-  const body = [`Para revisar: ${reason}`, `De: +${waId}${name ? ` (${name})` : ""}`, "", ...lines].join("\n").slice(0, 4000);
+  const body = [`Para revisar: ${reason}`, `De: ${contactLabel(waId)}${name ? ` (${name})` : ""}`, "", ...lines].join("\n").slice(0, 4000);
   try {
     await ctx.wa.sendText(ctx.env.ADMIN_NUMBER, body);
     await logOutbound(ctx.env.DB, ctx.env.ADMIN_NUMBER, "text", body, null, ctx.now());

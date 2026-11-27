@@ -75,8 +75,10 @@ export default {
       // one line per webhook: what Meta sent (sender shortened to the last 4 digits)
       {
         const v = payload.entry?.[0]?.changes?.[0]?.value;
-        const from = (v?.messages ?? []).map((m) => `…${m.from.slice(-4)}:${m.type}`).join(",");
-        console.log(`webhook in: messages=[${from}] statuses=${(v?.statuses ?? []).length}`);
+        const msgs = (v?.messages ?? []) as unknown as Record<string, unknown>[];
+        const from = msgs.map((m) => `${typeof m.from === "string" ? "…" + m.from.slice(-4) : "no-from"}:${m.type}:{${Object.keys(m).join("|")}}`).join(",");
+        const contacts = ((v?.contacts ?? []) as unknown as Record<string, unknown>[]).map((c) => `{${Object.keys(c).join("|")}}`).join(",");
+        console.log(`webhook in: messages=[${from}] contacts=[${contacts}] statuses=${(v?.statuses ?? []).length}`);
       }
       // answer Meta immediately; the work continues in the background
       exec.waitUntil(processWebhook(ctxFactory(env), payload));

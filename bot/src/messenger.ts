@@ -52,7 +52,10 @@ export class CloudApiMessenger implements Messenger {
   }
 
   private send(to: string, payload: Record<string, unknown>) {
-    return this.post(`${this.phoneNumberId}/messages`, { messaging_product: "whatsapp", recipient_type: "individual", to, ...payload });
+    // customers who message with a WhatsApp username have no phone number, only a business-scoped
+    // user ID (e.g. "CO.1234…"): Meta addresses those with "recipient" instead of "to"
+    const address = isUserId(to) ? { recipient: to } : { to };
+    return this.post(`${this.phoneNumberId}/messages`, { messaging_product: "whatsapp", recipient_type: "individual", ...address, ...payload });
   }
 
   async sendText(to: string, body: string) {
@@ -110,3 +113,9 @@ export class CloudApiMessenger implements Messenger {
     return { bytes: new Uint8Array(await file.arrayBuffer()), mime: mime_type };
   }
 }
+
+/** A business-scoped user ID ("CO.1234…") rather than a phone number (digits only). */
+export const isUserId = (id: string) => !/^\d+$/.test(id);
+
+/** How a customer's WhatsApp identity is shown to Angelo: "+573001112233", or a note when they hid their number. */
+export const contactLabel = (id: string) => (isUserId(id) ? "usuario de WhatsApp sin número visible" : `+${id}`);

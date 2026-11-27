@@ -15,6 +15,7 @@ import type { InboundMessage } from "./whatsapp.ts";
 import { say } from "./handlers.ts";
 import { allOrders, countsByStatus, getOrder, lastInboundAt, latestProof, logOutbound, ordersInStatus, remainingStock, setStatus, type OrderRow } from "./db.ts";
 import { norm } from "./parse.ts";
+import { contactLabel } from "./messenger.ts";
 
 export const CONFIRM_TEMPLATE = "pedido_confirmado";
 const WINDOW_MS = 24 * 3600_000;
@@ -142,7 +143,7 @@ async function detail(ctx: Ctx, code: string) {
     ctx.env.ADMIN_NUMBER,
     [
       `${o.code} · ${STATUS_ES[o.status]}`,
-      `${o.name} · +${o.wa_id}`,
+      `${o.name} · ${contactLabel(o.wa_id)}`,
       `${o.qty} × ${CATALOG.options[o.option].label} · ${DELIVERY_LABEL[o.delivery]}${o.delivery === "shipping" ? ` a ${o.address}, ${o.city}` : ""}`,
       `Total: ${formatCOP(o.total)}`,
       `Creado: ${when(o.created_at)}`,

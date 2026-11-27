@@ -6,6 +6,7 @@
 import { CATALOG, formatCOP } from "../../shared/catalog.ts";
 import { STATUS_ES } from "./admin.ts";
 import type { OrderRow } from "./db.ts";
+import { isUserId } from "./messenger.ts";
 
 interface Row extends OrderRow {
   proof_json: string | null;
@@ -43,7 +44,7 @@ async function pickupTable(db: D1Database): Promise<Table> {
   const list = (await rows(db, true)).filter((r) => r.delivery !== "shipping");
   return {
     head: ["#", "Código", "Nombre", "Tel. (últimos 4)", "Producto", "Cant.", "Entrega", "Entregado ✓", "Firma / nota"],
-    rows: list.map((r, i) => [i + 1, r.code, r.name, `…${r.wa_id.slice(-4)}`, product(r), r.qty, delivery(r), "", ""]),
+    rows: list.map((r, i) => [i + 1, r.code, r.name, isUserId(r.wa_id) ? "sin número" : `…${r.wa_id.slice(-4)}`, product(r), r.qty, delivery(r), "", ""]),
   };
 }
 
@@ -52,7 +53,7 @@ async function shippingTable(db: D1Database): Promise<Table> {
   const list = (await rows(db, true)).filter((r) => r.delivery === "shipping");
   return {
     head: ["#", "Código", "Nombre", "Teléfono", "Dirección", "Ciudad", "Producto", "Cant.", "Enviado ✓", "Guía"],
-    rows: list.map((r, i) => [i + 1, r.code, r.name, `+${r.wa_id}`, r.address ?? "", r.city ?? "", product(r), r.qty, "", ""]),
+    rows: list.map((r, i) => [i + 1, r.code, r.name, isUserId(r.wa_id) ? "sin número (pedir por el chat)" : `+${r.wa_id}`, r.address ?? "", r.city ?? "", product(r), r.qty, "", ""]),
   };
 }
 
@@ -85,7 +86,7 @@ async function paymentsTable(db: D1Database): Promise<Table> {
         r.code,
         STATUS_ES[r.status] ?? r.status,
         r.name,
-        `wa.me/${r.wa_id}`, // opens the chat
+        isUserId(r.wa_id) ? "sin número" : `wa.me/${r.wa_id}`, // opens the chat
         product(r),
         r.qty,
         delivery(r),
@@ -113,7 +114,7 @@ export async function panelHtml(db: D1Database, view: string, key: string, now: 
   const stamp = new Intl.DateTimeFormat("es-CO", { timeZone: "America/Bogota", dateStyle: "long", timeStyle: "short" }).format(now);
   const cell = (v: unknown, i: number) => {
     const s = String(v ?? "");
-    if (!pickup && t.head[i] === "WhatsApp" && s) return `<a href="https://${h(s)}">${h(s.replace("wa.me/", "+"))}</a>`;
+    if (!pickup && t.head[i] === "WhatsApp" && s.startsWith("wa.me/")) return `<a href="https://${h(s)}">${h(s.replace("wa.me/", "+"))}</a>`;
     if (pickup && (t.head[i] === "Entregado ✓" || t.head[i] === "Enviado ✓")) return `<span class="box"></span>`;
     return h(s);
   };

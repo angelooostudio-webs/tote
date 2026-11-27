@@ -15,7 +15,8 @@ export async function verifySignature(rawBody: ArrayBuffer | Uint8Array, header:
 
 export interface InboundMessage {
   id: string; // wamid…
-  from: string; // sender's number, digits
+  from: string; // sender's number (digits), or their business-scoped user ID when they hide their number
+  from_user_id?: string; // business-scoped user ID (users with a WhatsApp username may send no number)
   timestamp: string;
   type: "text" | "image" | "interactive" | "button" | "document" | "audio" | "video" | "sticker" | "location" | "contacts" | "reaction" | string;
   text?: { body: string };
@@ -32,7 +33,7 @@ export interface WebhookPayload {
       field?: string;
       value?: {
         messages?: InboundMessage[];
-        contacts?: { wa_id: string; profile?: { name?: string } }[];
+        contacts?: { wa_id?: string; user_id?: string; profile?: { name?: string } }[];
         statuses?: unknown[];
       };
     }[];
@@ -44,8 +45,17 @@ export function inboundMessages(p: WebhookPayload): { msg: InboundMessage; profi
   const out: { msg: InboundMessage; profileName?: string }[] = [];
   for (const e of p.entry ?? [])
     for (const c of e.changes ?? []) {
-      const names = new Map((c.value?.contacts ?? []).map((x) => [x.wa_id, x.profile?.name]));
-      for (const m of c.value?.messages ?? []) out.push({ msg: m, profileName: names.get(m.from) });
+      const names = new Map<string | undefined, string | undefined>();
+      for (const x of c.value?.contacts ?? []) {
+        if (x.wa_id) names.set(x.wa_id, x.profile?.name);
+        if (x.user_id) names.set(x.user_id, x.profile?.name);
+      }
+      for (const m of c.value?.messages ?? []) {
+        // the phone number when Meta sends one, otherwise the business-scoped user ID
+        const from = m.from || m.from_user_id;
+        if (!from) continue;
+        out.push({ msg: { ...m, from }, profileName: names.get(m.from) ?? names.get(m.from_user_id) });
+      }
     }
   return out;
 }

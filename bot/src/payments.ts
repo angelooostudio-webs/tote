@@ -14,6 +14,7 @@ import type { InboundMessage } from "./whatsapp.ts";
 import { say } from "./handlers.ts";
 import { bumpFailedAttempts, latestOrderFor, otherOrderHashes, saveProof, setStatus, type OrderRow } from "./db.ts";
 import { SAME_IMAGE_MAX_DISTANCE, checkProof, hashDistance, imageHash, type Extracted, type Problem } from "./proofs.ts";
+import { contactLabel } from "./messenger.ts";
 
 export const MAX_FAILED_ATTEMPTS = 2;
 
@@ -54,7 +55,7 @@ export async function sendReview(ctx: Ctx, o: OrderRow, x: Extracted | null, pro
     : ["No se pudo leer el comprobante automáticamente."];
   const body = [
     `Pago por revisar: ${o.code}`,
-    `Cliente: ${o.name} (+${o.wa_id})`,
+    `Cliente: ${o.name} (${contactLabel(o.wa_id)})`,
     `Pedido: ${o.qty} × ${CATALOG.options[o.option].label} · ${DELIVERY_LABEL[o.delivery]}${o.delivery === "shipping" ? ` a ${o.address}, ${o.city}` : ""}`,
     `Total: ${formatCOP(o.total)}`,
     "",
