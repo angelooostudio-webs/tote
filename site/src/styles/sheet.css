@@ -91,7 +91,7 @@
   aspect-ratio: 5 / 4;
   max-height: 46dvh;
   width: 100%;
-  background: var(--canvas);
+  background: #ebe5d9; /* a shade under the paper, so the cotton bag stands out */
   overflow: hidden;
 }
 .sheet__media picture {
