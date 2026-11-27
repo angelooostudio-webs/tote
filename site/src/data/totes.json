@@ -71,7 +71,26 @@
       "role": "Dirección audiovisual",
       "instagram": "jhohan_gp",
       "photo": "totes/jhohan.jpg",
-      "items": []
+      "items": [
+        {
+          "label": "Mecato"
+        },
+        {
+          "label": "Gorro"
+        },
+        {
+          "label": "Audífonos"
+        },
+        {
+          "label": "Llavero de Crayon Shin-chan"
+        },
+        {
+          "label": "Sencillo"
+        },
+        {
+          "label": "Gorra de repuesto"
+        }
+      ]
     },
     {
       "slug": "salome",
