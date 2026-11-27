@@ -72,6 +72,12 @@ export default {
       } catch {
         return new Response("bad json", { status: 400 });
       }
+      // one line per webhook: what Meta sent (sender shortened to the last 4 digits)
+      {
+        const v = payload.entry?.[0]?.changes?.[0]?.value;
+        const from = (v?.messages ?? []).map((m) => `…${m.from.slice(-4)}:${m.type}`).join(",");
+        console.log(`webhook in: messages=[${from}] statuses=${(v?.statuses ?? []).length}`);
+      }
       // answer Meta immediately; the work continues in the background
       exec.waitUntil(processWebhook(ctxFactory(env), payload));
       return new Response("ok", { status: 200 });
