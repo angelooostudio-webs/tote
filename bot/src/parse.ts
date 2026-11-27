@@ -51,7 +51,11 @@ type Fields = { code: string; option: string; qty: string; addOns: string; deliv
 
 export function parseOrderMessage(text: string): ParseResult {
   const fields: Partial<Fields> = {};
-  for (const raw of text.replace(/\r\n?/g, "\n").split("\n")) {
+  // some WhatsApp apps flatten the message onto one line: put each known field back on its own line
+  const unflattened = text
+    .replace(/\r\n?/g, "\n")
+    .replace(/[ \t]+(?=[*_]*(?:pedido|c[oó]digo|opci[oó]n|cantidad|adicionales|entrega|nombre|direcci[oó]n|ciudad|prueba|total)[*_]*\s*:)/gi, "\n");
+  for (const raw of unflattened.split("\n")) {
     const m = raw.match(/^\s*[*_]*([^:]{3,20}?)[*_]*\s*:\s*(.*)$/);
     if (!m) continue;
     const key = KEYS[norm(m[1])];

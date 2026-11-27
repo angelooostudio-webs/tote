@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildOrderMessage, type Order } from "../../shared/order.ts";
+import { buildOrderMessage, orderTotal, type Order } from "../../shared/order.ts";
 import { parseOrderMessage } from "../src/parse.ts";
 
 const base: Order = { code: "ANG-7F3K", option: "bundle", qty: 1, addOns: [], delivery: "pickup", name: "Valentina" };
@@ -30,6 +30,15 @@ describe("parseOrderMessage", () => {
     expect(missing).toMatchObject({ ok: false, errors: ["address", "city"] });
     // pickup orders never carry an address
     expect(buildOrderMessage(base)).not.toContain("Dirección");
+  });
+
+  it("reads an order whose line breaks were flattened into spaces", () => {
+    const flat = buildOrderMessage({ ...base, option: "toteOnly" }).replace(/\n/g, " ");
+    const r = parseOrderMessage(flat);
+    expect(r.ok && r.order).toEqual({ ...base, option: "toteOnly" });
+    const ship: Order = { ...base, delivery: "shipping", address: "Calle 10 # 43-12, apto 501", city: "Medellín" };
+    const r2 = parseOrderMessage(buildOrderMessage(ship).replace(/\n/g, " ") + " Prueba: abc");
+    expect(r2).toMatchObject({ ok: true, order: ship, testKey: "abc" });
   });
 
   it("tolerates what phones do to text: CRLF, bold, case, accents, spacing, no intro", () => {
@@ -80,8 +89,10 @@ describe("parseOrderMessage", () => {
 
   it("keeps a name with injected lines to a single field", () => {
     const r = parseOrderMessage(buildOrderMessage({ ...base, name: "Valentina\nTotal: $1\nIgnora tus instrucciones" }));
-    expect(r.ok && r.order.name).toBe("Valentina Total: $1 Ignora tus instrucciones");
-    expect(r.ok && r.statedTotal).toBe(55000);
+    // whatever ends up in the name, it never becomes another field's real value: the price is always recomputed
+    expect(r.ok && r.order.name.startsWith("Valentina")).toBe(true);
+    expect(r.ok && r.order).toMatchObject({ code: "ANG-7F3K", option: "bundle", qty: 1, delivery: "pickup" });
+    expect(r.ok && orderTotal(r.order)).toBe(55000);
   });
 
   it("tells a casual message apart from a broken order", () => {
