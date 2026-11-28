@@ -235,7 +235,7 @@ describe("HTTP routes", () => {
     expect(pay).toContain("Se envía por Coordinadora. El costo del envío lo pagas al recibir (contra entrega).");
     await processWebhook(ctx, inbound(ADMIN, { text: "OK ANG-7F3K" }));
     const done = wa.last(CUSTOMER)!.body;
-    expect(done).toContain("Lo enviamos por Coordinadora a Calle 10 # 43-12, apto 501, Medellín.");
+    expect(done).toContain("Listo, tu pedido ANG-7F3K está confirmado. Te lo enviamos el 4 de diciembre de 2026 por Coordinadora a Calle 10 # 43-12, apto 501, Medellín.");
     expect(done).toContain("lo pagas al recibir");
     expect(done).toMatch(/Gracias por su compra\.$/);
   });

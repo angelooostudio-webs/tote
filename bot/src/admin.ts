@@ -62,14 +62,13 @@ async function notifyCustomer(ctx: Ctx, o: OrderRow, text: string, template?: { 
 }
 
 export function confirmationText(o: OrderRow): string {
-  const unbound = o.option === "bundle" ? ` UNBOUND sale el ${launchDate()}.` : "";
-  const where =
-    o.delivery === "pickup"
-      ? CATALOG.pickup.place
-        ? ` Recogida: ${CATALOG.pickup.place}${CATALOG.pickup.hours ? `, ${CATALOG.pickup.hours}` : ""}.`
-        : " Te escribimos por aquí para coordinar la recogida en El Retiro."
-      : ` Lo enviamos por ${CATALOG.shipping.carrier} a ${o.address ?? ""}, ${o.city ?? ""}.${CATALOG.shipping.price > 0 ? "" : " El costo del envío lo pagas al recibir (contra entrega)."} Te escribimos por aquí con el número de guía.`;
-  return `Tu pedido ${o.code} está confirmado.${unbound}${where} Gracias por su compra.`;
+  const day = launchDate(); // UNBOUND launch day, from the catalog
+  if (o.delivery === "shipping") {
+    const cod = CATALOG.shipping.price > 0 ? "" : " El costo del envío lo pagas al recibir (contra entrega).";
+    return `Listo, tu pedido ${o.code} está confirmado. Te lo enviamos el ${day} por ${CATALOG.shipping.carrier} a ${o.address ?? ""}, ${o.city ?? ""}.${cod} Gracias por su compra.`;
+  }
+  const place = CATALOG.pickup.place ? ` en ${CATALOG.pickup.place}${CATALOG.pickup.hours ? `, ${CATALOG.pickup.hours}` : ""}` : "";
+  return `Listo, tu pedido ${o.code} está confirmado. Puedes recogerlo el ${day}${place}. Gracias por su compra.`;
 }
 
 export async function confirmOrder(ctx: Ctx, code: string) {

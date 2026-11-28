@@ -119,7 +119,7 @@ describe("payment flow", () => {
     await processWebhook(ctx, inbound(ADMIN, { button: { id: "ok:ANG-7F3K", title: "Confirmar" } }));
     const o = (await getOrder(ctx.env.DB, "ANG-7F3K"))!;
     expect(o.status).toBe("CONFIRMED");
-    expect(wa.last(CUSTOMER)!.body).toMatch(/^Tu pedido ANG-7F3K está confirmado\. UNBOUND sale el 4 de diciembre de 2026\./);
+    expect(wa.last(CUSTOMER)!.body).toBe("Listo, tu pedido ANG-7F3K está confirmado. Puedes recogerlo el 4 de diciembre de 2026. Gracias por su compra.");
     expect(wa.last(ADMIN)!.body).toContain("Confirmado ANG-7F3K");
     // a day later the stock is still held (it's confirmed, not a reservation)
     expect(await remainingStock(ctx.env.DB, new Date(ctx.now().getTime() + 3 * 86400_000))).toBe(CATALOG.stockTotal - 1);
