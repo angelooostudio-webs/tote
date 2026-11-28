@@ -6,7 +6,7 @@
  */
 import { CATALOG } from "../../shared/catalog.ts";
 import { ClaudeAssistant, KeywordAssistant } from "./assistant.ts";
-import { remainingStock } from "./db.ts";
+import { FUNNEL, countEvent, remainingStock, type FunnelStep } from "./db.ts";
 import type { Ctx, Env } from "./env.ts";
 import { handleInbound } from "./handlers.ts";
 import { panelHtml, paymentsCsv, pickupCsv, shippingCsv } from "./sheet.ts";
@@ -98,6 +98,13 @@ export default {
       if (!env.SHEET_KEY || key !== env.SHEET_KEY) return new Response("forbidden", { status: 403 });
       const html = await panelHtml(env.DB, url.searchParams.get("v") ?? "entrega", key, new Date());
       return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "x-robots-tag": "noindex" } });
+    }
+    // anonymous funnel ping from the site (navigator.sendBeacon): only a step name, nothing personal
+    if (url.pathname === "/event") {
+      if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env, req) });
+      const e = url.searchParams.get("e") as FunnelStep;
+      if (req.method === "POST" && FUNNEL.includes(e)) await countEvent(env.DB, e, new Date());
+      return new Response(null, { status: 204, headers: cors(env, req) });
     }
     if (url.pathname === "/stock") {
       if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env, req) });

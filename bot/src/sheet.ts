@@ -5,7 +5,7 @@
  */
 import { CATALOG, formatCOP } from "../../shared/catalog.ts";
 import { STATUS_ES } from "./admin.ts";
-import type { OrderRow } from "./db.ts";
+import { funnelByDay, type OrderRow } from "./db.ts";
 import { isUserId } from "./messenger.ts";
 
 interface Row extends OrderRow {
@@ -62,6 +62,17 @@ export async function shippingCsv(db: D1Database): Promise<string> {
   return csv(t.head, t.rows);
 }
 
+/** anonymous visit funnel per day */
+async function visitsTable(db: D1Database): Promise<Table> {
+  const days = await funnelByDay(db);
+  const n = (r: Record<string, number>, k: string) => r[k] ?? 0;
+  const pct = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%` : "—");
+  return {
+    head: ["Día", "Visitas", "Abrieron pedido", "Eligieron opción", "Eligieron entrega", "Tocaron WhatsApp", "Pedidos enviados", "Visita → pedido"],
+    rows: days.map(([d, r]) => [d, n(r, "visit"), n(r, "sheet_open"), n(r, "option"), n(r, "delivery"), n(r, "whatsapp"), n(r, "orders"), pct(n(r, "orders"), n(r, "visit"))]),
+  };
+}
+
 export async function pickupCsv(db: D1Database): Promise<string> {
   const t = await pickupTable(db);
   return csv(t.head, t.rows);
@@ -106,11 +117,11 @@ const h = (v: unknown) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&a
 
 /** Printable page: /panel?key=…&v=entrega|pagos */
 export async function panelHtml(db: D1Database, view: string, key: string, now: Date): Promise<string> {
-  const v = view === "pagos" || view === "envios" ? view : "entrega";
-  const pickup = v !== "pagos"; // printable lists with a checkbox column
-  const t = v === "entrega" ? await pickupTable(db) : v === "envios" ? await shippingTable(db) : await paymentsTable(db);
+  const v = view === "pagos" || view === "envios" || view === "visitas" ? view : "entrega";
+  const pickup = v === "entrega" || v === "envios"; // printable lists with a checkbox column
+  const t = v === "entrega" ? await pickupTable(db) : v === "envios" ? await shippingTable(db) : v === "visitas" ? await visitsTable(db) : await paymentsTable(db);
   const k = encodeURIComponent(key);
-  const title = v === "entrega" ? "Recogida" : v === "envios" ? "Envíos" : "Pagos";
+  const title = v === "entrega" ? "Recogida" : v === "envios" ? "Envíos" : v === "visitas" ? "Visitas" : "Pagos";
   const stamp = new Intl.DateTimeFormat("es-CO", { timeZone: "America/Bogota", dateStyle: "long", timeStyle: "short" }).format(now);
   const cell = (v: unknown, i: number) => {
     const s = String(v ?? "");
@@ -120,7 +131,7 @@ export async function panelHtml(db: D1Database, view: string, key: string, now: 
   };
   const body = t.rows.length
     ? t.rows.map((r) => `<tr>${r.map((v, i) => `<td class="c${i}">${cell(v, i)}</td>`).join("")}</tr>`).join("")
-    : `<tr><td colspan="${t.head.length}" class="empty">${v === "pagos" ? "Todavía no hay pedidos." : "Todavía no hay pedidos confirmados aquí."}</td></tr>`;
+    : `<tr><td colspan="${t.head.length}" class="empty">${v === "visitas" ? "Todavía no hay visitas registradas." : v === "pagos" ? "Todavía no hay pedidos." : "Todavía no hay pedidos confirmados aquí."}</td></tr>`;
   return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex"><title>${title} · Tote Angelo Studio</title>
 <style>
@@ -136,9 +147,9 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#6b685f;wh
 .c8{min-width:140px}
 @media print{body{background:#fff;padding:0;font-size:12px}nav,button{display:none}.wrap{overflow:visible;border-radius:0}table{min-width:0}th,td{padding:6px 8px}tr{break-inside:avoid}}
 </style></head><body>
-<header><div><h1>${title}</h1><div class="meta">Tote Angelo Studio · ${t.rows.length} ${t.rows.length === 1 ? (pickup ? "pedido confirmado" : "pedido") : pickup ? "pedidos confirmados" : "pedidos"} · actualizado ${h(stamp)}</div></div>
-<nav>${(["entrega", "envios", "pagos"] as const).map((x) => `<a href="?key=${k}&v=${x}"${x === v ? ' class="on"' : ""}>${x === "entrega" ? "Recogida" : x === "envios" ? "Envíos" : "Pagos"}</a>`).join("")}
-<a href="/sheet/${v}.csv?key=${k}">Descargar (Excel/Sheets)</a><button onclick="print()">Imprimir</button></nav></header>
+<header><div><h1>${title}</h1><div class="meta">Tote Angelo Studio · ${v === "visitas" ? "conteo anónimo por día" : `${t.rows.length} ${t.rows.length === 1 ? (pickup ? "pedido confirmado" : "pedido") : pickup ? "pedidos confirmados" : "pedidos"}`} · actualizado ${h(stamp)}</div></div>
+<nav>${(["entrega", "envios", "pagos", "visitas"] as const).map((x) => `<a href="?key=${k}&v=${x}"${x === v ? ' class="on"' : ""}>${x === "entrega" ? "Recogida" : x === "envios" ? "Envíos" : x === "visitas" ? "Visitas" : "Pagos"}</a>`).join("")}
+${v === "visitas" ? "" : `<a href="/sheet/${v}.csv?key=${k}">Descargar (Excel/Sheets)</a>`}<button onclick="print()">Imprimir</button></nav></header>
 <div class="wrap"><table><thead><tr>${t.head.map((x) => `<th>${h(x)}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>
 </body></html>`;
 }

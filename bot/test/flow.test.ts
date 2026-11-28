@@ -296,4 +296,19 @@ describe("HTTP routes", () => {
       spy.mockRestore();
     }
   });
+
+  it("counts the anonymous visit funnel and shows it in RESUMEN and the Visitas tab", async () => {
+    const { ctx, wa } = testCtx();
+    const env = { ...ctx.env, SHEET_KEY: "k123" };
+    setCtxFactory(() => ({ ...ctx, env }));
+    for (const e of ["visit", "visit", "sheet_open", "whatsapp", "nope"])
+      expect((await worker.fetch(new Request(`https://bot/event?e=${e}`, { method: "POST" }), env, exec().e)).status).toBe(204);
+    await processWebhook(ctx, inbound(CUSTOMER, { text: buildOrderMessage(order()) }));
+    await processWebhook(ctx, inbound(ADMIN, { text: "RESUMEN" }));
+    const resumen = wa.last(ADMIN)!.body;
+    expect(resumen).toContain("visitas 2 → abrieron pedido 1 → WhatsApp 1 → pedidos 1");
+    const html = await (await worker.fetch(new Request("https://bot/panel?key=k123&v=visitas"), env, exec().e)).text();
+    expect(html).toContain("Visitas");
+    expect(html).toContain("50%"); // 1 order / 2 visits
+  });
 });

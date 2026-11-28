@@ -170,3 +170,29 @@ export async function bumpFailedAttempts(db: D1Database, code: string, now: Date
   await db.prepare(`UPDATE orders SET failed_attempts = failed_attempts + 1, updated_at = ? WHERE code = ?`).bind(now.toISOString(), code).run();
   return (await getOrder(db, code))?.failed_attempts ?? 0;
 }
+
+// ---------- anonymous visit funnel ----------
+export const FUNNEL = ["visit", "sheet_open", "option", "delivery", "whatsapp"] as const;
+export type FunnelStep = (typeof FUNNEL)[number];
+const bogotaDay = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(d);
+
+export async function countEvent(db: D1Database, name: FunnelStep, now: Date) {
+  await db
+    .prepare(`INSERT INTO events (day, name, count) VALUES (?, ?, 1) ON CONFLICT(day, name) DO UPDATE SET count = count + 1`)
+    .bind(bogotaDay(now), name)
+    .run();
+}
+
+/** per-day funnel, newest first, plus orders sent that day */
+export async function funnelByDay(db: D1Database) {
+  const ev = (await db.prepare(`SELECT day, name, count FROM events`).all<{ day: string; name: string; count: number }>()).results ?? [];
+  const ord = (await db.prepare(`SELECT created_at FROM orders`).all<{ created_at: string }>()).results ?? [];
+  const days = new Map<string, Record<string, number>>();
+  const row = (d: string) => days.get(d) ?? (days.set(d, {}), days.get(d)!);
+  for (const e of ev) row(e.day)[e.name] = e.count;
+  for (const o of ord) {
+    const r = row(bogotaDay(new Date(o.created_at)));
+    r.orders = (r.orders ?? 0) + 1;
+  }
+  return [...days.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1));
+}

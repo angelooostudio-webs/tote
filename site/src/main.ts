@@ -1,3 +1,4 @@
+import { track } from "./lib/track";
 import { CATALOG, shortDate, type PresalePhase } from "../../shared/catalog";
 import { initOrderButtons } from "./sections/order-button";
 import { initSheet } from "./sections/sheet";
@@ -22,6 +23,7 @@ initScroll(reduced);
 initHeader(reduced);
 initContigo(reduced);
 initLlevan(reduced);
+track("visit");
 initOrderButtons(setPill);
 initSheet(reduced);
 

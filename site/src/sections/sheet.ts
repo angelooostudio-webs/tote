@@ -1,6 +1,7 @@
 import { CATALOG, formatCOP, shortDate, type OptionId } from "../../../shared/catalog";
 import { SHIPPING_NOTE, buildOrderMessage, cleanLine, cleanName, makeOrderCode, orderLines, whatsappLink, type Delivery, type Order } from "../../../shared/order";
 import { testKey } from "../lib/clock";
+import { track } from "../lib/track";
 import { gsap, getLenis } from "../lib/scroll";
 
 /**
@@ -177,8 +178,9 @@ export function initSheet(reduced: boolean) {
   form.addEventListener("change", (e) => {
     update();
     const name = (e.target as HTMLInputElement).name;
-    if (name === "option") advance(0);
+    if (name === "option") (track("option"), advance(0));
     if (name === "delivery") {
+      track("delivery");
       // a shipping order still needs an address in step 3; a pickup one is ready for a name
       advance(1);
     }
@@ -238,6 +240,7 @@ export function initSheet(reduced: boolean) {
       first.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
       return;
     }
+    track("whatsapp");
     // the link opens WhatsApp; the next order gets a fresh code
     try {
       sessionStorage.removeItem(CODE_KEY);
@@ -268,6 +271,7 @@ export function initSheet(reduced: boolean) {
     }
     order.code = code;
     codeEl.textContent = code;
+    track("sheet_open");
     update();
 
     root.hidden = false;

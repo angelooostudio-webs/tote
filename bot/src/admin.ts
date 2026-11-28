@@ -13,7 +13,7 @@ import { DELIVERY_LABEL } from "../../shared/order.ts";
 import type { Ctx } from "./env.ts";
 import type { InboundMessage } from "./whatsapp.ts";
 import { say } from "./handlers.ts";
-import { allOrders, countsByStatus, getOrder, lastInboundAt, latestProof, logOutbound, ordersInStatus, remainingStock, setStatus, type OrderRow } from "./db.ts";
+import { allOrders, countsByStatus, funnelByDay, getOrder, lastInboundAt, latestProof, logOutbound, ordersInStatus, remainingStock, setStatus, type OrderRow } from "./db.ts";
 import { norm } from "./parse.ts";
 import { contactLabel } from "./messenger.ts";
 
@@ -118,8 +118,22 @@ async function summary(ctx: Ctx) {
       `Totes confirmados: ${confirmed?.q ?? 0}`,
       `Recaudo confirmado: ${formatCOP(confirmed?.t ?? 0)}`,
       `Totes disponibles: ${left} de ${CATALOG.stockTotal}`,
+      "",
+      ...(await funnelLines(ctx)),
     ].join("\n")
   );
+}
+
+/** today's and total visit funnel, for RESUMEN */
+async function funnelLines(ctx: Ctx): Promise<string[]> {
+  const days = await funnelByDay(ctx.env.DB);
+  if (!days.length) return ["Visitas: todavía no hay datos."];
+  const total: Record<string, number> = {};
+  for (const [, r] of days) for (const [k, v] of Object.entries(r)) total[k] = (total[k] ?? 0) + v;
+  const today = days[0][1];
+  const fmt = (r: Record<string, number>) =>
+    `visitas ${r.visit ?? 0} → abrieron pedido ${r.sheet_open ?? 0} → WhatsApp ${r.whatsapp ?? 0} → pedidos ${r.orders ?? 0}`;
+  return [`Hoy (${days[0][0]}): ${fmt(today)}`, `Total: ${fmt(total)}`];
 }
 
 async function pending(ctx: Ctx) {
