@@ -68,7 +68,7 @@ export function confirmationText(o: OrderRow): string {
     return `Listo, tu pedido ${o.code} está confirmado. Te lo enviamos el ${day} por ${CATALOG.shipping.carrier} a ${o.address ?? ""}, ${o.city ?? ""}.${cod} Gracias por su compra.`;
   }
   const place = CATALOG.pickup.place ? ` en ${CATALOG.pickup.place}${CATALOG.pickup.hours ? `, ${CATALOG.pickup.hours}` : ""}` : "";
-  return `Listo, tu pedido ${o.code} está confirmado. Puedes recogerlo el ${day}${place}. Gracias por su compra.`;
+  return `Listo, tu pedido ${o.code} está confirmado. Puedes recogerlo el ${day}${place}. El día antes te escribimos por aquí con toda la información de la recogida. Gracias por su compra.`;
 }
 
 export async function confirmOrder(ctx: Ctx, code: string) {
